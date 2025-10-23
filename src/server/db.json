@@ -1,0 +1,414 @@
+{
+  "employees_position_enum": [
+    {
+      "id": "1",
+      "name_position": "manager"
+    },
+    {
+      "id": "2",
+      "name_position": "dairy_manager"
+    },
+    {
+      "id": "3",
+      "name_position": "veterinarian"
+    },
+    {
+      "id": "4",
+      "name_position": "transportation_manager"
+    },
+    {
+      "id": "5",
+      "name_position": "worker"
+    },
+    {
+      "id": "6",
+      "name_position": "pasture_manager"
+    }
+  ],
+  "name_rol_enum": [
+    {
+      "id": "1",
+      "name_rol": "manager"
+    },
+    {
+      "id": "2",
+      "name_rol": "dairy_manager"
+    },
+    {
+      "id": "3",
+      "name_rol": "veterinarian"
+    }
+  ],
+  "client_type_enum": [
+    {
+      "id": "1",
+      "name_rol": "company"
+    },
+    {
+      "id": "2",
+      "name_rol": "person"
+    }
+  ],
+  "breed_bovine_enum": [
+    {
+      "id": "1",
+      "name": "holstein"
+    },
+    {
+      "id": "2",
+      "name": "jersey"
+    },
+    {
+      "id": "3",
+      "name": "gyrolandas"
+    },
+    {
+      "id": "4",
+      "name": "carora"
+    },
+    {
+      "id": "5",
+      "name": "gyrhol"
+    }
+  ],
+  "cattle_color_enum": [
+    {
+      "id": "1",
+      "name": "black and white"
+    },
+    {
+      "id": "2",
+      "name": "red and white"
+    },
+    {
+      "id": "3",
+      "name": "dark brown and white"
+    }
+  ],
+  "cattle_stage_enum": [
+    {
+      "id": "1",
+      "name": "suckling calf"
+    },
+    {
+      "id": "2",
+      "name": "weaned calf"
+    },
+    {
+      "id": "3",
+      "name": "calves"
+    },
+    {
+      "id": "4",
+      "name": "heifers"
+    },
+    {
+      "id": "5",
+      "name": "cows"
+    }
+  ],
+  "cattle_statu_enum": [
+    {
+      "id": "1",
+      "name": "in service"
+    },
+    {
+      "id": "2",
+      "name": "not in service"
+    }
+  ],
+  "input_category_enum": [
+    {
+      "id": "1",
+      "name": "food"
+    },
+    {
+      "id": "2",
+      "name": "vaccinate"
+    }
+  ],
+  "movement_category_enum": [
+    {
+      "id": "1",
+      "name": "income"
+    },
+    {
+      "id": "2",
+      "name": "exit"
+    }
+  ],
+  "payment_type_enum": [
+    {
+      "id": "1",
+      "name": "employees_payroll"
+    },
+    {
+      "id": "2",
+      "name": "payment_inputs"
+    }
+  ],
+  "treatment_enum": [
+    {
+      "id": "1",
+      "name": "pospartum"
+    },
+    {
+      "id": "2",
+      "name": "check"
+    },
+    {
+      "id": "3",
+      "name": "deworm"
+    }
+  ],
+  "vaccinate_enum": [
+    {
+      "id": "1",
+      "name": "aftosa"
+    },
+    {
+      "id": "2",
+      "name": "clostridium"
+    },
+    {
+      "id": "3",
+      "name": "mixed"
+    }
+  ],
+  "sale_type_enum": [
+    {
+      "id": "1",
+      "name": "cattel"
+    },
+    {
+      "id": "2",
+      "name": "milk"
+    }
+  ],
+  "bill_statu_enum": [
+    {
+      "id": "1",
+      "name": "paid"
+    },
+    {
+      "id": "2",
+      "name": "unpaid"
+    }
+  ],
+  "roles": [
+    {
+      "id": "1",
+      "name": "manager"
+    },
+    {
+      "id": "2",
+      "name": "dairy_manager"
+    },
+    {
+      "id": "3",
+      "name": "veterinarian"
+    }
+  ],
+  "users": [
+    {
+      "id": "c483",
+      "first_name": "luisa",
+      "first_lasname": "moreno",
+      "email": "luisanavalmor@gmail.com",
+      "phone": "",
+      "rol": "dairy_manager"
+    }
+  ],
+  "employees": [
+    {
+      "id": "1",
+      "first_name": "Ana",
+      "middle_name": "Maria",
+      "first_lasname": "Perez",
+      "second_lasname": "Gomez",
+      "document_number": "V12345678",
+      "date_birth": "1990-06-15",
+      "phone": "04145556666",
+      "address": "Calle 10, Táchira",
+      "contract_date": "2023-03-01",
+      "position": "veterinarian",
+      "created_at": "2023-03-01T08:00:00",
+      "update_at": "2023-03-01T08:00:00"
+    },
+    {
+      "id": "2",
+      "first_name": "Luis",
+      "middle_name": "Alberto",
+      "first_lasname": "Martinez",
+      "second_lasname": "Lopez",
+      "document_number": "V87654321",
+      "date_birth": "1985-11-20",
+      "phone": "04145556666",
+      "address": "Calle 20, Mérida",
+      "contract_date": "2023-03-01",
+      "position": "manager",
+      "created_at": "2023-03-01T08:00:00",
+      "update_at": "2023-03-01T08:00:00"
+    },
+    {
+      "id": "4b9a",
+      "first_name": "Ricardo",
+      "middle_name": "David",
+      "first_lasname": "Colmenares",
+      "second_lasname": "Pérez",
+      "document_number": "30781641",
+      "date_birth": "2004-09-09",
+      "phone": "04126996916",
+      "address": "Cordero",
+      "contract_date": "2025-01-01",
+      "position": "worker"
+    }
+  ],
+  "client": [
+    {
+      "id": "1",
+      "client_type": "person",
+      "company_name": null,
+      "first_name": "José",
+      "first_lasname": "Lopez",
+      "document_number": "V99887766",
+      "rif": null,
+      "phone": "04245554444",
+      "address": "Carrera 15, San Cristóbal",
+      "email": "jose.lopez@example.com"
+    },
+    {
+      "id": "2",
+      "client_type": "company",
+      "company_name": "Agropecuaria Los Andes",
+      "first_name": null,
+      "first_lasname": null,
+      "document_number": null,
+      "rif": "J123456789",
+      "phone": "04245554444",
+      "address": "Carrera 15, San Cristóbal",
+      "email": "jose.lopez@example.com"
+    },
+    {
+      "id": "6c6a",
+      "client_type": "company",
+      "company_name": "luisa",
+      "first_name": "",
+      "first_lasname": "",
+      "document_number": "",
+      "rif": "111",
+      "phone": "111",
+      "address": "111",
+      "email": "jjj"
+    }
+  ],
+  "cattle": [
+    {
+      "id": "1",
+      "cattle_number": 1001,
+      "breed_bovine": "holstein",
+      "date_birth": "2022-09-01",
+      "color_cattle": "black and white",
+      "weight": 420.5,
+      "stage": "cows",
+      "statu_cattle": "in service"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "1",
+      "input_category": "vaccinate",
+      "name": "Aftosa Vac",
+      "amount": 50,
+      "expiration_date": "2025-12-31"
+    }
+  ],
+  "input_movements": [
+    {
+      "id": "1",
+      "id_input": "1",
+      "movement_category": "income",
+      "amount": 50,
+      "date": "2025-01-15T10:00:00",
+      "created_at": "2025-01-15T10:00:00",
+      "update_at": "2025-01-15T10:00:00"
+    }
+  ],
+  "payment_inputs": [
+    {
+      "id": "1",
+      "id_input": "1",
+      "amount": 150,
+      "payment_date": "2025-01-10T12:00:00",
+      "created_at": "2025-01-10T12:00:00",
+      "update_at": "2025-01-10T12:00:00"
+    }
+  ],
+  "assistance": [
+    {
+      "id": "1",
+      "id_employee": "1",
+      "entry_time": "07:00:00",
+      "departure_time": "15:00:00",
+      "hour": "08:00:00",
+      "date": "2025-04-20"
+    }
+  ],
+  "employee_payrolls": [
+    {
+      "id": "1",
+      "id_assist": "1",
+      "total_hour": 40,
+      "total_payment": 200,
+      "week_start": "2025-04-14",
+      "week_end": "2025-04-20",
+      "created_at": "2025-04-20T18:00:00"
+    }
+  ],
+  "expenses": [
+    {
+      "id": "1",
+      "id_employee": "1",
+      "payment_date": "2025-04-20",
+      "payment_type": "employees_payroll",
+      "id_payroll": 1,
+      "id_payment_input": null,
+      "created_at": "2025-04-20T18:00:00",
+      "update_at": "2025-04-20T18:00:00"
+    }
+  ],
+  "medical_records": [
+    {
+      "id": "1",
+      "id_cattle": "1",
+      "id_employee": "1",
+      "id_input_movement": "1",
+      "diagnosis": "Control postparto",
+      "treatment": "pospartum",
+      "vaccinate": "aftosa",
+      "date": "2025-04-15T09:00:00"
+    }
+  ],
+  "milk_production": [
+    {
+      "id": "1",
+      "id_cattle": "1",
+      "date": "2025-04-18",
+      "number_liter": 24.5
+    }
+  ],
+  "bills": [
+    {
+      "id": "1",
+      "id_client": "1",
+      "id_user": "1",
+      "id_production": "1",
+      "date": "2025-04-19T10:30:00",
+      "sale_type": "milk",
+      "amount_milk": 24,
+      "id_medical": "1",
+      "bill_statu": "paid",
+      "amount": 150
+    }
+  ]
+}

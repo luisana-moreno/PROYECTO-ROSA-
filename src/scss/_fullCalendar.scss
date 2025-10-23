@@ -1,0 +1,134 @@
+.fc {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  
+    .fc-toolbar-title {
+      font-size: 1.5rem !important;
+      color: #2c3e50;
+      font-weight: 600;
+    }
+  
+    .fc-button-primary {
+      background-color: rgb(45,129,30)  !important;
+      border-color: rgb(45,129,30)  !important;
+  
+      &:hover {
+        background-color: rgb(157,222,114) !important;
+        border-color: #1e7e34 !important;
+      }
+    }
+  
+    .fc-daygrid-day {
+      cursor: pointer;
+      transition: background-color 0.2s;
+  
+      &:hover {
+        background-color: #f8f9fa;
+      }
+    }
+  
+    .fc-day-today {
+      background-color: rgba(40, 167, 69, 0.1) !important;
+    }
+  
+    .fc-event {
+      border-radius: 4px;
+      padding: 2px;
+      cursor: pointer;
+    }
+
+    .fc-daygrid-day-number {
+          color: rgb(45,129,30) ; // Cambia este color al que desees
+          font-weight: bold; // Opcional: negrita
+          font-size: 1rem;   // Opcional: tamaño
+    }
+    
+    .fc-col-header-cell-cushion {
+        color: rgb(11, 55, 4) ; // Cambia este color al que desees
+        font-weight: 600; // Opcional: negrita
+        font-size: 1rem;  // Opcional: tamaño
+      }
+
+    .fc-daygrid-event {
+        background-color: rgb(157,222,114) !important;
+        color: white !important;
+        border-radius: 4px;
+        padding: 2px 4px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    
+        &:hover {
+            background-color: #218838 !important;
+            color: white !important;
+        }
+        }
+
+
+  }
+  
+  // Estilos para los eventos
+  .vaccination-event {
+    padding: 2px 4px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  
+    .event-title {
+      font-weight: bold;
+    }
+  
+    .event-cattle {
+      font-size: 0.7rem;
+    }
+  }
+  
+  // Estilos para el modal
+  .vaccination-modal {
+    .modal-module {
+      background-color: #28a745;
+      color: white;
+    }
+  }
+  
+  .typography-color-title {
+    color: white;
+    font-weight: 600;
+  }
+  
+  .selected-date {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: #2c3e50;
+  }
+  
+  .modal-input {
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+  
+    &:focus {
+      border-color: #28a745;
+      box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+  }
+  
+  .button-cancel {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+  
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+  
+  .button-save {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+  
+    &:hover {
+      opacity: 0.9;
+    }
+  }
