@@ -4,6 +4,8 @@ import { helpFetch } from 'src/helpper/helpFetch'
 const { get, post, put, del } = helpFetch()
 import {
   cilPlus,
+  cilPencil,
+  cilTrash,
 } from '@coreui/icons'
 import {
   CCard,
@@ -24,12 +26,13 @@ import {
   CModalBody,
   CModalFooter,
   CModalTitle,
+  CPagination,
+  CPaginationItem,
 } from '@coreui/react';
 
 const SectionOne = ({ addUser, setAddUser }) =>
   <div>
     <CRow className="g-3 mt-2">
-      <h4 className='text-green mt-1 me-5'>Usuarios Registrados</h4>
       <CCol md={6}>
         <CFormInput
           className="modal-name custom-select"
@@ -148,7 +151,20 @@ const Users = () => {
   const [currentEditSection, setEditCurrentSection] = useState(0)
   const [currentUser, setCurrentUser] = useState(null)
   const [deleteConfirmation, setDeleteConfirmation] = useState('')
-  const [user, setUser] = useState([])
+  const [user, setUser] = useState([
+    { id: 1, TTR_NOMBREU: 'Juan', TTR_APELLID: 'Perez', TTR_CORREOE: 'juan.perez@example.com', TTR_TELEFON: '123456789', TTR_NOMBREC: 'Administrador' },
+    { id: 2, TTR_NOMBREU: 'Maria', TTR_APELLID: 'Gomez', TTR_CORREOE: 'maria.gomez@example.com', TTR_TELEFON: '987654321', TTR_NOMBREC: 'Editor' },
+    { id: 3, TTR_NOMBREU: 'Carlos', TTR_APELLID: 'Ruiz', TTR_CORREOE: 'carlos.ruiz@example.com', TTR_TELEFON: '555111222', TTR_NOMBREC: 'Visualizador' },
+    { id: 4, TTR_NOMBREU: 'Ana', TTR_APELLID: 'Lopez', TTR_CORREOE: 'ana.lopez@example.com', TTR_TELEFON: '111222333', TTR_NOMBREC: 'Administrador' },
+    { id: 5, TTR_NOMBREU: 'Pedro', TTR_APELLID: 'Martinez', TTR_CORREOE: 'pedro.martinez@example.com', TTR_TELEFON: '444555666', TTR_NOMBREC: 'Editor' },
+    { id: 6, TTR_NOMBREU: 'Laura', TTR_APELLID: 'Garcia', TTR_CORREOE: 'laura.garcia@example.com', TTR_TELEFON: '777888999', TTR_NOMBREC: 'Visualizador' },
+    { id: 7, TTR_NOMBREU: 'Miguel', TTR_APELLID: 'Sanchez', TTR_CORREOE: 'miguel.sanchez@example.com', TTR_TELEFON: '123123123', TTR_NOMBREC: 'Administrador' },
+    { id: 8, TTR_NOMBREU: 'Sofia', TTR_APELLID: 'Ramirez', TTR_CORREOE: 'sofia.ramirez@example.com', TTR_TELEFON: '456456456', TTR_NOMBREC: 'Editor' },
+    { id: 9, TTR_NOMBREU: 'David', TTR_APELLID: 'Torres', TTR_CORREOE: 'david.torres@example.com', TTR_TELEFON: '789789789', TTR_NOMBREC: 'Visualizador' },
+    { id: 10, TTR_NOMBREU: 'Elena', TTR_APELLID: 'Flores', TTR_CORREOE: 'elena.flores@example.com', TTR_TELEFON: '321321321', TTR_NOMBREC: 'Administrador' },
+    { id: 11, TTR_APELLID: 'Pablo', TTR_CORREOE: 'pablo.diaz@example.com', TTR_TELEFON: '654654654', TTR_NOMBREC: 'Editor' },
+    { id: 12, TTR_APELLID: 'Lucia', TTR_CORREOE: 'lucia.herrera@example.com', TTR_TELEFON: '987987987', TTR_NOMBREC: 'Visualizador' },
+  ])
   const [addUser, setAddUser] = useState({
     TTR_NOMBREU: '',
     TTR_APELLID: '',
@@ -156,13 +172,25 @@ const Users = () => {
     TTR_TELEFON: '',
     TTR_NOMBREC: ''
   })
+  const [currentPage, setCurrentPage] = useState(1)
+  const [usersPerPage] = useState(10)
+
+  // Get current users
+  const indexOfLastUser = currentPage * usersPerPage
+  const indexOfFirstUser = indexOfLastUser - usersPerPage
+  const currentUsers = user.slice(indexOfFirstUser, indexOfLastUser)
+
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber)
 
   // Cargar usuarios al iniciar
+  /*
   useEffect(() => {
     get('user').then(data => {
       if (data) setUser(data)
     })
   }, [])
+  */
 
   // Agregar usuario
   const handleAddUser = () => {
@@ -226,9 +254,10 @@ const Users = () => {
         </h4>
       </CCardHeader>
       <CCardBody>
-        <CTable hover responsive>
-          <CTableHead>
+        <CTable hover responsive className="shadow-sm">
+          <CTableHead className="table-header-custom">
             <CTableRow>
+              <CTableHeaderCell className='text-green'>N°</CTableHeaderCell>
               <CTableHeaderCell className='text-green'>Nombre</CTableHeaderCell>
               <CTableHeaderCell className='text-green'>Apellido</CTableHeaderCell>
               <CTableHeaderCell className='text-green'>Correo</CTableHeaderCell>
@@ -238,8 +267,9 @@ const Users = () => {
             </CTableRow>
           </CTableHead>
           <CTableBody>
-            {user.map((usr) => (
+            {currentUsers.map((usr, index) => (
               <CTableRow key={usr.id}>
+                <CTableDataCell>{indexOfFirstUser + index + 1}</CTableDataCell>
                 <CTableDataCell>{usr?.TTR_NOMBREU || ''}</CTableDataCell>
                 <CTableDataCell>{usr?.TTR_APELLID || ''}</CTableDataCell>
                 <CTableDataCell>{usr?.TTR_CORREOE || ''}</CTableDataCell>
@@ -271,22 +301,34 @@ const Users = () => {
             ))}
           </CTableBody>
         </CTable>
+        <CPagination align="center" aria-label="Page navigation example">
+          {Array.from({ length: Math.ceil(user.length / usersPerPage) }, (_, i) => (
+            <CPaginationItem
+              key={i + 1}
+              active={i + 1 === currentPage}
+              onClick={() => paginate(i + 1)}
+            >
+              {i + 1}
+            </CPaginationItem>
+          ))}
+        </CPagination>
       </CCardBody>
       <CModal
         alignment="center"
         scrollable
         visible={visible}
         onClose={() => setVisible(false)}
+        className="modern-modal"
       >
-        <CModalHeader className='modal-module'>
-          <CModalTitle className='typography-color'>
-            Registro de Usuarios
+        <CModalHeader className='modern-modal-header'>
+          <CModalTitle className='modern-modal-title'>
+            Registro de Usuario
           </CModalTitle>
         </CModalHeader>
-        <CModalBody style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+        <CModalBody className="modern-modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
           {sections[currentSection]}
         </CModalBody>
-        <CModalFooter>
+        <CModalFooter className="modern-modal-footer">
           <CButton
             className='button-no-hover-green text-white'
             onClick={handleAddUser}>
@@ -299,16 +341,17 @@ const Users = () => {
         scrollable
         visible={editVisible}
         onClose={() => setEditVisible(false)}
+        className="modern-modal"
       >
-        <CModalHeader className='modal-module'>
-          <CModalTitle className='text-white'>
+        <CModalHeader className='modern-modal-header'>
+          <CModalTitle className='modern-modal-title'>
             Editar Usuario
           </CModalTitle>
         </CModalHeader>
-        <CModalBody style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+        <CModalBody className="modern-modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
           {editsections[currentEditSection]}
         </CModalBody>
-        <CModalFooter>
+        <CModalFooter className="modern-modal-footer">
           <CButton
             className='button-no-hover-green text-white'
             onClick={handleEditUser}>
@@ -319,13 +362,14 @@ const Users = () => {
       <CModal
         visible={deleteVisible}
         onClose={() => setDeleteVisible(false)}
+        className="modern-modal"
       >
-        <CModalHeader className='modal-module'>
-          <CModalTitle className='typography-color'>
+        <CModalHeader className='modern-modal-header'>
+          <CModalTitle className='modern-modal-title'>
             Eliminar Usuario
           </CModalTitle>
         </CModalHeader>
-        <CModalBody>
+        <CModalBody className="modern-modal-body">
           <h6>
             Por favor escriba "confirmar" para eliminar el usuario
           </h6>
@@ -335,7 +379,7 @@ const Users = () => {
             value={deleteConfirmation}
             onChange={(e) => setDeleteConfirmation(e.target.value)} />
         </CModalBody>
-        <CModalFooter>
+        <CModalFooter className="modern-modal-footer">
           <CButton
             className='button-no-hover green'
             onClick={() => setDeleteVisible(false)}>
