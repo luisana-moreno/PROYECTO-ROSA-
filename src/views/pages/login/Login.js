@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   CButton,
   CCard,
@@ -12,80 +12,96 @@ import {
   CInputGroup,
   CInputGroupText,
   CRow,
+  CImage,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
-import { CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle } from '@coreui/react'
-
+import logo from 'src/assets/images/finca/fincalogo.png' // Importa el logo
+import { useAuth } from '../../../context/AuthContext' // Importa useAuth
+import { toast } from 'react-toastify' // Importa toast de react-toastify
 
 const Login = () => {
-  const [visible, setVisible] = useState(false)
-  return (
+  const [correo, setCorreo] = useState('')
+  const [contrasena, setContrasena] = useState('')
+  const navigate = useNavigate()
+  const { login } = useAuth() // Usa la función login del AuthContext
+  // const addToast = useToast() // Ya no se usa useToast
 
-    <div
-      className="login-background min-vh-100 d-flex flex-row align-items-center ">
+  useEffect(() => {
+    document.body.classList.add('login-page')
+    // No limpiar el token aquí, AuthContext se encarga de la persistencia
+    return () => {
+      document.body.classList.remove('login-page')
+    }
+  }, [])
+
+  const handleSubmit = async () => {
+    if (!correo || !contrasena) {
+      toast.warning('Por favor, completa todos los campos.')
+      return
+    }
+
+    try {
+      const success = await login({ correo, contrasena }) // Llama a la función login del contexto
+      if (success) {
+        toast.success('Bienvenido al sistema.')
+        navigate('/dashboard')
+      } else {
+        toast.error('Credenciales inválidas o error al iniciar sesión.')
+      }
+    } catch (error) {
+      toast.error(error.message || 'Error al iniciar sesión.')
+    }
+  }
+
+  return (
+    <div className="min-vh-100 d-flex flex-row align-items-center login-vignette">
       <CContainer>
-        <CRow
-          className="justify-content-center">
+        <CRow className="justify-content-center">
           <CCol md={8}>
             <CCardGroup>
-              <CCard
-                className="login-color p-4">
+              <CCard className="p-4">
                 <CCardBody>
                   <CForm>
-                    <h1
-                      className='typography-color-title'>
-                      Acceso
-                    </h1>
-
-                    <p
-                      className="typography-color">
-                      Iniciar sesión en su cuenta
-                    </p>
-
-                    <CInputGroup
-                      className="mb-3">
+                    <h1>Acceso</h1>
+                    <p className="text-medium-emphasis">Iniciar sesión en su cuenta</p>
+                    <CInputGroup className="mb-3">
                       <CInputGroupText>
-                        <CIcon
-                          icon={cilUser} />
-                      </CInputGroupText>
-
-                      <CFormInput
-                        placeholder="email"
-                        autoComplete="email" />
-                    </CInputGroup>
-
-                    <CInputGroup
-                      className="mb-4">
-                      <CInputGroupText>
-                        <CIcon
-                          icon={cilLockLocked} />
+                        <CIcon icon={cilUser} />
                       </CInputGroupText>
                       <CFormInput
-                        type="Contraseña"
-                        placeholder="Contraseña"
-                        autoComplete="current-password"
+                        type="text"
+                        placeholder="Correo electrónico"
+                        autoComplete="email"
+                        value={correo}
+                        onChange={(e) => setCorreo(e.target.value)}
                       />
                     </CInputGroup>
-
+                    <CInputGroup className="mb-4">
+                      <CInputGroupText>
+                        <CIcon icon={cilLockLocked} />
+                      </CInputGroupText>
+                      <CFormInput
+                        type="password"
+                        placeholder="Contraseña"
+                        autoComplete="current-password"
+                        value={contrasena}
+                        onChange={(e) => setContrasena(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            handleSubmit()
+                          }
+                        }}
+                      />
+                    </CInputGroup>
                     <CRow>
                       <CCol xs={6}>
-                        <Link to="/dashboard">
-                          <CButton
-                            className="button-no-hover-green text-white mt-3">
-                              Acceder 
-                          </CButton>
-                        </Link>
+                        <CButton className="px-4 btn-custom-green" onClick={handleSubmit}>
+                          Acceder
+                        </CButton>
                       </CCol>
-
-                      <CCol
-                        xs={6}
-                        className="text-right">
-
-                        <CButton
-                          color="link"
-                          className="px-0"
-                          onClick={() => setVisible(!visible)}>
+                      <CCol xs={6} className="text-right">
+                        <CButton color="link" className="px-0 text-white">
                           ¿Has olvidado tu contraseña?
                         </CButton>
                       </CCol>
@@ -93,26 +109,17 @@ const Login = () => {
                   </CForm>
                 </CCardBody>
               </CCard>
-
-              <CCard
-                className="login-card text-white bg-primary py-5">
-                <CCardBody
-                  className="text-center">
-                  <div>
-                    <h2
-                      className='text-white'>
-                      Registro
-                    </h2>
-                    <p>
-                    Bienvenido al sistema de gestión de Finca La Laguna. Regístrese para comenzar.
-                    </p>
-                    <Link
-                      to="/register">
-                      <CButton
-                        className="button-no-hover-green text-white mt-3">
-                        Regístrate ahora!
-                      </CButton>
-                    </Link>
+              <CCard className="text-white bg-custom-green py-5" style={{ width: '44%' }}>
+                <CCardBody className="text-center d-flex align-items-center justify-content-center">
+                  <div
+                    style={{
+                      backgroundColor: 'white',
+                      borderRadius: '50%',
+                      padding: '20px',
+                      display: 'inline-block',
+                    }}
+                  >
+                    <CImage src={logo} fluid width={150} />
                   </div>
                 </CCardBody>
               </CCard>
@@ -120,48 +127,6 @@ const Login = () => {
           </CCol>
         </CRow>
       </CContainer>
-
-      <CModal
-        visible={visible}
-        onClose={() => setVisible(false)}
-        aria-labelledby="LiveDemoExampleLabel"
-      >
-        <CModalHeader>
-          <CModalTitle
-            className='typography-color-title'>
-            Recupera tu contraseña
-          </CModalTitle>
-        </CModalHeader>
-
-        <CModalBody>
-          <h6>
-          Por favor ingrese su correo electrónico para restablecer su contraseña
-          </h6>
-          <CInputGroup
-            className="button-no-hover-green text-white  mb-3">
-            <CInputGroupText>
-              <CIcon
-                icon={cilUser} />
-            </CInputGroupText>
-            <CFormInput
-              placeholder="email"
-              autoComplete="email" />
-          </CInputGroup>
-        </CModalBody>
-
-        <CModalFooter>
-          <CButton
-            className='button-no-hover-green text-white '
-            onClick={() => setVisible(false)}>
-                Cerrar
-          </CButton>
-
-          <CButton
-            className='button-no-hover-green text-white '>
-              Guardar cambios
-          </CButton>
-        </CModalFooter>
-      </CModal>
     </div>
   )
 }

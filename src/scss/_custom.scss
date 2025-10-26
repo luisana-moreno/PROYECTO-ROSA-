@@ -1,12 +1,6 @@
-$blue-sky: #4cb5f5;
-$granite: #b7b8b6;
-$pine: #34675c;
-$fields: #b3c100;
+// Here you can add other styles
+$primary: rgb(45, 129, 30);
 
 $theme-colors: (
-  'primary': $blue-sky,
-  'info': $blue-sky,
-  'secondary': $granite,
-  'dark': $pine,
-  'success': $fields,
+  'primary': $primary,
 );

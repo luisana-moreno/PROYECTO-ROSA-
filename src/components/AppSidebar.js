@@ -37,10 +37,14 @@ const AppSidebar = () => {
       }}
     >
       <CSidebarHeader className="border-bottom">
-        <CSidebarBrand to="/" className="w-100 d-flex justify-content-center align-items-center" style={{ minHeight: 100 }}>
+        <CSidebarBrand
+          to="/"
+          className="w-100 d-flex justify-content-center align-items-center"
+          style={{ minHeight: 100 }}
+        >
           <CImage
             src={logo}
-            customClassName="sidebar-brand-full"
+            className="sidebar-brand-full"
             height={unfoldable ? 50 : 125}
             width={unfoldable ? 50 : 125}
             style={{
@@ -53,7 +57,6 @@ const AppSidebar = () => {
               display: 'block',
             }}
           />
-          
         </CSidebarBrand>
         <CCloseButton
           className="d-lg-none"
