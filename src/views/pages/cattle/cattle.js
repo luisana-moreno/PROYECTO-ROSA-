@@ -448,9 +448,9 @@ const Cattle = () => {
     return (
         <CCard>
             <CCardHeader>
-                <h4 className=" typography-color-title  mb-0 d-flex justify-content-between align-items-center" >
+                <h4 className="typography-color-title mb-0 d-flex justify-content-between align-items-center">
                     Registro de Ganado
-                    <CButton className='button-no-hover-green text-white' onClick={() => setVisible(!visible)} >
+                    <CButton className='button-no-hover-green text-white' onClick={() => setVisible(!visible)}>
                         <CIcon icon={cilPlus} className="me-2" />
                         Agregar Bovino
                     </CButton>
@@ -459,11 +459,11 @@ const Cattle = () => {
 
             <CCardBody>
                 <CTable hover responsive>
-                    <CTableHead>
+                    <CTableHead className="table-header-custom">
                         <CTableRow>
-                        <CTableHeaderCell className='text-green'> Cattle Number</CTableHeaderCell>
-                            <CTableHeaderCell className='text-green'> Bread Bovine</CTableHeaderCell>
-                            <CTableHeaderCell className='text-green'> Date-Birth</CTableHeaderCell>
+                            <CTableHeaderCell className='text-green'>Cattle Number</CTableHeaderCell>
+                            <CTableHeaderCell className='text-green'>Breed Bovine</CTableHeaderCell>
+                            <CTableHeaderCell className='text-green'>Date-Birth</CTableHeaderCell>
                             <CTableHeaderCell className='text-green'>Color</CTableHeaderCell>
                             <CTableHeaderCell className='text-green'>Weight</CTableHeaderCell>
                             <CTableHeaderCell className='text-green'>Stage</CTableHeaderCell>
@@ -526,21 +526,20 @@ const Cattle = () => {
                 scrollable
                 visible={visible}
                 onClose={() => setVisible(false)}
-
+                className="modern-modal"
             >
-                <CModalHeader
-                    className='modal-module'>
-                    <CModalTitle className='typography-color'>
+                <CModalHeader className='modern-modal-header'>
+                    <CModalTitle className='modern-modal-title'>
                         Datos del Bovino
                     </CModalTitle>
                 </CModalHeader>
 
-                <CModalBody
+                <CModalBody className="modern-modal-body"
                     style={{ maxHeight: '70vh', overflowY: 'auto' }}>
                     {sections[currentSection]}
                 </CModalBody>
 
-                <CModalFooter>
+                <CModalFooter className="modern-modal-footer">
                     <CButton
                         className='button-no-hover-green text-white'
                         onClick={handleAddCattle}>
@@ -554,22 +553,21 @@ const Cattle = () => {
                 scrollable
                 visible={editVisible}
                 onClose={() => setEditVisible(false)}
-
+                className="modern-modal"
             >
-                <CModalHeader
-                    className='modal-module'>
-                    <CModalTitle className='text-white'>
+                <CModalHeader className='modern-modal-header'>
+                    <CModalTitle className='modern-modal-title'>
                         Editar Bovino
                     </CModalTitle>
                 </CModalHeader>
 
 
-                <CModalBody
+                <CModalBody className="modern-modal-body"
                     style={{ maxHeight: '70vh', overflowY: 'auto' }}>
                     {editsections[currentEditSection]}
                 </CModalBody>
 
-                <CModalFooter>
+                <CModalFooter className="modern-modal-footer">
                     <CButton
                         className='button-no-hover-green text-white'
                         onClick={handleEditCattle}>
@@ -581,21 +579,28 @@ const Cattle = () => {
             <CModal
                 visible={deleteVisible}
                 onClose={() => setDeleteVisible(false)}
+                className="modern-modal"
             >
-                <CModalHeader>
-                    <CModalTitle
-                        className='typography-color-title'>
+                <CModalHeader className='modern-modal-header'>
+                    <CModalTitle className='modern-modal-title'>
                         Eliminar Bovino
                     </CModalTitle>
                 </CModalHeader>
-
-
-                <CModalFooter>
+                <CModalBody className="modern-modal-body">
+                    <h6>
+                        Por favor escriba "confirmar" para eliminar el bovino
+                    </h6>
+                    <CFormInput
+                        placeholder="confirmar"
+                        className='modal-border'
+                        value={deleteConfirmation}
+                        onChange={(e) => setDeleteConfirmation(e.target.value)} />
+                </CModalBody>
+                <CModalFooter className="modern-modal-footer">
                     <CButton
                         className='button-no-hover green'
                         onClick={() => setDeleteVisible(false)}>
-                        <h6
-                            className='typography-color'>
+                        <h6 className='typography-color'>
                             Cancelar
                         </h6>
                     </CButton>
@@ -609,45 +614,45 @@ const Cattle = () => {
                     </CButton>
                 </CModalFooter>
             </CModal>
-            <CModal alignment="center" scrollable visible={viewVisible} onClose={() => setViewVisible(false)}>
-  <CModalHeader>
-    <CModalTitle>Detalles del Bovino</CModalTitle>
-  </CModalHeader>
-  <CModalBody>
-    {currentCattle ? (
-      <>
-        <p><strong>Número de Arete:</strong> {currentCattle.cattle_number || currentCattle.number_Bovino}</p>
-        <p><strong>Raza:</strong> {currentCattle.breed_bovine}</p>
-        <p><strong>Fecha de Nacimiento:</strong> {currentCattle.date_birth}</p>
-        <p><strong>Color:</strong> {currentCattle.color_cattle}</p>
-        <p><strong>Peso:</strong> {currentCattle.weight}</p>
-        <p><strong>Etapa:</strong> {currentCattle.stage}</p>
-        <p><strong>Estado:</strong> {currentCattle.statu_cattle}</p>
-      </>
-    ) : (
-      <p>No hay detalles disponibles.</p>
-    )}
-  </CModalBody>
-  <CModalFooter>
-    <CButton className="button-no-hover-green text-white" onClick={() => setViewVisible(false)}>
-      Cerrar
-    </CButton>
-  </CModalFooter>
-</CModal>
+            <CModal alignment="center" scrollable visible={viewVisible} onClose={() => setViewVisible(false)} className="modern-modal">
+                <CModalHeader className='modern-modal-header'>
+                    <CModalTitle className='modern-modal-title'>Detalles del Bovino</CModalTitle>
+                </CModalHeader>
+                <CModalBody className="modern-modal-body">
+                    {currentCattle ? (
+                        <>
+                            <p><strong>Número de Arete:</strong> {currentCattle.cattle_number || currentCattle.number_Bovino}</p>
+                            <p><strong>Raza:</strong> {currentCattle.breed_bovine}</p>
+                            <p><strong>Fecha de Nacimiento:</strong> {currentCattle.date_birth}</p>
+                            <p><strong>Color:</strong> {currentCattle.color_cattle}</p>
+                            <p><strong>Peso:</strong> {currentCattle.weight}</p>
+                            <p><strong>Etapa:</strong> {currentCattle.stage}</p>
+                            <p><strong>Estado:</strong> {currentCattle.statu_cattle}</p>
+                        </>
+                    ) : (
+                        <p>No hay detalles disponibles.</p>
+                    )}
+                </CModalBody>
+                <CModalFooter className="modern-modal-footer">
+                    <CButton className="button-no-hover-green text-white" onClick={() => setViewVisible(false)}>
+                        Cerrar
+                    </CButton>
+                </CModalFooter>
+            </CModal>
             {toast.show && (
-  <div style={{
-    position: 'fixed',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    zIndex: 9999,
-    minWidth: 300,
-  }}>
-    <CAlert color={toast.color} className="text-center m-0">
-      {toast.message}
-    </CAlert>
-  </div>
-)}
+                <div style={{
+                    position: 'fixed',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    zIndex: 9999,
+                    minWidth: 300,
+                }}>
+                    <CAlert color={toast.color} className="text-center m-0">
+                        {toast.message}
+                    </CAlert>
+                </div>
+            )}
         </CCard>
 
     )

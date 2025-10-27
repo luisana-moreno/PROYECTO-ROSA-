@@ -22,7 +22,9 @@ import {
   CModalBody,
   CModalFooter,
   CModalTitle,
-  CAlert
+  CAlert,
+  CPagination,
+  CPaginationItem,
 } from '@coreui/react';
 import {
   cilPlus,
@@ -69,8 +71,8 @@ const SectionOne = ({ addEmployee, setAddEmployee }) => (
       <CCol md={6}>
         <CFormInput
           className="modal-name custom-select"
-          placeholder="primer apellido"
-          aria-label="primer apellido"
+          placeholder="Primer apellido"
+          aria-label="Primer apellido"
           value={addEmployee.Firts_Las_Name}
           onChange={(e) => setAddEmployee({ ...addEmployee, Firts_Las_Name: e.target.value })} />
         <small
@@ -82,8 +84,8 @@ const SectionOne = ({ addEmployee, setAddEmployee }) => (
       <CCol md={6}>
         <CFormInput
           className="modal-name custom-select"
-          placeholder="segundo apellido"
-          aria-label="segundo apellido"
+          placeholder="Segundo apellido"
+          aria-label="Segundo apellido"
           value={addEmployee.Second_Las_Name}
           onChange={(e) => setAddEmployee({ ...addEmployee, Second_Las_Name: e.target.value })} />
         <small
@@ -96,8 +98,8 @@ const SectionOne = ({ addEmployee, setAddEmployee }) => (
       <CCol md={6}>
         <CFormInput
           className="modal-name custom-select"
-          placeholder="numero de documento"
-          aria-label="numero de documento"
+          placeholder="Numero de documento"
+          aria-label="Numero de documento"
           value={addEmployee.Document_Number}
           onChange={(e) => setAddEmployee({ ...addEmployee, Document_Number: e.target.value })} />
         <small
@@ -109,8 +111,8 @@ const SectionOne = ({ addEmployee, setAddEmployee }) => (
         <CFormInput
           className="modal-name custom-select"
           type="date"
-          aria-label="fecha de nacimiento"
-          placeholder="fecha de nacimiento"
+          aria-label="Fecha de nacimiento"
+          placeholder="Fecha de nacimiento"
           value={addEmployee.Date_Birth}
           onChange={(e) => setAddEmployee({ ...addEmployee, Date_Birth: e.target.value })} />
         <small className="text-muted">
@@ -165,8 +167,8 @@ const SectionOne = ({ addEmployee, setAddEmployee }) => (
       <CCol md={6}>
         <CFormSelect
           className="modal-name custom-select"
-          placeholder="cargo"
-          aria-label="cargo"
+          placeholder="Cargo"
+          aria-label="Cargo"
           value={addEmployee.Position}
           onChange={(e) => setAddEmployee({ ...addEmployee, Position: e.target.value })} 
           >
@@ -351,7 +353,10 @@ const Employees = () => {
   const [currentEditSection, setEditCurrentSection] = useState(0)
   const [currentEmployee, setCurrentEmployee] = useState(null)
   const [deleteConfirmation, setDeleteConfirmation] = useState('')
-  const [employee, setEmployee] = useState([])
+  const [employee, setEmployee] = useState([
+    { id: 1, firts_name: 'Juan', Middle_Name: 'Carlos', Firts_Las_Name: 'Perez', Second_Las_Name: 'Gomez', Document_Number: '12345678', Date_Birth: '1990-01-15', Phone: '111-222-3333', Address: 'Calle Falsa 123', Date_contrate: '2020-03-01', Position: 'Administrador', Contact_Person: 'Maria Perez' },
+    { id: 2, firts_name: 'Ana', Middle_Name: 'Maria', Firts_Las_Name: 'Lopez', Second_Las_Name: 'Diaz', Document_Number: '87654321', Date_Birth: '1985-07-20', Phone: '444-555-6666', Address: 'Avenida Siempre Viva 456', Date_contrate: '2019-06-10', Position: 'Veterinario', Contact_Person: 'Pedro Lopez' },
+  ])
   const [addEmployee, setAddEmployee] = useState({
     firts_name: '',
     Middle_Name: '',
@@ -366,11 +371,21 @@ const Employees = () => {
     Contact_Person: '',
   })
   const [toast, setToast] = useState({ show: false, message: '', color: 'success' });
+  const [currentPage, setCurrentPage] = useState(1)
+  const [employeesPerPage] = useState(10)
 
   const showToast = (message, color = 'success') => {
     setToast({ show: true, message, color });
     setTimeout(() => setToast({ show: false, message: '', color: 'success' }), 2500);
   };
+
+  // Get current employees
+  const indexOfLastEmployee = currentPage * employeesPerPage
+  const indexOfFirstEmployee = indexOfLastEmployee - employeesPerPage
+  const currentEmployees = employee.slice(indexOfFirstEmployee, indexOfLastEmployee)
+
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber)
 
   // Cargar empleados al iniciar
   useEffect(() => {
@@ -450,9 +465,10 @@ const Employees = () => {
         </h4>
       </CCardHeader>
       <CCardBody>
-        <CTable hover responsive>
-          <CTableHead>
+        <CTable hover responsive className="shadow-sm">
+          <CTableHead className="table-header-custom">
             <CTableRow>
+              <CTableHeaderCell className='text-green'>N°</CTableHeaderCell>
               <CTableHeaderCell className='text-green'>Nombre Completo</CTableHeaderCell>
               <CTableHeaderCell className='text-green'>Cargo</CTableHeaderCell>
               <CTableHeaderCell className='text-green'>Fecha de Contrato</CTableHeaderCell>
@@ -461,8 +477,9 @@ const Employees = () => {
             </CTableRow>
           </CTableHead>
           <CTableBody>
-            {employee.map((employees) => (
+            {currentEmployees.map((employees, index) => (
               <CTableRow key={employees.Document_Number}>
+                <CTableDataCell>{indexOfFirstEmployee + index + 1}</CTableDataCell>
                 <CTableDataCell>
                   {`${employees?.firts_name || ''} ${employees?.Middle_Name || ''} ${employees?.Firts_Las_Name || ''} ${employees?.Second_Las_Name || ''}`}
                 </CTableDataCell>
@@ -510,27 +527,38 @@ const Employees = () => {
             ))}
           </CTableBody>
         </CTable>
+        <CPagination align="center" aria-label="Page navigation example">
+          {Array.from({ length: Math.ceil(employee.length / employeesPerPage) }, (_, i) => (
+            <CPaginationItem
+              key={i + 1}
+              active={i + 1 === currentPage}
+              onClick={() => paginate(i + 1)}
+            >
+              {i + 1}
+            </CPaginationItem>
+          ))}
+        </CPagination>
       </CCardBody>
       <CModal
         alignment="center"
         scrollable
         visible={visible}
         onClose={() => setVisible(false)}
+        className="modern-modal"
 
       >
-        <CModalHeader
-          className='modal-module'>
-          <CModalTitle className='typography-color'>
+        <CModalHeader className='modern-modal-header'>
+          <CModalTitle className='modern-modal-title'>
             Registro de Empleados
           </CModalTitle>
         </CModalHeader>
 
-        <CModalBody
+        <CModalBody className="modern-modal-body"
           style={{ maxHeight: '70vh', overflowY: 'auto' }}>
           {sections[currentSection]}
         </CModalBody>
 
-        <CModalFooter>
+        <CModalFooter className="modern-modal-footer">
           <CButton
             className='button-no-hover-green text-white'
             onClick={handleAddEmployee}>
@@ -544,22 +572,22 @@ const Employees = () => {
         scrollable
         visible={editVisible}
         onClose={() => setEditVisible(false)}
+        className="modern-modal"
 
       >
-        <CModalHeader
-          className='modal-module'>
-          <CModalTitle className='text-white'>
+        <CModalHeader className='modern-modal-header'>
+          <CModalTitle className='modern-modal-title'>
             Editar Empleado
           </CModalTitle>
         </CModalHeader>
 
 
-        <CModalBody
+        <CModalBody className="modern-modal-body"
           style={{ maxHeight: '70vh', overflowY: 'auto' }}>
           {editsections[currentEditSection]}
         </CModalBody>
 
-        <CModalFooter>
+        <CModalFooter className="modern-modal-footer">
           <CButton
             className='button-no-hover-green text-white'
             onClick={handleEditEmployee}>
@@ -571,15 +599,15 @@ const Employees = () => {
       <CModal
         visible={deleteVisible}
         onClose={() => setDeleteVisible(false)}
+        className="modern-modal"
       >
-        <CModalHeader className='modal-module'>
-          <CModalTitle
-            className='typography-color'>
+        <CModalHeader className='modern-modal-header'>
+          <CModalTitle className='modern-modal-title'>
             Eliminar Empleado
           </CModalTitle>
         </CModalHeader>
 
-        <CModalBody>
+        <CModalBody className="modern-modal-body">
           <h6>
             Por favor escriba "confirmar" para eliminar el empleado
           </h6>
@@ -590,7 +618,7 @@ const Employees = () => {
             onChange={(e) => setDeleteConfirmation(e.target.value)} /> {/* detectar cambios*/}
         </CModalBody>
 
-        <CModalFooter>
+        <CModalFooter className="modern-modal-footer">
           <CButton
             className='button-no-hover green'
             onClick={() => setDeleteVisible(false)}>
@@ -609,11 +637,11 @@ const Employees = () => {
           </CButton>
         </CModalFooter>
       </CModal>
-      <CModal alignment="center" scrollable visible={viewVisible} onClose={() => setViewVisible(false)}>
-        <CModalHeader>
-          <CModalTitle>Detalles del Empleado</CModalTitle>
+      <CModal alignment="center" scrollable visible={viewVisible} onClose={() => setViewVisible(false)} className="modern-modal">
+        <CModalHeader className='modern-modal-header'>
+          <CModalTitle className='modern-modal-title'>Detalles del Empleado</CModalTitle>
         </CModalHeader>
-        <CModalBody>
+        <CModalBody className="modern-modal-body">
           {currentEmployee ? (
             <>
               <p><strong>Nombre Completo:</strong> {`${currentEmployee.firts_name} ${currentEmployee.Middle_Name} ${currentEmployee.Firts_Las_Name} ${currentEmployee.Second_Las_Name}`}</p>
@@ -633,7 +661,7 @@ const Employees = () => {
             <p>No hay detalles disponibles.</p>
           )}
         </CModalBody>
-        <CModalFooter>
+        <CModalFooter className="modern-modal-footer">
           <CButton className="button-no-hover-green text-white" onClick={() => setViewVisible(false)}>
             Cerrar
           </CButton>

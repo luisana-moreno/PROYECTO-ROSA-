@@ -114,18 +114,18 @@ const MilkProduction = () => {
                 </h4>
             </CCardHeader>
             <CCardBody>
-                <CTable hover responsive>
-                    <CTableHead>
+                <CTable hover responsive className="shadow-sm">
+                    <CTableHead className="table-header-custom">
                         <CTableRow>
-                            <CTableHeaderCell>Tipo</CTableHeaderCell>
-                            <CTableHeaderCell>Identificador</CTableHeaderCell>
-                            <CTableHeaderCell>Día</CTableHeaderCell>
-                            <CTableHeaderCell>Litros</CTableHeaderCell>
-                            <CTableHeaderCell>Inicio Mañana</CTableHeaderCell>
-                            <CTableHeaderCell>Fin Mañana</CTableHeaderCell>
-                            <CTableHeaderCell>Inicio Tarde</CTableHeaderCell>
-                            <CTableHeaderCell>Fin Tarde</CTableHeaderCell>
-                            <CTableHeaderCell>Acciones</CTableHeaderCell>
+                            <CTableHeaderCell className='text-green'>Tipo</CTableHeaderCell>
+                            <CTableHeaderCell className='text-green'>Identificador</CTableHeaderCell>
+                            <CTableHeaderCell className='text-green'>Día</CTableHeaderCell>
+                            <CTableHeaderCell className='text-green'>Litros</CTableHeaderCell>
+                            <CTableHeaderCell className='text-green'>Inicio Mañana</CTableHeaderCell>
+                            <CTableHeaderCell className='text-green'>Fin Mañana</CTableHeaderCell>
+                            <CTableHeaderCell className='text-green'>Inicio Tarde</CTableHeaderCell>
+                            <CTableHeaderCell className='text-green'>Fin Tarde</CTableHeaderCell>
+                            <CTableHeaderCell className='text-green'>Acciones</CTableHeaderCell>
                         </CTableRow>
                     </CTableHead>
                     <CTableBody>
@@ -151,7 +151,7 @@ const MilkProduction = () => {
                                                 setEditVisible(true);
                                             }}
                                         >
-                                            Editar
+                                            <h6>Editar</h6>
                                         </CButton>
                                         <CButton
                                             className="me-2 mb-2"
@@ -163,7 +163,7 @@ const MilkProduction = () => {
                                                 setDeleteVisible(true);
                                             }}
                                         >
-                                            Eliminar
+                                            <h6>Eliminar</h6>
                                         </CButton>
                                     </div>
                                 </CTableDataCell>
@@ -174,17 +174,19 @@ const MilkProduction = () => {
             </CCardBody>
 
             {/* Modal para agregar registro */}
-            <CModal alignment="center" scrollable visible={visible} onClose={() => setVisible(false)}>
-                <CModalHeader>
-                    <CModalTitle>Agregar Registro</CModalTitle>
+            <CModal alignment="center" scrollable visible={visible} onClose={() => setVisible(false)} className="modern-modal">
+                <CModalHeader className='modern-modal-header'>
+                    <CModalTitle className='modern-modal-title'>Agregar Registro</CModalTitle>
                 </CModalHeader>
-                <CModalBody>
+                <CModalBody className="modern-modal-body">
                     <CRow className="g-3 mt-2">
                         <CCol md={6}>
                             <CFormSelect
+                                className="modal-name custom-select"
                                 value={newRecord.type}
                                 onChange={(e) => setNewRecord({ ...newRecord, type: e.target.value })}
                             >
+                                <option value="">Seleccione el tipo de registro</option>
                                 <option value="Bovino">Bovino</option>
                                 <option value="Lote">Lote</option>
                             </CFormSelect>
@@ -192,6 +194,7 @@ const MilkProduction = () => {
                         </CCol>
                         <CCol md={6}>
                             <CFormInput
+                                className="modal-name custom-select"
                                 placeholder={newRecord.type === 'Bovino' ? 'Número de Bovino' : 'Número de Lote'}
                                 value={newRecord.identifier}
                                 onChange={(e) => setNewRecord({ ...newRecord, identifier: e.target.value })}
@@ -206,6 +209,7 @@ const MilkProduction = () => {
                     <CRow className="g-3 mt-2">
                         <CCol md={6}>
                             <CFormSelect
+                                className="modal-name custom-select"
                                 value={newRecord.day}
                                 onChange={(e) => setNewRecord({ ...newRecord, day: e.target.value })}
                             >
@@ -220,6 +224,7 @@ const MilkProduction = () => {
                         </CCol>
                         <CCol md={6}>
                             <CFormInput
+                                className="modal-name custom-select"
                                 type="number"
                                 placeholder="Cantidad de Litros"
                                 value={newRecord.liters}
@@ -231,6 +236,7 @@ const MilkProduction = () => {
                     <CRow className="g-3 mt-2">
                         <CCol md={6}>
                             <CFormInput
+                                className="modal-name custom-select"
                                 type="time"
                                 placeholder="Inicio Mañana"
                                 value={newRecord.morningStart}
@@ -240,6 +246,7 @@ const MilkProduction = () => {
                         </CCol>
                         <CCol md={6}>
                             <CFormInput
+                                className="modal-name custom-select"
                                 type="time"
                                 placeholder="Fin Mañana"
                                 value={newRecord.morningEnd}
@@ -251,6 +258,7 @@ const MilkProduction = () => {
                     <CRow className="g-3 mt-2">
                         <CCol md={6}>
                             <CFormInput
+                                className="modal-name custom-select"
                                 type="time"
                                 placeholder="Inicio Tarde"
                                 value={newRecord.afternoonStart}
@@ -260,6 +268,7 @@ const MilkProduction = () => {
                         </CCol>
                         <CCol md={6}>
                             <CFormInput
+                                className="modal-name custom-select"
                                 type="time"
                                 placeholder="Fin Tarde"
                                 value={newRecord.afternoonEnd}
@@ -269,7 +278,7 @@ const MilkProduction = () => {
                         </CCol>
                     </CRow>
                 </CModalBody>
-                <CModalFooter>
+                <CModalFooter className="modern-modal-footer">
                     <CButton className="button-no-hover-green text-white" onClick={handleAddRecord}>
                         Agregar
                     </CButton>
@@ -277,17 +286,19 @@ const MilkProduction = () => {
             </CModal>
 
             {/* Modal para editar registro */}
-            <CModal alignment="center" scrollable visible={editVisible} onClose={() => setEditVisible(false)}>
-                <CModalHeader>
-                    <CModalTitle>Editar Registro</CModalTitle>
+            <CModal alignment="center" scrollable visible={editVisible} onClose={() => setEditVisible(false)} className="modern-modal">
+                <CModalHeader className='modern-modal-header'>
+                    <CModalTitle className='modern-modal-title'>Editar Registro</CModalTitle>
                 </CModalHeader>
-                <CModalBody>
+                <CModalBody className="modern-modal-body">
                     <CRow className="g-3 mt-2">
                         <CCol md={6}>
                             <CFormSelect
+                                className="modal-name custom-select"
                                 value={currentRecord?.type || ''}
                                 onChange={(e) => setCurrentRecord({ ...currentRecord, type: e.target.value })}
                             >
+                                <option value="">Seleccione el tipo de registro</option>
                                 <option value="Bovino">Bovino</option>
                                 <option value="Lote">Lote</option>
                             </CFormSelect>
@@ -295,6 +306,7 @@ const MilkProduction = () => {
                         </CCol>
                         <CCol md={6}>
                             <CFormInput
+                                className="modal-name custom-select"
                                 placeholder={currentRecord?.type === 'Bovino' ? 'Número de Bovino' : 'Número de Lote'}
                                 value={currentRecord?.identifier || ''}
                                 onChange={(e) => setCurrentRecord({ ...currentRecord, identifier: e.target.value })}
@@ -309,6 +321,7 @@ const MilkProduction = () => {
                     <CRow className="g-3 mt-2">
                         <CCol md={6}>
                             <CFormSelect
+                                className="modal-name custom-select"
                                 value={currentRecord?.day || ''}
                                 onChange={(e) => setCurrentRecord({ ...currentRecord, day: e.target.value })}
                             >
@@ -323,6 +336,7 @@ const MilkProduction = () => {
                         </CCol>
                         <CCol md={6}>
                             <CFormInput
+                                className="modal-name custom-select"
                                 type="number"
                                 placeholder="Cantidad de Litros"
                                 value={currentRecord?.liters || ''}
@@ -334,6 +348,7 @@ const MilkProduction = () => {
                     <CRow className="g-3 mt-2">
                         <CCol md={6}>
                             <CFormInput
+                                className="modal-name custom-select"
                                 type="time"
                                 placeholder="Inicio Mañana"
                                 value={currentRecord?.morningStart || ''}
@@ -343,6 +358,7 @@ const MilkProduction = () => {
                         </CCol>
                         <CCol md={6}>
                             <CFormInput
+                                className="modal-name custom-select"
                                 type="time"
                                 placeholder="Fin Mañana"
                                 value={currentRecord?.morningEnd || ''}
@@ -354,6 +370,7 @@ const MilkProduction = () => {
                     <CRow className="g-3 mt-2">
                         <CCol md={6}>
                             <CFormInput
+                                className="modal-name custom-select"
                                 type="time"
                                 placeholder="Inicio Tarde"
                                 value={currentRecord?.afternoonStart || ''}
@@ -363,6 +380,7 @@ const MilkProduction = () => {
                         </CCol>
                         <CCol md={6}>
                             <CFormInput
+                                className="modal-name custom-select"
                                 type="time"
                                 placeholder="Fin Tarde"
                                 value={currentRecord?.afternoonEnd || ''}
@@ -372,7 +390,7 @@ const MilkProduction = () => {
                         </CCol>
                     </CRow>
                 </CModalBody>
-                <CModalFooter>
+                <CModalFooter className="modern-modal-footer">
                     <CButton className="button-no-hover-green text-white" onClick={handleEditRecord}>
                         Guardar cambios
                     </CButton>
@@ -380,11 +398,11 @@ const MilkProduction = () => {
             </CModal>
 
             {/* Modal para eliminar registro */}
-            <CModal visible={deleteVisible} onClose={() => setDeleteVisible(false)}>
-                <CModalHeader>
-                    <CModalTitle>Eliminar Registro</CModalTitle>
+            <CModal visible={deleteVisible} onClose={() => setDeleteVisible(false)} className="modern-modal">
+                <CModalHeader className='modern-modal-header'>
+                    <CModalTitle className='modern-modal-title'>Eliminar Registro</CModalTitle>
                 </CModalHeader>
-                <CModalBody>
+                <CModalBody className="modern-modal-body">
                     <h6>Por favor escriba "confirmar" para eliminar el registro</h6>
                     <CFormInput
                         placeholder="confirmar"
@@ -393,12 +411,12 @@ const MilkProduction = () => {
                         onChange={(e) => setDeleteConfirmation(e.target.value)}
                     />
                 </CModalBody>
-                <CModalFooter>
+                <CModalFooter className="modern-modal-footer">
                     <CButton className="button-no-hover green" onClick={() => setDeleteVisible(false)}>
-                        Cancelar
+                        <h6 className='typography-color'>Cancelar</h6>
                     </CButton>
                     <CButton className="button-no-hover-green" onClick={handleDeleteRecord}>
-                        Eliminar
+                        <h6 className='typography-color'>Eliminar</h6>
                     </CButton>
                 </CModalFooter>
             </CModal>

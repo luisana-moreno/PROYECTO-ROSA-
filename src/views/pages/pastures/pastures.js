@@ -217,14 +217,14 @@ const Pastures = () => {
         </h4>
       </CCardHeader>
       <CCardBody>
-        <CTable hover responsive>
-          <CTableHead>
+        <CTable hover responsive className="shadow-sm">
+          <CTableHead className="table-header-custom">
             <CTableRow>
-              <CTableHeaderCell>Nombre</CTableHeaderCell>
-              <CTableHeaderCell>Estado</CTableHeaderCell>
-              <CTableHeaderCell>Lote</CTableHeaderCell>
-              <CTableHeaderCell>Responsable</CTableHeaderCell>
-              <CTableHeaderCell>Acciones</CTableHeaderCell>
+              <CTableHeaderCell className='text-green'>Nombre</CTableHeaderCell>
+              <CTableHeaderCell className='text-green'>Estado</CTableHeaderCell>
+              <CTableHeaderCell className='text-green'>Lote</CTableHeaderCell>
+              <CTableHeaderCell className='text-green'>Responsable</CTableHeaderCell>
+              <CTableHeaderCell className='text-green'>Acciones</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>
@@ -246,7 +246,7 @@ const Pastures = () => {
                         setEditVisible(true);
                       }}
                     >
-                      Editar
+                      <h6 className='typography-color'>Editar</h6>
                     </CButton>
                     <CButton
                       className="me-2 mb-2"
@@ -258,7 +258,7 @@ const Pastures = () => {
                         setDeleteVisible(true);
                       }}
                     >
-                      Eliminar
+                      <h6 className='typography-color'>Eliminar</h6>
                     </CButton>
                   </div>
                 </CTableDataCell>
@@ -267,33 +267,33 @@ const Pastures = () => {
           </CTableBody>
         </CTable>
       </CCardBody>
-      <CModal alignment="center" scrollable visible={visible} onClose={() => setVisible(false)}>
-        <CModalHeader>
-          <CModalTitle>Registrar Potrero</CModalTitle>
+      <CModal alignment="center" scrollable visible={visible} onClose={() => setVisible(false)} className="modern-modal">
+        <CModalHeader className='modern-modal-header'>
+          <CModalTitle className='modern-modal-title'>Registrar Potrero</CModalTitle>
         </CModalHeader>
-        <CModalBody style={{ maxHeight: '70vh', overflowY: 'auto' }}>{sections[currentSection]}</CModalBody>
-        <CModalFooter>
+        <CModalBody className="modern-modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>{sections[currentSection]}</CModalBody>
+        <CModalFooter className="modern-modal-footer">
           <CButton className="button-no-hover-green text-white" onClick={handleAddPasture}>
             Agregar
           </CButton>
         </CModalFooter>
       </CModal>
-      <CModal alignment="center" scrollable visible={editVisible} onClose={() => setEditVisible(false)}>
-        <CModalHeader>
-          <CModalTitle>Editar Potrero</CModalTitle>
+      <CModal alignment="center" scrollable visible={editVisible} onClose={() => setEditVisible(false)} className="modern-modal">
+        <CModalHeader className='modern-modal-header'>
+          <CModalTitle className='modern-modal-title'>Editar Potrero</CModalTitle>
         </CModalHeader>
-        <CModalBody style={{ maxHeight: '70vh', overflowY: 'auto' }}>{editsections[currentEditSection]}</CModalBody>
-        <CModalFooter>
+        <CModalBody className="modern-modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>{editsections[currentEditSection]}</CModalBody>
+        <CModalFooter className="modern-modal-footer">
           <CButton className="button-no-hover-green text-white" onClick={handleEditPasture}>
             Guardar cambios
           </CButton>
         </CModalFooter>
       </CModal>
-      <CModal visible={deleteVisible} onClose={() => setDeleteVisible(false)}>
-        <CModalHeader>
-          <CModalTitle>Eliminar Potrero</CModalTitle>
+      <CModal visible={deleteVisible} onClose={() => setDeleteVisible(false)} className="modern-modal">
+        <CModalHeader className='modern-modal-header'>
+          <CModalTitle className='modern-modal-title'>Eliminar Potrero</CModalTitle>
         </CModalHeader>
-        <CModalBody>
+        <CModalBody className="modern-modal-body">
           <h6>Por favor escriba "confirmar" para eliminar el potrero</h6>
           <CFormInput
             placeholder="confirmar"
@@ -302,12 +302,12 @@ const Pastures = () => {
             onChange={(e) => setDeleteConfirmation(e.target.value)}
           />
         </CModalBody>
-        <CModalFooter>
+        <CModalFooter className="modern-modal-footer">
           <CButton className="button-no-hover green" onClick={() => setDeleteVisible(false)}>
-            Cancelar
+            <h6 className='typography-color'>Cancelar</h6>
           </CButton>
           <CButton className="button-no-hover-green" onClick={handleDeletePasture}>
-            Eliminar
+            <h6 className='typography-color'>Eliminar</h6>
           </CButton>
         </CModalFooter>
       </CModal>
@@ -330,4 +330,3 @@ const Pastures = () => {
 };
 
 export default Pastures;
-

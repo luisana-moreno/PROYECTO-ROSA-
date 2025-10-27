@@ -185,7 +185,7 @@ const Inventory = () => {
     return (
         <CCard>
             <CCardHeader>
-                <h4 className="typography-color-title  mb-0 d-flex justify-content-between align-items-center">
+                <h4 className="typography-color-title mb-0 d-flex justify-content-between align-items-center">
                     Registro de Inventario
                     <CButton className="button-no-hover-green text-white" onClick={() => setVisibleInventory(true)}>
                         <CIcon icon={cilPlus} className="me-2" />
@@ -241,15 +241,15 @@ const Inventory = () => {
                 </CNav>
                 <CTabContent>
                     <CTabPane visible={activeKey === 1}>
-                        <CTable hover responsive>
-                            <CTableHead>
+                        <CTable hover responsive className="shadow-sm">
+                            <CTableHead className="table-header-custom">
                                 <CTableRow>
-                                    <CTableHeaderCell>Tipo</CTableHeaderCell>
-                                    <CTableHeaderCell>Categoría</CTableHeaderCell>
-                                    <CTableHeaderCell>Nombre</CTableHeaderCell>
-                                    <CTableHeaderCell>Cantidad</CTableHeaderCell>
-                                    <CTableHeaderCell>Fecha de Ingreso</CTableHeaderCell>
-                                    <CTableHeaderCell>Acciones</CTableHeaderCell>
+                                    <CTableHeaderCell className='text-green'>Tipo</CTableHeaderCell>
+                                    <CTableHeaderCell className='text-green'>Categoría</CTableHeaderCell>
+                                    <CTableHeaderCell className='text-green'>Nombre</CTableHeaderCell>
+                                    <CTableHeaderCell className='text-green'>Cantidad</CTableHeaderCell>
+                                    <CTableHeaderCell className='text-green'>Fecha de Ingreso</CTableHeaderCell>
+                                    <CTableHeaderCell className='text-green'>Acciones</CTableHeaderCell>
                                 </CTableRow>
                             </CTableHead>
                             <CTableBody>
@@ -274,7 +274,7 @@ const Inventory = () => {
                                                             setEditVisibleInventory(true);
                                                         }}
                                                     >
-                                                        Editar
+                                                        <h6>Editar</h6>
                                                     </CButton>
                                                     <CButton
                                                         className="me-2 mb-2"
@@ -286,7 +286,7 @@ const Inventory = () => {
                                                             setDeleteVisibleInventory(true);
                                                         }}
                                                     >
-                                                        Eliminar
+                                                        <h6>Eliminar</h6>
                                                     </CButton>
                                                 </div>
                                             </CTableDataCell>
@@ -296,15 +296,15 @@ const Inventory = () => {
                         </CTable>
                     </CTabPane>
                     <CTabPane visible={activeKey === 2}>
-                        <CTable hover responsive>
-                            <CTableHead>
+                        <CTable hover responsive className="shadow-sm">
+                            <CTableHead className="table-header-custom">
                                 <CTableRow>
-                                    <CTableHeaderCell>Tipo</CTableHeaderCell>
-                                    <CTableHeaderCell>Categoría</CTableHeaderCell>
-                                    <CTableHeaderCell>Nombre</CTableHeaderCell>
-                                    <CTableHeaderCell>Cantidad</CTableHeaderCell>
-                                    <CTableHeaderCell>Fecha de Egreso</CTableHeaderCell>
-                                    <CTableHeaderCell>Acciones</CTableHeaderCell>
+                                    <CTableHeaderCell className='text-green'>Tipo</CTableHeaderCell>
+                                    <CTableHeaderCell className='text-green'>Categoría</CTableHeaderCell>
+                                    <CTableHeaderCell className='text-green'>Nombre</CTableHeaderCell>
+                                    <CTableHeaderCell className='text-green'>Cantidad</CTableHeaderCell>
+                                    <CTableHeaderCell className='text-green'>Fecha de Egreso</CTableHeaderCell>
+                                    <CTableHeaderCell className='text-green'>Acciones</CTableHeaderCell>
                                 </CTableRow>
                             </CTableHead>
                             <CTableBody>
@@ -329,7 +329,7 @@ const Inventory = () => {
                                                             setEditVisibleInventory(true);
                                                         }}
                                                     >
-                                                        Editar
+                                                        <h6 className='typography-color'>Editar</h6>
                                                     </CButton>
                                                     <CButton
                                                         className="me-2 mb-2"
@@ -341,7 +341,7 @@ const Inventory = () => {
                                                             setDeleteVisibleInventory(true);
                                                         }}
                                                     >
-                                                        Eliminar
+                                                        <h6 className='typography-color'>Eliminar</h6>
                                                     </CButton>
                                                 </div>
                                             </CTableDataCell>
@@ -352,37 +352,37 @@ const Inventory = () => {
                     </CTabPane>
                 </CTabContent>
             </CCardBody>
-            <CModal alignment="center" scrollable visible={visibleInventory} onClose={() => setVisibleInventory(false)}>
-                <CModalHeader className='modal-module'>
-                    <CModalTitle className='typography-color'>Registro de Inventario</CModalTitle>
+            <CModal alignment="center" scrollable visible={visibleInventory} onClose={() => setVisibleInventory(false)} className="modern-modal">
+                <CModalHeader className='modern-modal-header'>
+                    <CModalTitle className='modern-modal-title'>Registro de Inventario</CModalTitle>
                 </CModalHeader>
-                <CModalBody style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                <CModalBody className="modern-modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
                     <SectionInventory addInventory={addInventory} setAddInventory={setAddInventory} insumoType={insumoType} setInsumoType={setInsumoType} />
                 </CModalBody>
-                <CModalFooter>
+                <CModalFooter className="modern-modal-footer">
                     <CButton className="button-no-hover-green text-white" onClick={handleAddInventory}>
                         Guardar
                     </CButton>
                 </CModalFooter>
             </CModal>
-            <CModal alignment="center" scrollable visible={editVisibleInventory} onClose={() => setEditVisibleInventory(false)}>
-                <CModalHeader className='modal-module'>
-                    <CModalTitle className='typography-color'>Editar Registro</CModalTitle>
+            <CModal alignment="center" scrollable visible={editVisibleInventory} onClose={() => setEditVisibleInventory(false)} className="modern-modal">
+                <CModalHeader className='modern-modal-header'>
+                    <CModalTitle className='modern-modal-title'>Editar Registro</CModalTitle>
                 </CModalHeader>
-                <CModalBody style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                <CModalBody className="modern-modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
                     <SectionInventory addInventory={currentInventory} setAddInventory={setCurrentInventory} insumoType={currentInventory?.type || ''} setInsumoType={(type) => setCurrentInventory({ ...currentInventory, type })} />
                 </CModalBody>
-                <CModalFooter>
+                <CModalFooter className="modern-modal-footer">
                     <CButton className="button-no-hover-green text-white" onClick={handleEditInventory}>
                         Guardar cambios
                     </CButton>
                 </CModalFooter>
             </CModal>
-            <CModal visible={deleteVisibleInventory} onClose={() => setDeleteVisibleInventory(false)}>
-                <CModalHeader className='modal-module'>
-                    <CModalTitle className='typography-color'>Eliminar Registro</CModalTitle>
+            <CModal visible={deleteVisibleInventory} onClose={() => setDeleteVisibleInventory(false)} className="modern-modal">
+                <CModalHeader className='modern-modal-header'>
+                    <CModalTitle className='modern-modal-title'>Eliminar Registro</CModalTitle>
                 </CModalHeader>
-                <CModalBody>
+                <CModalBody className="modern-modal-body">
                     <h6>Por favor escriba "confirmar" para eliminar el registro</h6>
                     <CFormInput
                         placeholder="confirmar"
@@ -391,12 +391,12 @@ const Inventory = () => {
                         onChange={(e) => setDeleteConfirmationInventory(e.target.value)}
                     />
                 </CModalBody>
-                <CModalFooter>
+                <CModalFooter className="modern-modal-footer">
                     <CButton className="button-no-hover green" onClick={() => setDeleteVisibleInventory(false)}>
-                        Cancelar
+                        <h6 className='typography-color'>Cancelar</h6>
                     </CButton>
                     <CButton className="button-no-hover-green" onClick={handleDeleteInventory}>
-                        Eliminar
+                        <h6 className='typography-color'>Eliminar</h6>
                     </CButton>
                 </CModalFooter>
             </CModal>

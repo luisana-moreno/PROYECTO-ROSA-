@@ -30,6 +30,8 @@ import {
   CNavLink,
   CTabContent,
   CTabPane,
+  CPagination,
+  CPaginationItem,
 } from '@coreui/react'
 
 const SectionOne = ({ addClient, setAddClient }) => (
@@ -257,7 +259,12 @@ const Client = () => {
   const [activeKey, setActiveKey] = useState(1)
   const [currentClient, setCurrentClient] = useState(null)
   const [deleteConfirmationClient, setDeleteConfirmationClient] = useState('')
-  const [client, setClient] = useState([])
+  const [client, setClient] = useState([
+    { id: 1, client_type: 'Person', company_name: '', firts_name: 'Juan', Firts_Las_Name: 'Perez', Document_Number: '12345678', Rif: '', Phone: '111-222-3333', Address: 'Calle Falsa 123', email: 'juan.perez@example.com' },
+    { id: 2, client_type: 'Company', company_name: 'Tech Solutions', firts_name: '', Firts_Las_Name: '', Document_Number: '', Rif: 'J-12345678-9', Phone: '444-555-6666', Address: 'Av. Principal 456', email: 'contact@techsolutions.com' },
+    { id: 3, client_type: 'Person', company_name: '', firts_name: 'Maria', Firts_Las_Name: 'Gomez', Document_Number: '87654321', Rif: '', Phone: '777-888-9999', Address: 'Urb. El Bosque', email: 'maria.gomez@example.com' },
+    { id: 4, client_type: 'Company', company_name: 'Global Corp', firts_name: '', Firts_Las_Name: '', Document_Number: '', Rif: 'G-98765432-1', Phone: '333-222-1111', Address: 'Centro Comercial', email: 'info@globalcorp.com' },
+  ])
   const [addClient, setAddClient] = useState({
     client_type: '',
     company_name: '',
@@ -269,11 +276,36 @@ const Client = () => {
     Address: '',
     email: '',
   })
+  const [currentPagePerson, setCurrentPagePerson] = useState(1)
+  const [currentPageCompany, setCurrentPageCompany] = useState(1)
+  const [clientsPerPage] = useState(10)
+
+  // Get current clients for pagination
+  const indexOfLastClientPerson = currentPagePerson * clientsPerPage
+  const indexOfFirstClientPerson = indexOfLastClientPerson - clientsPerPage
+  const currentClientsPerson = client.filter(c => c.client_type === 'Person').slice(indexOfFirstClientPerson, indexOfLastClientPerson)
+
+  const indexOfLastClientCompany = currentPageCompany * clientsPerPage
+  const indexOfFirstClientCompany = indexOfLastClientCompany - clientsPerPage
+  const currentClientsCompany = client.filter(c => c.client_type === 'Company').slice(indexOfFirstClientCompany, indexOfLastClientCompany)
+
+  // Change page
+  const paginatePerson = (pageNumber) => setCurrentPagePerson(pageNumber)
+  const paginateCompany = (pageNumber) => setCurrentPageCompany(pageNumber)
 
   // Cargar clientes al iniciar
   useEffect(() => {
     get('client').then(data => {
-      if (data) setClient(data)
+      if (data && data.length > 0) {
+        setClient(data)
+      } else {
+        setClient([
+          { id: 1, client_type: 'Person', company_name: '', firts_name: 'Juan', Firts_Las_Name: 'Perez', Document_Number: '12345678', Rif: '', Phone: '111-222-3333', Address: 'Calle Falsa 123', email: 'juan.perez@example.com' },
+          { id: 2, client_type: 'Company', company_name: 'Tech Solutions', firts_name: '', Firts_Las_Name: '', Document_Number: '', Rif: 'J-12345678-9', Phone: '444-555-6666', Address: 'Av. Principal 456', email: 'contact@techsolutions.com' },
+          { id: 3, client_type: 'Person', company_name: '', firts_name: 'Maria', Firts_Las_Name: 'Gomez', Document_Number: '87654321', Rif: '', Phone: '777-888-9999', Address: 'Urb. El Bosque', email: 'maria.gomez@example.com' },
+          { id: 4, client_type: 'Company', company_name: 'Global Corp', firts_name: '', Firts_Las_Name: '', Document_Number: '', Rif: 'G-98765432-1', Phone: '333-222-1111', Address: 'Centro Comercial', email: 'info@globalcorp.com' },
+        ]);
+      }
     })
   }, [])
 
@@ -369,9 +401,10 @@ const Client = () => {
         </CNav>
         <CTabContent>
           <CTabPane role="tabpanel" aria-labelledby="home-tab" visible={activeKey === 1}>
-            <CTable hover responsive>
-              <CTableHead>
+            <CTable hover responsive className="shadow-sm">
+              <CTableHead className="table-header-custom">
                 <CTableRow>
+                  <CTableHeaderCell className="text-green">N°</CTableHeaderCell>
                   <CTableHeaderCell className="text-green">Nombre</CTableHeaderCell>
                   <CTableHeaderCell className="text-green">Apellido</CTableHeaderCell>
                   <CTableHeaderCell className="text-green">Numero de Documento</CTableHeaderCell>
@@ -382,10 +415,10 @@ const Client = () => {
                 </CTableRow>
               </CTableHead>
               <CTableBody>
-                {client
-                  .filter((client) => client.client_type === 'Person')
-                  .map((client) => (
+                {currentClientsPerson
+                  .map((client, index) => (
                     <CTableRow key={client.id}>
+                      <CTableDataCell>{indexOfFirstClientPerson + index + 1}</CTableDataCell>
                       <CTableDataCell>{client?.firts_name || ''} </CTableDataCell>
                       <CTableDataCell>{client?.Firts_Las_Name || ''} </CTableDataCell>
                       <CTableDataCell>{client?.Document_Number || ''} </CTableDataCell>
@@ -424,11 +457,23 @@ const Client = () => {
                   ))}
               </CTableBody>
             </CTable>
+            <CPagination align="center" aria-label="Page navigation example">
+              {Array.from({ length: Math.ceil(client.filter(c => c.client_type === 'Person').length / clientsPerPage) }, (_, i) => (
+                <CPaginationItem
+                  key={i + 1}
+                  active={i + 1 === currentPagePerson}
+                  onClick={() => paginatePerson(i + 1)}
+                >
+                  {i + 1}
+                </CPaginationItem>
+              ))}
+            </CPagination>
           </CTabPane>
           <CTabPane role="tabpanel" aria-labelledby="profile-tab" visible={activeKey === 2}>
-            <CTable hover responsive>
-              <CTableHead>
+            <CTable hover responsive className="shadow-sm">
+              <CTableHead className="table-header-custom">
                 <CTableRow>
+                  <CTableHeaderCell className="text-green">N°</CTableHeaderCell>
                   <CTableHeaderCell className="text-green">Nombre de la Empresa</CTableHeaderCell>
                   <CTableHeaderCell className="text-green">Rif</CTableHeaderCell>
                   <CTableHeaderCell className="text-green">Telefono</CTableHeaderCell>
@@ -438,10 +483,10 @@ const Client = () => {
                 </CTableRow>
               </CTableHead>
               <CTableBody>
-                {client
-                  .filter((client) => client.client_type === 'Company')
-                  .map((client) => (
+                {currentClientsCompany
+                  .map((client, index) => (
                     <CTableRow key={client.id}>
+                      <CTableDataCell>{indexOfFirstClientCompany + index + 1}</CTableDataCell>
                       <CTableDataCell>{client?.company_name || ''}</CTableDataCell>
                       <CTableDataCell>{client?.Rif || ''}</CTableDataCell>
                       <CTableDataCell>{client?.Phone || ''}</CTableDataCell>
@@ -479,6 +524,17 @@ const Client = () => {
                   ))}
               </CTableBody>
             </CTable>
+            <CPagination align="center" aria-label="Page navigation example">
+              {Array.from({ length: Math.ceil(client.filter(c => c.client_type === 'Company').length / clientsPerPage) }, (_, i) => (
+                <CPaginationItem
+                  key={i + 1}
+                  active={i + 1 === currentPageCompany}
+                  onClick={() => paginateCompany(i + 1)}
+                >
+                  {i + 1}
+                </CPaginationItem>
+              ))}
+            </CPagination>
           </CTabPane>
         </CTabContent>
       </CCardBody>
@@ -487,14 +543,15 @@ const Client = () => {
         scrollable
         visible={visibleClient}
         onClose={() => setVisibleClient(false)}
+        className="modern-modal"
       >
-        <CModalHeader className="modal-module">
-          <CModalTitle className="typography-color">Datos del cliente</CModalTitle>
+        <CModalHeader className="modern-modal-header">
+          <CModalTitle className="modern-modal-title">Datos del cliente</CModalTitle>
         </CModalHeader>
-        <CModalBody style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+        <CModalBody className="modern-modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
           {sections[currentSectionClient]}
         </CModalBody>
-        <CModalFooter>
+        <CModalFooter className="modern-modal-footer">
           <CButton className="button-no-hover-green text-white" onClick={handleAddClient}>
             Agregar
           </CButton>
@@ -505,24 +562,25 @@ const Client = () => {
         scrollable
         visible={editVisibleClient}
         onClose={() => setEditVisibleClient(false)}
+        className="modern-modal"
       >
-        <CModalHeader className="modal-module">
-          <CModalTitle className="text-white">Editar Datos del cliente</CModalTitle>
+        <CModalHeader className="modern-modal-header">
+          <CModalTitle className="modern-modal-title">Editar Datos del cliente</CModalTitle>
         </CModalHeader>
-        <CModalBody style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+        <CModalBody className="modern-modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
           {editsections[currentEditSectionClient]}
         </CModalBody>
-        <CModalFooter>
+        <CModalFooter className="modern-modal-footer">
           <CButton className="button-no-hover-green text-white" onClick={handleEditClient}>
             Guardar cambios
           </CButton>
         </CModalFooter>
       </CModal>
-      <CModal visible={deleteVisibleClient} onClose={() => setDeleteVisibleClient(false)}>
-        <CModalHeader className="modal-module">
-          <CModalTitle className="typography-color">Eliminar cliente</CModalTitle>
+      <CModal visible={deleteVisibleClient} onClose={() => setDeleteVisibleClient(false)} className="modern-modal">
+        <CModalHeader className="modern-modal-header">
+          <CModalTitle className="modern-modal-title">Eliminar cliente</CModalTitle>
         </CModalHeader>
-        <CModalBody>
+        <CModalBody className="modern-modal-body">
           <h6>Por favor escriba "confirmar" para eliminar el cliente</h6>
           <CFormInput
             placeholder="confirmar"
@@ -531,7 +589,7 @@ const Client = () => {
             onChange={(e) => setDeleteConfirmationClient(e.target.value)}
           />
         </CModalBody>
-        <CModalFooter>
+        <CModalFooter className="modern-modal-footer">
           <CButton className="button-no-hover-green" onClick={() => setDeleteVisibleClient(false)}>
             <h6 className="typography-color">Salir</h6>
           </CButton>

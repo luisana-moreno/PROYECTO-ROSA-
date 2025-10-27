@@ -40,7 +40,7 @@ const ActivePastures = () => {
   return (
     <CCard>
       <CCardHeader>
-        <h4 className="typography-color-title mb-0">Actividad de Potreros</h4>
+        <h4 className="typography-color-title mb-0 d-flex justify-content-between align-items-center">Actividad de Potreros</h4>
       </CCardHeader>
       <CCardBody>
         <CRow>

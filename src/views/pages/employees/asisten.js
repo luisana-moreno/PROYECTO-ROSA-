@@ -21,6 +21,8 @@ import {
     CModalBody,
     CModalFooter,
     CModalTitle,
+    CPagination,
+    CPaginationItem,
 } from '@coreui/react';
 
 const Asisten = () => {
@@ -33,6 +35,8 @@ const Asisten = () => {
         position: '',
     });
     const days = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes'];
+    const [currentPage, setCurrentPage] = useState(1)
+    const [employeesPerPage] = useState(10)
 
     // Cargar empleados reales desde la API
     useEffect(() => {
@@ -78,6 +82,14 @@ const Asisten = () => {
         return matchesName && matchesPosition;
     });
 
+    // Get current employees for pagination
+    const indexOfLastEmployee = currentPage * employeesPerPage
+    const indexOfFirstEmployee = indexOfLastEmployee - employeesPerPage
+    const currentEmployees = filteredEmployees.slice(indexOfFirstEmployee, indexOfLastEmployee)
+
+    // Change page
+    const paginate = (pageNumber) => setCurrentPage(pageNumber)
+
     return (
         <CCard>
             <CCardHeader>
@@ -108,21 +120,23 @@ const Asisten = () => {
                 </CRow>
             </CCardHeader>
             <CCardBody>
-                <CTable hover responsive>
-                    <CTableHead>
+                <CTable hover responsive className="shadow-sm">
+                    <CTableHead className="table-header-custom">
                         <CTableRow>
-                            <CTableHeaderCell>Empleado</CTableHeaderCell>
-                            <CTableHeaderCell>Cargo</CTableHeaderCell>
+                            <CTableHeaderCell className='text-green'>N°</CTableHeaderCell>
+                            <CTableHeaderCell className='text-green'>Empleado</CTableHeaderCell>
+                            <CTableHeaderCell className='text-green'>Cargo</CTableHeaderCell>
                             {days.map((day) => (
-                                <CTableHeaderCell key={day}>{day}</CTableHeaderCell>
+                                <CTableHeaderCell className='text-green' key={day}>{day}</CTableHeaderCell>
                             ))}
-                            <CTableHeaderCell>Horas Trabajadas</CTableHeaderCell>
-                            <CTableHeaderCell>Acciones</CTableHeaderCell>
+                            <CTableHeaderCell className='text-green'>Horas Trabajadas</CTableHeaderCell>
+                            <CTableHeaderCell className='text-green'>Acciones</CTableHeaderCell>
                         </CTableRow>
                     </CTableHead>
                     <CTableBody>
-                        {filteredEmployees.map((emp) => (
+                        {currentEmployees.map((emp, index) => (
                             <CTableRow key={emp.id}>
+                                <CTableDataCell>{indexOfFirstEmployee + index + 1}</CTableDataCell>
                                 <CTableDataCell>
                                     {emp.name}
                                 </CTableDataCell>
@@ -171,14 +185,25 @@ const Asisten = () => {
                         ))}
                     </CTableBody>
                 </CTable>
+                <CPagination align="center" aria-label="Page navigation example">
+                    {Array.from({ length: Math.ceil(filteredEmployees.length / employeesPerPage) }, (_, i) => (
+                        <CPaginationItem
+                            key={i + 1}
+                            active={i + 1 === currentPage}
+                            onClick={() => paginate(i + 1)}
+                        >
+                            {i + 1}
+                        </CPaginationItem>
+                    ))}
+                </CPagination>
             </CCardBody>
 
             {/* Modal para detalle del empleado */}
-            <CModal alignment="center" scrollable visible={detailVisible} onClose={() => setDetailVisible(false)}>
-                <CModalHeader>
-                    <CModalTitle>Detalle del Empleado</CModalTitle>
+            <CModal alignment="center" scrollable visible={detailVisible} onClose={() => setDetailVisible(false)} className="modern-modal">
+                <CModalHeader className='modern-modal-header'>
+                    <CModalTitle className='modern-modal-title'>Detalle del Empleado</CModalTitle>
                 </CModalHeader>
-                <CModalBody>
+                <CModalBody className="modern-modal-body">
                     {selectedEmployee ? (
                         <>
                             <h5>Nombre: {selectedEmployee.name}</h5>
@@ -197,7 +222,7 @@ const Asisten = () => {
                         <p>No hay detalles disponibles.</p>
                     )}
                 </CModalBody>
-                <CModalFooter>
+                <CModalFooter className="modern-modal-footer">
                     <CButton className="button-no-hover-green text-white" onClick={() => setDetailVisible(false)}>
                         Cerrar
                     </CButton>

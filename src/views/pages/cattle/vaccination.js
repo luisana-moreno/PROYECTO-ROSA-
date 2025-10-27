@@ -193,13 +193,14 @@ const Vaccination = () => {
         alignment="center"
         visible={visibleVaccination}
         onClose={closeModal}
+        className="modern-modal"
       >
-        <CModalHeader className="modal-module">
-          <CModalTitle className="typograhy-color-title">
+        <CModalHeader className="modern-modal-header">
+          <CModalTitle className="modern-modal-title">
             {editMode ? 'Editar Evento de Vacunación' : 'Registrar Vacunación'}
           </CModalTitle>
         </CModalHeader>
-        <CModalBody>
+        <CModalBody className="modern-modal-body">
           <p>
             <strong>Fecha:</strong> {selectedDate}
           </p>
@@ -253,7 +254,7 @@ const Vaccination = () => {
               onChange={(e) => setFormData({ ...formData, vaccine: e.target.value })}
             />
             <CFormInput
-              className="modal-name mb-3"
+              className="modal-name mb-3 custom-select"
               type="date"
               placeholder="Fecha de Vacunación"
               name="date_vaccination"
@@ -262,29 +263,29 @@ const Vaccination = () => {
             />
           </CForm>
         </CModalBody>
-        <CModalFooter>
+        <CModalFooter className="modern-modal-footer">
           {editMode && (
             <CButton className="button-no-hover-green" color="danger" onClick={handleDelete}>
-              Eliminar
+              <h6 className='typography-color'>Eliminar</h6>
             </CButton>
           )}
           <CButton className="button-no-hover-green" onClick={closeModal}>
-            Cerrar
+            <h6 className='typography-color'>Cerrar</h6>
           </CButton>
-          <CButton className="button-no-hover-green" onClick={handleSubmit}>
+          <CButton className="button-no-hover-green text-white" onClick={handleSubmit}>
             {editMode ? 'Guardar Cambios' : 'Registrar'}
           </CButton>
         </CModalFooter>
       </CModal>
 
       {/* Modal de confirmación para eliminar */}
-      <CModal alignment="center" visible={confirmDelete} onClose={cancelDelete}>
-        <CModalHeader className="modal-module">
-          <CModalTitle className="typography-color">
+      <CModal alignment="center" visible={confirmDelete} onClose={cancelDelete} className="modern-modal">
+        <CModalHeader className="modern-modal-header">
+          <CModalTitle className="modern-modal-title">
             Confirmar Eliminación
           </CModalTitle>
         </CModalHeader>
-        <CModalBody>
+        <CModalBody className="modern-modal-body">
           <h6>
             Por favor escriba "confirmar" para eliminar el evento de vacunación:
           </h6>
@@ -295,12 +296,12 @@ const Vaccination = () => {
             onChange={(e) => setDeleteConfirmation(e.target.value)}
           />
         </CModalBody>
-        <CModalFooter>
+        <CModalFooter className="modern-modal-footer">
           <CButton className="button-no-hover green" onClick={cancelDelete}>
-            Cancelar
+            <h6 className='typography-color'>Cancelar</h6>
           </CButton>
           <CButton className="button-no-hover-green" color="danger" onClick={handleConfirmDelete}>
-            Eliminar
+            <h6 className='typography-color'>Eliminar</h6>
           </CButton>
         </CModalFooter>
       </CModal>
