@@ -16,14 +16,23 @@ export const helpFetch = () => {
       const response = await fetch(`${baseUrl}${endpoint}`, options)
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        const errorText = await response.text() // Intenta leer el cuerpo como texto
+        let errorMessage = `HTTP error! status: ${response.status}`
+        try {
+          const errorJson = JSON.parse(errorText)
+          errorMessage = errorJson.message || errorMessage
+        } catch (parseError) {
+          // Si no es JSON, usa el texto directamente
+          errorMessage = errorText || errorMessage
+        }
+        throw new Error(errorMessage)
       }
 
       const data = await response.json()
       return data
     } catch (error) {
-      console.error(error)
-      return null
+      console.error('Error en customFetch:', error)
+      throw error // Re-lanza el error para que los servicios lo manejen
     }
   }
 

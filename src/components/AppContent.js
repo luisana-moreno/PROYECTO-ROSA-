@@ -4,6 +4,7 @@ import { CContainer, CSpinner } from '@coreui/react'
 
 // routes config
 import routes from '../routes'
+import ProtectedRoute from './ProtectedRoute' // Importa ProtectedRoute
 
 const AppContent = () => {
   return (
@@ -18,12 +19,21 @@ const AppContent = () => {
                   path={route.path}
                   exact={route.exact}
                   name={route.name}
-                  element={<route.element />}
+                  element={
+                    route.roles ? (
+                      <ProtectedRoute roles={route.roles}>
+                        <route.element />
+                      </ProtectedRoute>
+                    ) : (
+                      <route.element />
+                    )
+                  }
                 />
               )
             )
           })}
-          <Route path="/" element={<Navigate to="dashboard" replace />} />
+          {/* La redirección a /dashboard se maneja en App.js */}
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Suspense>
     </CContainer>
