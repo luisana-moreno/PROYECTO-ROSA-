@@ -1,6 +1,26 @@
+@use 'sass:color';
+
 // Here you can add other styles
 $primary: rgb(45, 129, 30);
 
 $theme-colors: (
   'primary': $primary,
 );
+
+.pagination-item-green {
+  .page-link {
+    color: $primary;
+    &:hover {
+      color: color.adjust($primary, $lightness: -10%);
+    }
+  }
+  &.active .page-link {
+    background-color: $primary;
+    border-color: $primary;
+    color: white;
+    &:hover {
+      background-color: color.adjust($primary, $lightness: -10%);
+      border-color: color.adjust($primary, $lightness: -10%);
+    }
+  }
+}
