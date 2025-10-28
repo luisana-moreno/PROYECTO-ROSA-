@@ -1,0 +1,244 @@
+@use '@coreui/coreui/scss/coreui' as * with (
+  $enable-deprecation-messages: false
+);
+@use '@coreui/chartjs/scss/coreui-chartjs';
+@use 'vendors/simplebar';
+@use '_custom';
+@use 'src/scss/_fullCalendar.scss';
+
+body.login-page {
+  background-image: url('src/assets/images/finca/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  z-index: 1;
+}
+
+body.login-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5); /* Capa negra con 50% de opacidad */
+  z-index: -1;
+}
+
+.login-vignette {
+  position: relative;
+  min-height: 100vh;
+}
+
+.login-vignette::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.5); /* Viñeta negra transparente */
+  pointer-events: none;
+}
+
+.wrapper {
+  width: 100%;
+  padding-inline: var(--cui-sidebar-occupy-start, 0) var(--cui-sidebar-occupy-end, 0);
+  will-change: auto;
+  @include transition(padding 0.15s);
+}
+
+.header > .container-fluid,
+.sidebar-header {
+  min-height: calc(4rem + 1px); // stylelint-disable-line function-disallowed-list
+}
+.sidebar-header {
+  background-color: rgb(157, 222, 114);
+}
+
+.sidebar-brand-full {
+  margin-left: 3px;
+}
+//color de fondo titulo
+.sidebar {
+  background-color: rgb(157, 222, 114);
+}
+
+.sidebar-header {
+  .nav-underline-border {
+    --cui-nav-underline-border-link-padding-x: 1rem;
+    --cui-nav-underline-border-gap: 0;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    min-height: calc(4rem + 1px); // stylelint-disable-line function-disallowed-list
+  }
+}
+.sidebar-footer {
+  background-color: rgb(157, 222, 114);
+}
+.sidebar-toggler {
+  margin-inline-start: auto;
+}
+.sidebar-toggler {
+  background-color: rgb(157, 222, 114);
+} //color de la flechita
+
+.sidebar-narrow,
+.sidebar-narrow-unfoldable:not(:hover) {
+  .sidebar-toggler {
+    margin-inline-end: auto;
+  }
+}
+
+.header > .container-fluid + .container-fluid {
+  min-height: 3rem;
+  background-color: rgb(157, 222, 114);
+}
+.header {
+  background-color: rgb(255, 255, 255);
+}
+
+.footer {
+  min-height: calc(3rem + 1px); // stylelint-disable-line function-disallowed-list
+}
+.footer {
+  background-color: rgb(255, 253, 248);
+}
+
+.body {
+  background-color: rgb(255, 255, 255);
+}
+
+// agregado
+
+.nav-link:hover {
+  background-color: rgb(45, 129, 30) !important;
+}
+
+.login-color {
+  background-color: rgb(157, 222, 114);
+}
+// Estilo para el hover en las pestañas
+.c-nav-link:hover {
+  background-color: rgb(45, 129, 30) !important; // Cambia el color de fondo al pasar el mouse
+  color: #ffffff !important; // Cambia el color del texto al pasar el mouse
+}
+
+.login-background {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.768), rgba(255, 255, 255, 0.932)),
+    url('src/assets/images/finca/login2.jpeg') no-repeat center center; /* Imagen centrada */
+  background-size: cover; /* Escala la imagen para cubrir todo el contenedor */
+  height: 100vh; /* Asegura que el fondo ocupe toda la altura de la ventana */
+  width: 100%; /* Asegura que el fondo ocupe todo el ancho */
+  display: flex; /* Para centrar contenido dentro del fondo */
+  justify-content: center; /* Centra horizontalmente el contenido */
+  align-items: center; /* Centra verticalmente el contenido */
+  overflow: hidden; /* Evita que el contenido desborde */
+}
+
+.login-card {
+  background: url('src/assets/images/finca/toro.jpg');
+  background-size: 'cover';
+  background-position: 'center';
+}
+
+.register-color {
+  background-color: rgb(157, 222, 114);
+}
+.button-color {
+  background-color: rgb(157, 222, 114);
+
+  .button-color-b {
+    background-color: rgb(252, 251, 251);
+  }
+}
+.button-color-login {
+  background-color: rgb(45, 129, 30);
+}
+
+.modal-border {
+  border: 3px solid rgb(187, 187, 187);
+}
+
+.modal-name {
+  border: 3px solid rgb(187, 187, 187);
+}
+
+.modal-module {
+  background-color: rgb(157, 222, 114);
+}
+
+.text-green {
+  color: rgb(11, 69, 35) !important;
+}
+
+.typography-color-title {
+  color: rgb(11, 69, 35) !important;
+}
+
+.typography-color-green-claro {
+  color: rgb(157, 222, 114);
+}
+
+.typography-color {
+  color: white !important;
+}
+.simplebar-content .active {
+  background-color: rgb(45, 129, 30) !important;
+}
+
+// Boton Verde
+.button-no-hover-green {
+  background-color: rgb(45, 129, 30) !important; /* Color de fondo inicial */
+  color: white !important; /* Color del texto */
+  border: 1px solid rgb(45, 129, 3) !important; /* Borde del botón */
+  transition: none !important; /* Desactiva las transiciones */
+}
+
+.button-no-hover-registro {
+  background-color: rgb(45, 129, 30) !important; /* Color de fondo inicial */
+  color: white !important; /* Color del texto */
+  border: 1px solid rgb(116, 185, 82) !important; /* Borde del botón */
+  transition: none !important; /* Desactiva las transiciones */
+}
+
+.button-no-hover-green:hover,
+.button-no-hover-green:focus,
+.button-no-hover-green:active {
+  background-color: rgb(157, 222, 114) !important; /* Mantén el color de fondo */
+  color: white !important; /* Mantén el color del texto */
+  border-color: rgb(157, 222, 114) !important; /* Mantén el color del borde */
+  box-shadow: none !important; /* Elimina el efecto de sombra */
+}
+
+// Botones cambia color
+
+.button-no-hover-green-claro:hover,
+.button-no-hover-green-claro:focus,
+.button-no-hover-green-claro:active {
+  background-color: rgb(45, 129, 30) !important; /* Mantén el color de fondo */
+  color: white !important; /* Mantén el color del texto */
+  border-color: rgb(157, 222, 114) !important; /* Mantén el color del borde */
+  box-shadow: none !important; /* Elimina el efecto de sombra */
+}
+
+/* Cambiar el color del borde y el fondo cuando el select está enfocado */
+.custom-select:focus {
+  border-color: rgb(157, 222, 114) !important; /* Cambia el color del borde */
+  box-shadow: 0 0 0 0.2rem rgb(255, 255, 255) !important; /* Sombra verde */
+}
+
+.bg-custom-green {
+  background-color: rgb(45, 129, 30) !important;
+}
+
+.btn-custom-green {
+  background-color: rgb(45, 129, 30) !important;
+  color: white !important;
+  border-color: rgb(45, 129, 30) !important;
+}

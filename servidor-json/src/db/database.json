@@ -1,0 +1,270 @@
+{
+  "user": [
+    {
+      "id": "1",
+      "TTR_NOMBREU": "Luis",
+      "TTR_APELLID": "Moreno",
+      "TTR_CORREOE": "luismoreno@gmail.com",
+      "TTR_TELEFON": "0414-5684589",
+      "TTR_NOMBREC": "Gerente de potreros"
+    },
+    {
+      "id": "2",
+      "TTR_NOMBREU": "Maria",
+      "TTR_APELLID": "Gomez",
+      "TTR_CORREOE": "mariagomez@gmail.com",
+      "TTR_TELEFON": "0424-1234567",
+      "TTR_NOMBREC": "Administrador"
+    },
+    {
+      "id": "3",
+      "TTR_NOMBREU": "Pedro",
+      "TTR_APELLID": "Perez",
+      "TTR_CORREOE": "pedroperez@gmail.com",
+      "TTR_TELEFON": "0412-9876543",
+      "TTR_NOMBREC": "Veterinario"
+    }
+  ],
+  "cattle": [
+    {
+      "id": "1",
+      "cattle_number": "1001",
+      "breed_bovine": "Holstein",
+      "date_birth": "2022-09-01",
+      "color_cattle": "Blanca con negro",
+      "weight": "420.5",
+      "stage": "Vaca madura",
+      "statu_cattle": "No en servicio"
+    },
+    {
+      "id": "2",
+      "cattle_number": "100",
+      "breed_bovine": "Gyrolanda",
+      "date_birth": "2022-09-01",
+      "color_cattle": "Marron",
+      "weight": "42.5",
+      "stage": "Mauta",
+      "statu_cattle": "En servicio"
+    },
+    {
+      "id": "3",
+      "cattle_number": "2002",
+      "breed_bovine": "Jersey",
+      "date_birth": "2023-01-15",
+      "color_cattle": "Blanco con Marron",
+      "weight": "380.0",
+      "stage": "Novilla",
+      "statu_cattle": "En gestacion"
+    }
+  ],
+  "employee": [
+    {
+      "id": "1",
+      "firts_name": "Carlos",
+      "Middle_Name": "Eduardo",
+      "Firts_Las_Name": "Moreno",
+      "Second_Las_Name": "Andrade",
+      "Document_Number": "2145647987",
+      "Date_Birth": "1984-09-09",
+      "Phone": "0424-1234567",
+      "Address": "La Grita",
+      "Date_contrate": "2023-09-09",
+      "Position": "Manager",
+      "Contact_Person": "Pedro Perez"
+    },
+    {
+      "id": "2",
+      "firts_name": "Luis",
+      "Middle_Name": "Eduardo",
+      "Firts_Las_Name": "Moreno",
+      "Second_Las_Name": "Andrade",
+      "Document_Number": "13762893",
+      "Date_Birth": "1970-10-11",
+      "Phone": "04247580322",
+      "Address": "Pueblo Hondo",
+      "Date_contrate": "2005-06-05",
+      "Position": "Veterinary",
+      "Contact_Person": "Maria Gomez"
+    },
+    {
+      "id": "3",
+      "firts_name": "Ana",
+      "Middle_Name": "Lucia",
+      "Firts_Las_Name": "Torres",
+      "Second_Las_Name": "García",
+      "Document_Number": "30567890",
+      "Date_Birth": "1990-03-12",
+      "Phone": "0416-5551234",
+      "Address": "San Cristóbal",
+      "Date_contrate": "2021-01-10",
+      "Position": "Administrador",
+      "Contact_Person": "Luis Moreno"
+    }
+  ],
+  "client": [
+    {
+      "id": "1",
+      "client_type": "Person",
+      "company_name": "",
+      "firts_name": "Juan",
+      "Firts_Las_Name": "Alarcon",
+      "Document_Number": "30625345",
+      "Phone": "0424-1234567",
+      "Address": "calle 123",
+      "email": "juanalarcon@gmail.com"
+    },
+    {
+      "id": "2",
+      "client_type": "Company",
+      "company_name": "Caño Amarillo C.A",
+      "firts_name": "",
+      "Firts_Las_Name": "",
+      "Document_Number": "",
+      "Rif": "J-12345678-9",
+      "Phone": "0276-1234567",
+      "Address": "colon caño amarillo",
+      "email": "queseracañoamarillo@gmail.com"
+    },
+    {
+      "id": "3",
+      "client_type": "Person",
+      "company_name": "",
+      "firts_name": "Laura",
+      "Firts_Las_Name": "Gutiérrez",
+      "Document_Number": "30987654",
+      "Phone": "0412-6543210",
+      "Address": "Av. Principal",
+      "email": "lauragutierrez@gmail.com"
+    },
+    {
+      "id": "4",
+      "client_type": "Company",
+      "company_name": "Lácteos Los Andes",
+      "firts_name": "",
+      "Firts_Las_Name": "",
+      "Document_Number": "",
+      "Rif": "J-87654321-0",
+      "Phone": "0276-7654321",
+      "Address": "Zona Industrial",
+      "email": "contacto@losandes.com"
+    }
+  ],
+  "inventory": [
+    {
+      "id": "1",
+      "type": "Ingreso",
+      "category": "Alimentos",
+      "name": "Maíz",
+      "quantity": 100,
+      "entryDate": "2025-06-01",
+      "exitDate": ""
+    },
+    {
+      "id": "2",
+      "type": "Egreso",
+      "category": "Vacunas",
+      "name": "Vacuna A",
+      "quantity": 50,
+      "entryDate": "",
+      "exitDate": "2025-05-10"
+    },
+    {
+      "id": "3",
+      "type": "Ingreso",
+      "category": "Herramientas",
+      "name": "Pala",
+      "quantity": 10,
+      "entryDate": "2025-06-10",
+      "exitDate": ""
+    },
+    {
+      "id": "4",
+      "type": "Egreso",
+      "category": "Alimentos",
+      "name": "Sorgo",
+      "quantity": 30,
+      "entryDate": "",
+      "exitDate": "2025-06-15"
+    }
+  ],
+  "pastures": [
+    {
+      "id": "1",
+      "name": "Potrero 1",
+      "state": "Disponible",
+      "lot": "Lote A",
+      "responsible": "Juan Pérez"
+    },
+    {
+      "id": "2",
+      "name": "Potrero 2",
+      "state": "En mantenimiento",
+      "lot": "Lote B",
+      "responsible": "María Gómez"
+    }
+  ],
+  "milkProduction": [
+    {
+      "id": "1",
+      "type": "Bovino",
+      "identifier": "1001",
+      "day": "lunes",
+      "liters": 50,
+      "morningStart": "06:00",
+      "morningEnd": "08:00",
+      "afternoonStart": "14:00",
+      "afternoonEnd": "16:00"
+    },
+    {
+      "id": "2",
+      "type": "Lote",
+      "identifier": "Lote A",
+      "day": "martes",
+      "liters": 120,
+      "morningStart": "06:00",
+      "morningEnd": "08:00",
+      "afternoonStart": "14:00",
+      "afternoonEnd": "16:00"
+    },
+    {
+      "id": "3",
+      "type": "Bovino",
+      "identifier": "2002",
+      "day": "miércoles",
+      "liters": 60,
+      "morningStart": "06:30",
+      "morningEnd": "08:30",
+      "afternoonStart": "14:30",
+      "afternoonEnd": "16:30"
+    }
+  ],
+  "vaccination": [
+    {
+      "id": "1",
+      "cattleId": "1001",
+      "employeeId": "2145647987",
+      "diagnosis": "Fiebre",
+      "treatment": "Antibiótico",
+      "vaccine": "Vacuna A",
+      "date_vaccination": "2025-07-01"
+    },
+    {
+      "id": "2",
+      "cattleId": "100",
+      "employeeId": "13762893",
+      "diagnosis": "Parásitos",
+      "treatment": "Desparasitante",
+      "vaccine": "Vacuna B",
+      "date_vaccination": "2025-07-05"
+    },
+    {
+      "id": "3",
+      "cattleId": "2002",
+      "employeeId": "30567890",
+      "diagnosis": "Gripe",
+      "treatment": "Vitaminas",
+      "vaccine": "Vacuna C",
+      "date_vaccination": "2025-07-10"
+    }
+  ]
+}
