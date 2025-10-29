@@ -86,13 +86,17 @@ const UsersTable = ({ users, setCurrentUser, setEditVisible, setDeleteVisible })
           ))}
         </CTableBody>
       </CTable>
-      <CPagination align="center" aria-label="Page navigation example">
+      <CPagination
+        align="center"
+        aria-label="Page navigation example"
+        className="custom-pagination"
+      >
         {Array.from({ length: Math.ceil(users.length / usersPerPage) }, (_, i) => (
           <CPaginationItem
             key={i + 1}
             active={i + 1 === currentPage}
             onClick={() => paginate(i + 1)}
-            className="pagination-item-green"
+            color="success"
           >
             {i + 1}
           </CPaginationItem>

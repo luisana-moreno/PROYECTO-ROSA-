@@ -2,6 +2,8 @@ import React from 'react'
 import CIcon from '@coreui/icons-react'
 import { cilPlus } from '@coreui/icons'
 import { CCard, CButton, CCardBody, CCardHeader } from '@coreui/react'
+// import { ToastContainer, toast } from 'react-toastify' // Eliminado
+// import 'react-toastify/dist/ReactToastify.css' // Eliminado
 
 import { useUsers } from './hooks/useUsers'
 import UsersTable from './components/UsersTable'
@@ -52,7 +54,6 @@ const Users = () => {
           setDeleteVisible={setDeleteVisible}
         />
       </CCardBody>
-
       <AddUserModal
         visible={visible}
         setVisible={setVisible}
@@ -61,7 +62,6 @@ const Users = () => {
         handleAddUser={handleAddUser}
         roles={roles} // Pasar roles al modal de agregar
       />
-
       <EditUserModal
         editVisible={editVisible}
         setEditVisible={setEditVisible}
@@ -70,7 +70,6 @@ const Users = () => {
         handleEditUser={handleEditUser}
         roles={roles} // Pasar roles al modal de editar
       />
-
       <DeleteUserModal
         deleteVisible={deleteVisible}
         setDeleteVisible={setDeleteVisible}
@@ -78,6 +77,7 @@ const Users = () => {
         setDeleteConfirmation={setDeleteConfirmation}
         handleDeleteUser={handleDeleteUser}
       />
+      {/* <ToastContainer /> Eliminado porque ya está en App.js */}
     </CCard>
   )
 }

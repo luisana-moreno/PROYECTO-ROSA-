@@ -7,20 +7,26 @@ $theme-colors: (
   'primary': $primary,
 );
 
-.pagination-item-green {
-  .page-link {
-    color: $primary;
-    &:hover {
-      color: color.adjust($primary, $lightness: -10%);
+// Estilos para la paginación
+.custom-pagination {
+  .page-item {
+    .page-link {
+      color: $primary !important; // Color del texto para elementos inactivos
+      &:hover {
+        color: color.adjust(
+          $primary,
+          $lightness: -10%
+        ) !important; // Color del texto al pasar el ratón
+      }
     }
-  }
-  &.active .page-link {
-    background-color: $primary;
-    border-color: $primary;
-    color: white;
-    &:hover {
-      background-color: color.adjust($primary, $lightness: -10%);
-      border-color: color.adjust($primary, $lightness: -10%);
+    &.active .page-link {
+      background-color: $primary !important;
+      border-color: $primary !important;
+      color: white !important; // Color del texto para el elemento activo
+      &:hover {
+        background-color: color.adjust($primary, $lightness: -10%) !important;
+        border-color: color.adjust($primary, $lightness: -10%) !important;
+      }
     }
   }
 }
