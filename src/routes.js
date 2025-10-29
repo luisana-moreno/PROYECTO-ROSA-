@@ -22,79 +22,79 @@ const routes = [
     exact: true,
     name: 'Dashboard',
     element: Dashboard,
-    roles: ['administrador', 'veterinario', 'empleado', 'cliente'],
+    roles: [1, 2, 3, 4], // IDs de roles: 1=administrador, 2=veterinario, 3=empleado, 4=cliente
   },
   {
     path: '/employee',
     exact: true,
     name: 'Employee',
     element: Employee,
-    roles: ['administrador', 'empleado'],
+    roles: [1, 3], // IDs de roles: 1=administrador, 3=empleado
   },
-  { path: '/users', exact: true, name: 'Users', element: Users, roles: ['administrador'] },
+  { path: '/users', exact: true, name: 'Users', element: Users, roles: [1] }, // ID de rol: 1=administrador
   {
     path: '/cattle',
     exact: true,
     name: 'Cattle',
     element: Cattle,
-    roles: ['administrador', 'veterinario'],
+    roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
   },
   {
     path: '/vaccination',
     exact: true,
     name: 'Vaccination',
     element: Vaccination,
-    roles: ['administrador', 'veterinario'],
+    roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
   },
   {
     path: '/client',
     exact: true,
     name: 'Client',
     element: Client,
-    roles: ['administrador', 'cliente'],
+    roles: [1, 4], // IDs de roles: 1=administrador, 4=cliente
   },
-  { path: '/finances', exact: true, name: 'Finances', element: Finances, roles: ['administrador'] },
+  { path: '/finances', exact: true, name: 'Finances', element: Finances, roles: [1] }, // ID de rol: 1=administrador
   {
     path: '/inventory',
     exact: true,
     name: 'Inventory',
     element: Inventory,
-    roles: ['administrador', 'empleado'],
+    roles: [1, 3], // IDs de roles: 1=administrador, 3=empleado
   },
   {
     path: '/pastures',
     exact: true,
     name: 'Pastures',
     element: Pastures,
-    roles: ['administrador', 'veterinario'],
+    roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
   },
   {
     path: '/activepastures',
     exact: true,
     name: 'ActivePastures',
     element: ActivePastures,
-    roles: ['administrador', 'veterinario'],
+    roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
   },
   {
     path: '/milkProduction',
     exact: true,
     name: 'MilkProduction',
     element: MilkProduction,
-    roles: ['administrador', 'veterinario'],
+    roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
   },
   {
     path: '/asisten',
     exact: true,
     name: 'Asisten',
     element: Asisten,
-    roles: ['administrador', 'empleado'],
+    roles: [1, 3], // IDs de roles: 1=administrador, 3=empleado
   },
   {
     path: '/expbov',
     exact: true,
     name: 'Expbov',
     element: React.lazy(() => import('./views/pages/cattle/expbov')),
-    roles: ['administrador', 'veterinario'],
+    roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
   },
 ]
 

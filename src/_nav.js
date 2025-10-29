@@ -62,7 +62,7 @@ const _nav = [
       },
       {
         component: CNavItem,
-        name: 'asistencia',
+        name: 'Control de Asistencia',
         to: '/asisten',
         icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
         roles: ['administrador', 'empleado'],

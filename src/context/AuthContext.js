@@ -28,17 +28,19 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     setLoading(true)
     try {
-      const { token } = await authLogin(credentials.correo, credentials.contrasena) // Llama a la función login del servicio y obtiene solo el token
-      const profileResponse = await getProfile(token) // Llama a getProfile con el token
-      const userProfile = profileResponse // profileResponse ya es el objeto del usuario
+      const { token, user: userProfile } = await authLogin(
+        credentials.correo,
+        credentials.contrasena,
+      ) // Obtiene token y user del login
 
       const userData = {
         token: token,
-        role: userProfile.role, // Mapea 'role' del perfil
-        name: userProfile.nombre_completo, // Usa 'nombre_completo' del perfil
-        id: userProfile.id,
-        email: userProfile.email,
-        telefono: userProfile.telefono,
+        roleId: userProfile.ttr_idrolus, // Almacenar el ID del rol
+        roleName: userProfile.tma_nomrolu, // Almacenar también el nombre del rol si es necesario para la UI
+        name: userProfile.ttr_nombrel + ' ' + userProfile.ttr_apellid,
+        id: userProfile.ttr_idusuar,
+        email: userProfile.ttr_correoe,
+        telefono: userProfile.ttr_telefon,
       }
       localStorage.setItem('user', JSON.stringify(userData))
       setUser(userData)
@@ -58,13 +60,13 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user')
   }
 
-  const hasRole = (roles) => {
-    if (!user || !user.role) return false
-    const userRoleLower = user.role.toLowerCase()
-    if (Array.isArray(roles)) {
-      return roles.map((role) => role.toLowerCase()).includes(userRoleLower)
+  const hasRole = (requiredRoleIds) => {
+    if (!user || !user.roleId) return false
+    const userRoleId = user.roleId
+    if (Array.isArray(requiredRoleIds)) {
+      return requiredRoleIds.includes(userRoleId)
     }
-    return userRoleLower === roles.toLowerCase()
+    return userRoleId === requiredRoleIds
   }
 
   const value = {

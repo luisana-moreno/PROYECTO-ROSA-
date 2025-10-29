@@ -19,6 +19,19 @@ $theme-colors: (
         ) !important; // Color del texto al pasar el ratón
       }
     }
+
+    .typography-color-title {
+      color: $primary;
+    }
+
+    .button-no-hover-green {
+      background-color: $primary !important;
+      border-color: $primary !important;
+      &:hover {
+        background-color: color.adjust($primary, $lightness: -10%) !important;
+        border-color: color.adjust($primary, $lightness: -10%) !important;
+      }
+    }
     &.active .page-link {
       background-color: $primary !important;
       border-color: $primary !important;
