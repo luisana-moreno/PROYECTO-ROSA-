@@ -13,7 +13,11 @@ export const employeeService = {
       throw new Error(errorData.message || 'Error al obtener empleados')
     }
     const data = await response.json()
-    return data
+    return data.map((emp) => ({
+      id: emp.ttr_idemplo,
+      name: `${emp.ttr_nombrel} ${emp.ttr_apellid}`,
+      position: emp.cargo_nombre,
+    }))
   },
 
   getEmployeeById: async (id) => {

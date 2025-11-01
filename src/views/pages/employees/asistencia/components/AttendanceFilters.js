@@ -1,22 +1,28 @@
-import React from 'react'
-import { CRow, CCol, CFormSelect, CFormInput } from '@coreui/react'
+'use client'
+import { CRow, CCol, CFormSelect, CFormInput, CButton } from '@coreui/react'
 
-const AttendanceFilters = ({ filters, setFilters }) => {
+const AttendanceFilters = ({ filters, setFilters, onExport }) => {
+  const handleReset = () => {
+    setFilters({ name: '', position: '' })
+  }
+
   return (
-    <CRow className="mt-3">
-      <CCol md={6}>
+    <CRow className="g-3">
+      <CCol md={5}>
         <CFormInput
-          placeholder="Buscar por nombre"
+          placeholder="Buscar por nombre..."
           value={filters.name}
           onChange={(e) => setFilters({ ...filters, name: e.target.value })}
+          className="form-control-sm"
         />
       </CCol>
-      <CCol md={6}>
+      <CCol md={5}>
         <CFormSelect
           value={filters.position}
           onChange={(e) => setFilters({ ...filters, position: e.target.value })}
+          className="form-control-sm"
         >
-          <option value="">Filtrar por cargo</option>
+          <option value="">Todos los cargos</option>
           <option value="Administrador">Administrador</option>
           <option value="Gerente de lacteos">Gerente de lacteos</option>
           <option value="Veterinario">Veterinario</option>
@@ -25,6 +31,17 @@ const AttendanceFilters = ({ filters, setFilters }) => {
           <option value="Gerente de Mantenimiento">Gerente de Mantenimiento</option>
           <option value="Trabajador de campo">Trabajador de campo</option>
         </CFormSelect>
+      </CCol>
+      <CCol md={2} className="d-flex gap-2">
+        <CButton
+          size="sm"
+          color="secondary"
+          variant="outline"
+          onClick={handleReset}
+          className="flex-grow-1"
+        >
+          Limpiar
+        </CButton>
       </CCol>
     </CRow>
   )

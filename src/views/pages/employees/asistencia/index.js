@@ -1,9 +1,10 @@
-import React from 'react'
+'use client'
+import { CCard, CCardHeader, CCardBody, CContainer, CRow, CCol } from '@coreui/react'
+import CheckInOut from './components/CheckInOut'
 import AttendanceFilters from './components/AttendanceFilters'
 import AttendanceTable from './components/AttendanceTable'
 import AttendanceDetailModal from './components/AttendanceDetailModal'
 import useAttendance from './hooks/useAttendance'
-import { CCard, CCardHeader, CCardBody } from '@coreui/react'
 
 const AsistenciaModule = () => {
   const {
@@ -15,36 +16,52 @@ const AsistenciaModule = () => {
     days,
     handleAttendanceChange,
     handleHoursWorkedChange,
+    handleCheckIn,
     setFilters,
     setSelectedEmployee,
     setDetailVisible,
     filteredEmployees,
+    loading,
   } = useAttendance()
 
   return (
-    <CCard>
-      <CCardHeader>
-        <h4 className="typography-color-title mb-0">Control de Asistencias</h4>
-        <AttendanceFilters filters={filters} setFilters={setFilters} />
-      </CCardHeader>
-      <CCardBody>
-        <AttendanceTable
-          employees={filteredEmployees}
-          days={days}
-          handleAttendanceChange={handleAttendanceChange}
-          handleHoursWorkedChange={handleHoursWorkedChange}
-          setSelectedEmployee={setSelectedEmployee}
-          setDetailVisible={setDetailVisible}
-        />
-      </CCardBody>
+    <CContainer fluid>
+      <CRow className="mb-4">
+        <CCol>
+          <h3 className="mb-1">Control de Asistencias</h3>
+          <p className="text-muted mb-0">Semana del {week}</p>
+        </CCol>
+      </CRow>
 
+      {/* Sección de Check-in/Check-out */}
+      <CheckInOut employees={employees} onCheckIn={handleCheckIn} loading={loading} />
+
+      {/* Card principal de asistencias */}
+      <CCard>
+        <CCardHeader className="bg-light">
+          <h5 className="mb-3">Gestión de Asistencias</h5>
+          <AttendanceFilters filters={filters} setFilters={setFilters} />
+        </CCardHeader>
+        <CCardBody>
+          <AttendanceTable
+            employees={filteredEmployees}
+            days={days}
+            handleAttendanceChange={handleAttendanceChange}
+            handleHoursWorkedChange={handleHoursWorkedChange}
+            setSelectedEmployee={setSelectedEmployee}
+            setDetailVisible={setDetailVisible}
+          />
+        </CCardBody>
+      </CCard>
+
+      {/* Modal de detalles */}
       <AttendanceDetailModal
         visible={detailVisible}
         onClose={() => setDetailVisible(false)}
         employee={selectedEmployee}
         days={days}
       />
-    </CCard>
+    </CContainer>
   )
 }
 
