@@ -14,6 +14,7 @@ const ActivePastures = React.lazy(() => import('./views/pages/pastures/activePas
 const MilkProduction = React.lazy(() => import('./views/pages/cattle/milkProduction'))
 const Asisten = React.lazy(() => import('./views/pages/employees/asisten'))
 const Expbov = React.lazy(() => import('./views/pages/cattle/expbov'))
+const Settings = React.lazy(() => import('./views/pages/settings/Settings')) // Añadido para el módulo de configuración
 
 const routes = [
   { path: '/login', exact: true, name: 'Login', element: Login }, // La ruta '/' ahora redirige en App.js
@@ -95,6 +96,13 @@ const routes = [
     name: 'Expbov',
     element: React.lazy(() => import('./views/pages/cattle/expbov')),
     roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
+  },
+  {
+    path: '/settings',
+    exact: true,
+    name: 'Settings',
+    element: Settings,
+    roles: [1], // ID de rol: 1=administrador
   },
 ]
 

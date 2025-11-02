@@ -35,7 +35,20 @@ const useAttendance = () => {
 
       if (employeesData) {
         const employeesWithAttendance = employeesData.map((emp) => {
-          const employeeAttendances = attendancesData.filter((att) => att.ttr_idemplea === emp.id)
+          // Asegurarse de que el objeto emp tenga las propiedades 'id', 'name' y 'position'
+          // para que los componentes de frontend y los filtros funcionen correctamente.
+          const formattedEmp = {
+            ...emp,
+            id: emp.ttr_idemplo, // Usar ttr_idemplo como id principal
+            name: `${emp.ttr_nombrel || ''} ${emp.ttr_nomsegu || ''} ${
+              emp.ttr_apellid || ''
+            } ${emp.ttr_apesegu || ''}`,
+            position: emp.cargo_nombre || '',
+          }
+
+          const employeeAttendances = attendancesData.filter(
+            (att) => att.ttr_idemplea === formattedEmp.id,
+          )
 
           const attendanceByDay = {}
           let totalHoursWorked = 0
@@ -85,7 +98,7 @@ const useAttendance = () => {
           })
 
           return {
-            ...emp,
+            ...formattedEmp, // Usar el objeto formateado
             attendance: attendanceByDay,
             hoursWorked: totalHoursWorked.toFixed(2),
             currentAttendanceId: currentAttendanceId, // ID de la asistencia activa para check-out
@@ -111,7 +124,7 @@ const useAttendance = () => {
   const handleCheckIn = async (employeeId, type) => {
     setLoading(true)
     try {
-      const employee = employees.find((emp) => emp.id === employeeId)
+      const employee = employees.find((emp) => emp.id === employeeId) // 'id' ya está mapeado
       const currentTime = new Date().toLocaleTimeString('es-ES', {
         hour: '2-digit',
         minute: '2-digit',
@@ -179,7 +192,7 @@ const useAttendance = () => {
   const handleAttendanceChange = async (employeeId, day, value) => {
     setLoading(true)
     try {
-      const employee = employees.find((emp) => emp.id === employeeId)
+      const employee = employees.find((emp) => emp.id === employeeId) // 'id' ya está mapeado
       const tempDate = new Date() // Usar una nueva instancia de Date para evitar mutaciones
       const attendanceDate = new Date(
         tempDate.setDate(tempDate.getDate() - tempDate.getDay() + days.indexOf(day) + 1),
@@ -256,7 +269,7 @@ const useAttendance = () => {
   const handleHoursWorkedChange = async (employeeId, hours) => {
     setLoading(true)
     try {
-      const employee = employees.find((emp) => emp.id === employeeId)
+      const employee = employees.find((emp) => emp.id === employeeId) // 'id' ya está mapeado
       const today = new Date()
       const dayOfWeek = getDayName(today)
       const currentAttendance = employee.attendance[dayOfWeek]

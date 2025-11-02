@@ -38,7 +38,7 @@ const EmployeesTable = ({
         </CTableHead>
         <CTableBody>
           {employees.map((employee, index) => (
-            <CTableRow key={employee.ttr_documen}>
+            <CTableRow key={employee.ttr_documen || index}>
               <CTableDataCell>{indexOfFirstEmployee + index + 1}</CTableDataCell>
               <CTableDataCell>
                 {`${employee?.ttr_nombrel || ''} ${employee?.ttr_nomsegu || ''} ${

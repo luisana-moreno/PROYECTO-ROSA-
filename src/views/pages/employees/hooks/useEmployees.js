@@ -63,7 +63,7 @@ export const useEmployees = () => {
         }
         const positionsData = await employeeService.getAllPositions()
         if (positionsData) {
-          setPositions(positionsData.map((pos) => ({ id: pos.tma_idemplo, name: pos.tma_nombrel }))) // Usar tma_idemplo y tma_nombrel (minúsculas)
+          setPositions(positionsData.map((pos) => ({ id: pos.id, name: pos.nombre })))
         }
       } catch (error) {
         toast.error(error.message || 'Error al cargar datos iniciales.')

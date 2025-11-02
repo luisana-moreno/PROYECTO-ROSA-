@@ -17,6 +17,7 @@ import {
   cilTerrain,
   cilRain,
   cilGraph,
+  cilSettings, // Añadido para el módulo de configuración
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -172,6 +173,21 @@ const _nav = [
         to: '/finances',
         icon: <CIcon icon={cilCash} customClassName="nav-icon" />,
         roles: [1], // ID de rol: 1=administrador
+      },
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Configuración',
+    icon: <CIcon icon={cilSettings} customClassName="nav-icon" />,
+    roles: [1], // Asumo que solo el administrador puede acceder a la configuración
+    items: [
+      {
+        component: CNavItem,
+        name: 'Configuración de la Aplicación',
+        to: '/settings',
+        icon: <CIcon icon={cilSettings} customClassName="nav-icon" />,
+        roles: [1],
       },
     ],
   },

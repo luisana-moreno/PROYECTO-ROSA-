@@ -188,10 +188,13 @@ const EditEmployeeModal = ({
               aria-label="cargo"
               value={currentEmployee?.ttr_idcargp || ''}
               onChange={(e) =>
-                setCurrentEmployee({ ...currentEmployee, ttr_idcargp: e.target.value })
+                setCurrentEmployee({
+                  ...currentEmployee,
+                  ttr_idcargp: e.target.value === '' ? '' : parseInt(e.target.value, 10),
+                })
               }
             >
-              <option key="default-position" value="">
+              <option key="default-position-edit" value="">
                 Seleccione el cargo
               </option>
               {positions.map((pos) => (

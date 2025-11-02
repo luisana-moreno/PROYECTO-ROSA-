@@ -169,9 +169,14 @@ const AddEmployeeModal = ({
               className="modal-name custom-select"
               aria-label="Cargo"
               value={addEmployee.ttr_idcargp}
-              onChange={(e) => setAddEmployee({ ...addEmployee, ttr_idcargp: e.target.value })}
+              onChange={(e) =>
+                setAddEmployee({
+                  ...addEmployee,
+                  ttr_idcargp: e.target.value === '' ? '' : parseInt(e.target.value, 10),
+                })
+              }
             >
-              <option key="default-position" value="">
+              <option key="default-position-add" value="">
                 Seleccione el cargo
               </option>
               {positions.map((pos) => (
