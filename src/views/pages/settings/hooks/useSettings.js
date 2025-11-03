@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { cattleService } from 'src/api/cattleService'
 import { employeeService } from 'src/api/employeeService'
+import { pastureService } from 'src/api/pastureService' // Importar pastureService
 
 export const useSettings = () => {
   const [razas, setRazas] = useState([])
@@ -8,6 +9,8 @@ export const useSettings = () => {
   const [etapas, setEtapas] = useState([])
   const [estados, setEstados] = useState([])
   const [cargos, setCargos] = useState([])
+  const [estadosPotrero, setEstadosPotrero] = useState([]) // Nuevo estado
+  const [tiposMantenimiento, setTiposMantenimiento] = useState([]) // Nuevo estado
   const [toast, setToast] = useState({ show: false, message: '', color: 'success' })
 
   const showToast = (message, color = 'success') => {
@@ -66,12 +69,45 @@ export const useSettings = () => {
     }
   }
 
+  // --- Fetch functions for Pastures ---
+  const fetchEstadosPotrero = async () => {
+    try {
+      const data = await pastureService.getAllEstadosPotrero()
+      setEstadosPotrero(
+        data.map((estado) => ({
+          tma_idestpo: estado.tma_idestpo,
+          tma_nomestp: estado.tma_nomestp,
+        })),
+      )
+    } catch (error) {
+      console.error('Error fetching estados de potrero:', error)
+      showToast('Error al cargar estados de potrero', 'danger')
+    }
+  }
+
+  const fetchTiposMantenimiento = async () => {
+    try {
+      const data = await pastureService.getAllTiposMantenimiento()
+      setTiposMantenimiento(
+        data.map((tipo) => ({
+          tma_idtipma: tipo.tma_idtipma,
+          tma_nomtipm: tipo.tma_nomtipm,
+        })),
+      )
+    } catch (error) {
+      console.error('Error fetching tipos de mantenimiento:', error)
+      showToast('Error al cargar tipos de mantenimiento', 'danger')
+    }
+  }
+
   useEffect(() => {
     fetchRazas()
     fetchColores()
     fetchEtapas()
     fetchEstados()
     fetchCargos()
+    fetchEstadosPotrero() // Cargar estados de potrero
+    fetchTiposMantenimiento() // Cargar tipos de mantenimiento
   }, [])
 
   // --- CRUD functions for Razas ---
@@ -260,17 +296,95 @@ export const useSettings = () => {
     }
   }
 
+  // --- CRUD functions for Estados de Potrero ---
+  const createEstadoPotrero = async (nombre) => {
+    try {
+      await pastureService.createEstadoPotrero({ nombre })
+      showToast('Estado de potrero agregado correctamente', 'success')
+      fetchEstadosPotrero()
+    } catch (error) {
+      console.error('Error creating estado de potrero:', error)
+      showToast(error.message || 'Error al agregar estado de potrero', 'danger')
+      throw error
+    }
+  }
+
+  const updateEstadoPotrero = async (id, nombre) => {
+    try {
+      await pastureService.updateEstadoPotrero(id, { nombre })
+      showToast('Estado de potrero editado correctamente', 'info')
+      fetchEstadosPotrero()
+    } catch (error) {
+      console.error('Error updating estado de potrero:', error)
+      showToast(error.message || 'Error al editar estado de potrero', 'danger')
+      throw error
+    }
+  }
+
+  const deleteEstadoPotrero = async (id) => {
+    try {
+      await pastureService.deleteEstadoPotrero(id)
+      showToast('Estado de potrero eliminado correctamente', 'danger')
+      fetchEstadosPotrero()
+    } catch (error) {
+      console.error('Error deleting estado de potrero:', error)
+      showToast(error.message || 'Error al eliminar estado de potrero', 'danger')
+      throw error
+    }
+  }
+
+  // --- CRUD functions for Tipos de Mantenimiento ---
+  const createTipoMantenimiento = async (nombre) => {
+    try {
+      await pastureService.createTipoMantenimiento({ nombre })
+      showToast('Tipo de mantenimiento agregado correctamente', 'success')
+      fetchTiposMantenimiento()
+    } catch (error) {
+      console.error('Error creating tipo de mantenimiento:', error)
+      showToast(error.message || 'Error al agregar tipo de mantenimiento', 'danger')
+      throw error
+    }
+  }
+
+  const updateTipoMantenimiento = async (id, nombre) => {
+    try {
+      await pastureService.updateTipoMantenimiento(id, { nombre })
+      showToast('Tipo de mantenimiento editado correctamente', 'info')
+      fetchTiposMantenimiento()
+    } catch (error) {
+      console.error('Error updating tipo de mantenimiento:', error)
+      showToast(error.message || 'Error al editar tipo de mantenimiento', 'danger')
+      throw error
+    }
+  }
+
+  const deleteTipoMantenimiento = async (id) => {
+    try {
+      await pastureService.deleteTipoMantenimiento(id)
+      showToast('Tipo de mantenimiento eliminado correctamente', 'danger')
+      fetchTiposMantenimiento()
+    } catch (error) {
+      console.error('Error deleting tipo de mantenimiento:', error)
+      showToast(error.message || 'Error al eliminar tipo de mantenimiento', 'danger')
+      throw error
+    }
+  }
+
   return {
     razas,
     colores,
     etapas,
     estados,
     cargos,
+    estadosPotrero,
+    tiposMantenimiento,
     fetchRazas,
     fetchColores,
     fetchEtapas,
     fetchEstados,
     fetchCargos,
+    fetchEstadosPotrero,
+    fetchTiposMantenimiento,
     createRaza,
     updateRaza,
     deleteRaza,
@@ -286,6 +400,12 @@ export const useSettings = () => {
     createCargo,
     updateCargo,
     deleteCargo,
+    createEstadoPotrero,
+    updateEstadoPotrero,
+    deleteEstadoPotrero,
+    createTipoMantenimiento,
+    updateTipoMantenimiento,
+    deleteTipoMantenimiento,
     toast,
     showToast,
   }

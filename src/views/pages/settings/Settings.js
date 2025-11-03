@@ -11,11 +11,9 @@ import {
 } from '@coreui/react'
 
 import GeneralSettings from './components/GeneralSettings'
-import BreedSettings from './components/BreedSettings'
-import ColorSettings from './components/ColorSettings'
-import StageSettings from './components/StageSettings'
-import StateSettings from './components/StateSettings'
 import PositionSettings from './components/PositionSettings'
+import BovineSettings from './components/BovineSettings'
+import PastureSettings from './components/PastureSettings' // Importar el nuevo componente
 import { useSettings } from './hooks/useSettings'
 
 const Settings = () => {
@@ -26,6 +24,8 @@ const Settings = () => {
     etapas,
     estados,
     cargos,
+    estadosPotrero, // Nuevos estados para potreros
+    tiposMantenimiento, // Nuevos tipos de mantenimiento para potreros
     createRaza,
     updateRaza,
     deleteRaza,
@@ -41,6 +41,12 @@ const Settings = () => {
     createCargo,
     updateCargo,
     deleteCargo,
+    createEstadoPotrero, // Nuevas funciones CRUD para estados de potrero
+    updateEstadoPotrero,
+    deleteEstadoPotrero,
+    createTipoMantenimiento, // Nuevas funciones CRUD para tipos de mantenimiento
+    updateTipoMantenimiento,
+    deleteTipoMantenimiento,
   } = useSettings()
 
   return (
@@ -56,23 +62,13 @@ const Settings = () => {
             </CNavLink>
           </CNavItem>
           <CNavItem>
-            <CNavLink active={activeTab === 'breeds'} onClick={() => setActiveTab('breeds')}>
-              Razas de Bovinos
+            <CNavLink active={activeTab === 'bovines'} onClick={() => setActiveTab('bovines')}>
+              Configuración de Bovinos
             </CNavLink>
           </CNavItem>
           <CNavItem>
-            <CNavLink active={activeTab === 'colors'} onClick={() => setActiveTab('colors')}>
-              Colores de Bovinos
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink active={activeTab === 'stages'} onClick={() => setActiveTab('stages')}>
-              Etapas de Bovinos
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink active={activeTab === 'states'} onClick={() => setActiveTab('states')}>
-              Estados de Bovinos
+            <CNavLink active={activeTab === 'pastures'} onClick={() => setActiveTab('pastures')}>
+              Configuración de Potreros
             </CNavLink>
           </CNavItem>
           <CNavItem>
@@ -86,36 +82,36 @@ const Settings = () => {
           <CTabPane visible={activeTab === 'general'}>
             <GeneralSettings />
           </CTabPane>
-          <CTabPane visible={activeTab === 'breeds'}>
-            <BreedSettings
+          <CTabPane visible={activeTab === 'bovines'}>
+            <BovineSettings
               razas={razas}
               createRaza={createRaza}
               updateRaza={updateRaza}
               deleteRaza={deleteRaza}
-            />
-          </CTabPane>
-          <CTabPane visible={activeTab === 'colors'}>
-            <ColorSettings
               colores={colores}
               createColor={createColor}
               updateColor={updateColor}
               deleteColor={deleteColor}
-            />
-          </CTabPane>
-          <CTabPane visible={activeTab === 'stages'}>
-            <StageSettings
               etapas={etapas}
               createEtapa={createEtapa}
               updateEtapa={updateEtapa}
               deleteEtapa={deleteEtapa}
-            />
-          </CTabPane>
-          <CTabPane visible={activeTab === 'states'}>
-            <StateSettings
               estados={estados}
               createEstado={createEstado}
               updateEstado={updateEstado}
               deleteEstado={deleteEstado}
+            />
+          </CTabPane>
+          <CTabPane visible={activeTab === 'pastures'}>
+            <PastureSettings
+              estadosPotrero={estadosPotrero}
+              createEstadoPotrero={createEstadoPotrero}
+              updateEstadoPotrero={updateEstadoPotrero}
+              deleteEstadoPotrero={deleteEstadoPotrero}
+              tiposMantenimiento={tiposMantenimiento}
+              createTipoMantenimiento={createTipoMantenimiento}
+              updateTipoMantenimiento={updateTipoMantenimiento}
+              deleteTipoMantenimiento={deleteTipoMantenimiento}
             />
           </CTabPane>
           <CTabPane visible={activeTab === 'positions'}>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { cattleService } from 'src/api/cattleService'
+import { toast } from 'react-toastify' // Importa toast de react-toastify
 
 export const useCattle = () => {
   const [visible, setVisible] = useState(false)
@@ -23,12 +24,6 @@ export const useCattle = () => {
     idEtapaBovino: '',
     idEstadoBovino: '',
   })
-  const [toast, setToast] = useState({ show: false, message: '', color: 'success' })
-
-  const showToast = (message, color = 'success') => {
-    setToast({ show: true, message, color })
-    setTimeout(() => setToast({ show: false, message: '', color: 'success' }), 2500)
-  }
 
   useEffect(() => {
     loadInitialData()
@@ -50,15 +45,33 @@ export const useCattle = () => {
       setEstados(estadosData)
     } catch (error) {
       console.error('Error loading initial data:', error)
-      showToast('Error al cargar datos iniciales', 'danger')
+      toast.error('Error al cargar datos iniciales')
     }
   }
 
   const handleAddCattle = async () => {
     try {
-      const newCattle = await cattleService.createCattle(addCattleForm)
-      if (newCattle) {
-        setCattle((prevCattle) => [...prevCattle, newCattle])
+      const newCattleResponse = await cattleService.createCattle(addCattleForm)
+      if (newCattleResponse) {
+        // Obtener los nombres de las propiedades relacionadas
+        const razaNombre =
+          razas.find((r) => r.tma_idrazab === newCattleResponse.ttr_idrazabo)?.tma_nomraza || ''
+        const colorNombre =
+          colores.find((c) => c.tma_idcolbo === newCattleResponse.ttr_idcolorb)?.tma_nomcolb || ''
+        const etapaNombre =
+          etapas.find((e) => e.tma_idetabo === newCattleResponse.ttr_idetapav)?.tma_nometab || ''
+        const estadoNombre =
+          estados.find((s) => s.tma_idestbo === newCattleResponse.ttr_idestadb)?.tma_nomestb || ''
+
+        const formattedNewCattle = {
+          ...newCattleResponse,
+          raza_nombre: razaNombre,
+          color_nombre: colorNombre,
+          etapa_nombre: etapaNombre,
+          estado_nombre: estadoNombre,
+        }
+
+        setCattle((prevCattle) => [...prevCattle, formattedNewCattle])
         setAddCattleForm({
           numeroBovino: '',
           idRazaBovino: '',
@@ -69,17 +82,17 @@ export const useCattle = () => {
           idEstadoBovino: '',
         })
         setVisible(false)
-        showToast('Registro agregado correctamente', 'success')
+        toast.success('Registro agregado correctamente')
       }
     } catch (error) {
       console.error('Error al agregar bovino:', error)
-      showToast(error.message || 'Error al agregar bovino', 'danger')
+      toast.error(error.message || 'Error al agregar bovino')
     }
   }
 
   const handleEditCattle = async () => {
     if (!currentCattle || !currentCattle.ttr_idbovino) {
-      showToast('No cattle selected for editing.', 'warning')
+      toast.warning('No cattle selected for editing.')
       return
     }
     try {
@@ -97,17 +110,17 @@ export const useCattle = () => {
           prevCattle.map((c) => (c.ttr_idbovino === updated.ttr_idbovino ? updated : c)),
         )
         setEditVisible(false)
-        showToast('Registro editado correctamente', 'info')
+        toast.info('Registro editado correctamente')
       }
     } catch (error) {
       console.error('Error al editar bovino:', error)
-      showToast(error.message || 'Error al editar bovino', 'danger')
+      toast.error(error.message || 'Error al editar bovino')
     }
   }
 
   const handleDeleteCattle = async () => {
     if (!currentCattle || !currentCattle.ttr_idbovino) {
-      showToast('No cattle selected for deletion.', 'warning')
+      toast.warning('No cattle selected for deletion.')
       return
     }
     if (deleteConfirmation === 'confirmar') {
@@ -117,13 +130,13 @@ export const useCattle = () => {
           prevCattle.filter((c) => c.ttr_idbovino !== currentCattle.ttr_idbovino),
         )
         setDeleteVisible(false)
-        showToast('Bovino eliminado exitosamente', 'danger')
+        toast.error('Bovino eliminado exitosamente')
       } catch (error) {
         console.error('Error al eliminar bovino:', error)
-        showToast(error.message || 'Error al eliminar bovino', 'danger')
+        toast.error(error.message || 'Error al eliminar bovino')
       }
     } else {
-      showToast('Debe escribir "confirmar" para eliminar', 'warning')
+      toast.warning('Debe escribir "confirmar" para eliminar')
     }
   }
 
@@ -150,7 +163,5 @@ export const useCattle = () => {
     colores,
     etapas,
     estados,
-    toast,
-    showToast,
   }
 }

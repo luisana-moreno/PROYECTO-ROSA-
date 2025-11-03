@@ -11,6 +11,7 @@ import {
   CRow,
   CFormSelect,
 } from '@coreui/react'
+import { toast } from 'react-toastify' // Importa toast de react-toastify
 
 const EditCattleModal = ({
   editVisible,
@@ -23,6 +24,28 @@ const EditCattleModal = ({
   etapas,
   estados,
 }) => {
+  const validateForm = () => {
+    if (
+      !currentCattle.ttr_numerobv ||
+      !currentCattle.ttr_idrazabo ||
+      !currentCattle.ttr_fecnacim ||
+      !currentCattle.ttr_idcolorb ||
+      !currentCattle.ttr_pesokilo ||
+      !currentCattle.ttr_idetapav ||
+      !currentCattle.ttr_idestadb
+    ) {
+      toast.error('Todos los campos obligatorios deben ser llenados.')
+      return false
+    }
+    return true
+  }
+
+  const handleEditCattleWithValidation = () => {
+    if (validateForm()) {
+      handleEditCattle()
+    }
+  }
+
   return (
     <CModal
       alignment="center"
@@ -147,7 +170,10 @@ const EditCattleModal = ({
         </CRow>
       </CModalBody>
       <CModalFooter>
-        <CButton className="button-no-hover-green text-white" onClick={handleEditCattle}>
+        <CButton
+          className="button-no-hover-green text-white"
+          onClick={handleEditCattleWithValidation}
+        >
           Guardar cambios
         </CButton>
       </CModalFooter>

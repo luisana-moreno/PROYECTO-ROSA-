@@ -11,6 +11,7 @@ import {
   CRow,
   CFormSelect,
 } from '@coreui/react'
+import { toast } from 'react-toastify' // Importa toast de react-toastify
 
 const AddCattleModal = ({
   visible,
@@ -23,6 +24,28 @@ const AddCattleModal = ({
   etapas,
   estados,
 }) => {
+  const validateForm = () => {
+    if (
+      !addCattleForm.numeroBovino ||
+      !addCattleForm.idRazaBovino ||
+      !addCattleForm.fechaNacimiento ||
+      !addCattleForm.idColorBovino ||
+      !addCattleForm.pesoKilo ||
+      !addCattleForm.idEtapaBovino ||
+      !addCattleForm.idEstadoBovino
+    ) {
+      toast.error('Todos los campos obligatorios deben ser llenados.')
+      return false
+    }
+    return true
+  }
+
+  const handleAddCattleWithValidation = () => {
+    if (validateForm()) {
+      handleAddCattle()
+    }
+  }
+
   return (
     <CModal alignment="center" scrollable visible={visible} onClose={() => setVisible(false)}>
       <CModalHeader className="modal-module">
@@ -147,7 +170,10 @@ const AddCattleModal = ({
         </CRow>
       </CModalBody>
       <CModalFooter>
-        <CButton className="button-no-hover-green text-white" onClick={handleAddCattle}>
+        <CButton
+          className="button-no-hover-green text-white"
+          onClick={handleAddCattleWithValidation}
+        >
           Agregar
         </CButton>
       </CModalFooter>

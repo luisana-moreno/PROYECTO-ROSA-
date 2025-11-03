@@ -8,30 +8,21 @@ import {
   CModalTitle,
   CFormInput,
 } from '@coreui/react'
-import { toast } from 'react-toastify' // Importa toast de react-toastify
 
-const DeleteCattleModal = ({
+const DeletePastureModal = ({
   deleteVisible,
   setDeleteVisible,
   deleteConfirmation,
   setDeleteConfirmation,
-  handleDeleteCattle,
+  handleDeletePasture,
 }) => {
-  const handleDeleteCattleWithValidation = () => {
-    if (deleteConfirmation === 'confirmar') {
-      handleDeleteCattle()
-    } else {
-      toast.warning('Debe escribir "confirmar" para eliminar')
-    }
-  }
-
   return (
     <CModal visible={deleteVisible} onClose={() => setDeleteVisible(false)}>
       <CModalHeader>
-        <CModalTitle className="typography-color-title">Eliminar Bovino</CModalTitle>
+        <CModalTitle>Eliminar Potrero</CModalTitle>
       </CModalHeader>
       <CModalBody>
-        <h6>Por favor escriba "confirmar" para eliminar el registro</h6>
+        <h6>Por favor escriba "confirmar" para eliminar el potrero</h6>
         <CFormInput
           placeholder="confirmar"
           className="modal-border"
@@ -41,14 +32,14 @@ const DeleteCattleModal = ({
       </CModalBody>
       <CModalFooter>
         <CButton className="button-no-hover green" onClick={() => setDeleteVisible(false)}>
-          <h6 className="typography-color">Cancelar</h6>
+          Cancelar
         </CButton>
-        <CButton className="button-no-hover-green" onClick={handleDeleteCattleWithValidation}>
-          <h6 className="typography-color">Eliminar</h6>
+        <CButton className="button-no-hover-green" onClick={handleDeletePasture}>
+          Eliminar
         </CButton>
       </CModalFooter>
     </CModal>
   )
 }
 
-export default DeleteCattleModal
+export default DeletePastureModal

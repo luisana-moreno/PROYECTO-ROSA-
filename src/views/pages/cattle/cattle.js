@@ -1,7 +1,9 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
 import { cilPlus } from '@coreui/icons'
-import { CCard, CButton, CCardBody, CCardHeader, CAlert } from '@coreui/react'
+import { CCard, CButton, CCardBody, CCardHeader } from '@coreui/react'
+import { ToastContainer } from 'react-toastify' // Importa ToastContainer
+import 'react-toastify/dist/ReactToastify.css' // Importa los estilos de react-toastify
 
 import { useCattle } from './hooks/useCattle'
 import CattleTable from './components/CattleTable'
@@ -34,7 +36,6 @@ const Cattle = () => {
     colores,
     etapas,
     estados,
-    toast,
   } = useCattle()
 
   return (
@@ -51,7 +52,6 @@ const Cattle = () => {
           </CButton>
         </h4>
       </CCardHeader>
-
       <CCardBody>
         <CattleTable
           cattle={cattle}
@@ -61,7 +61,6 @@ const Cattle = () => {
           setViewVisible={setViewVisible}
         />
       </CCardBody>
-
       <AddCattleModal
         visible={visible}
         setVisible={setVisible}
@@ -73,7 +72,6 @@ const Cattle = () => {
         etapas={etapas}
         estados={estados}
       />
-
       <EditCattleModal
         editVisible={editVisible}
         setEditVisible={setEditVisible}
@@ -85,7 +83,6 @@ const Cattle = () => {
         etapas={etapas}
         estados={estados}
       />
-
       <DeleteCattleModal
         deleteVisible={deleteVisible}
         setDeleteVisible={setDeleteVisible}
@@ -93,29 +90,12 @@ const Cattle = () => {
         setDeleteConfirmation={setDeleteConfirmation}
         handleDeleteCattle={handleDeleteCattle}
       />
-
       <ViewCattleModal
         viewVisible={viewVisible}
         setViewVisible={setViewVisible}
         currentCattle={currentCattle}
       />
-
-      {toast.show && (
-        <div
-          style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            zIndex: 9999,
-            minWidth: 300,
-          }}
-        >
-          <CAlert color={toast.color} className="text-center m-0">
-            {toast.message}
-          </CAlert>
-        </div>
-      )}
+      <ToastContainer /> {/* Agrega ToastContainer aquí */}
     </CCard>
   )
 }
