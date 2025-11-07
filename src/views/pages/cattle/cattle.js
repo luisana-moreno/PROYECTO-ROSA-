@@ -11,6 +11,7 @@ import AddCattleModal from './components/AddCattleModal'
 import EditCattleModal from './components/EditCattleModal'
 import DeleteCattleModal from './components/DeleteCattleModal'
 import ViewCattleModal from './components/ViewCattleModal'
+import ExpBovModal from './components/ExpBovModal' // Importa el nuevo modal de expediente
 
 const Cattle = () => {
   const {
@@ -22,6 +23,8 @@ const Cattle = () => {
     setDeleteVisible,
     viewVisible,
     setViewVisible,
+    expBovVisible, // Nuevo estado
+    setExpBovVisible, // Nuevo setter
     currentCattle,
     setCurrentCattle,
     deleteConfirmation,
@@ -32,6 +35,7 @@ const Cattle = () => {
     handleAddCattle,
     handleEditCattle,
     handleDeleteCattle,
+    handleViewExpBov, // Nueva función
     razas,
     colores,
     etapas,
@@ -59,6 +63,7 @@ const Cattle = () => {
           setEditVisible={setEditVisible}
           setDeleteVisible={setDeleteVisible}
           setViewVisible={setViewVisible}
+          handleViewExpBov={handleViewExpBov} // Pasa la nueva función
         />
       </CCardBody>
       <AddCattleModal
@@ -93,6 +98,11 @@ const Cattle = () => {
       <ViewCattleModal
         viewVisible={viewVisible}
         setViewVisible={setViewVisible}
+        currentCattle={currentCattle}
+      />
+      <ExpBovModal // Nuevo modal de expediente
+        expBovVisible={expBovVisible}
+        setExpBovVisible={setExpBovVisible}
         currentCattle={currentCattle}
       />
       <ToastContainer /> {/* Agrega ToastContainer aquí */}

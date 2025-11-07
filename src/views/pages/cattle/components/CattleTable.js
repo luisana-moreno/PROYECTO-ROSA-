@@ -15,6 +15,7 @@ const CattleTable = ({
   setEditVisible,
   setDeleteVisible,
   setViewVisible,
+  handleViewExpBov, // Nueva prop
 }) => {
   return (
     <CTable hover responsive>
@@ -66,17 +67,15 @@ const CattleTable = ({
                 >
                   Eliminar
                 </CButton>
+
                 <CButton
                   className="me-2 mb-2"
                   size="sm"
-                  color="primary"
+                  color="success"
                   variant="outline"
-                  onClick={() => {
-                    setCurrentCattle(cattleItem)
-                    setViewVisible(true)
-                  }}
+                  onClick={() => handleViewExpBov(cattleItem)} // Nuevo botón
                 >
-                  Visualizar
+                  Expediente
                 </CButton>
               </div>
             </CTableDataCell>

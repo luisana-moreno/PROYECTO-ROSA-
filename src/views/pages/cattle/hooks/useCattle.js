@@ -7,6 +7,7 @@ export const useCattle = () => {
   const [editVisible, setEditVisible] = useState(false)
   const [deleteVisible, setDeleteVisible] = useState(false)
   const [viewVisible, setViewVisible] = useState(false)
+  const [expBovVisible, setExpBovVisible] = useState(false) // Nuevo estado para el modal de expediente
   const [currentCattle, setCurrentCattle] = useState(null)
   const [deleteConfirmation, setDeleteConfirmation] = useState('')
   const [cattle, setCattle] = useState([])
@@ -140,6 +141,11 @@ export const useCattle = () => {
     }
   }
 
+  const handleViewExpBov = (cattle) => {
+    setCurrentCattle(cattle)
+    setExpBovVisible(true)
+  }
+
   return {
     visible,
     setVisible,
@@ -149,6 +155,8 @@ export const useCattle = () => {
     setDeleteVisible,
     viewVisible,
     setViewVisible,
+    expBovVisible, // Nuevo estado
+    setExpBovVisible, // Nuevo setter
     currentCattle,
     setCurrentCattle,
     deleteConfirmation,
@@ -159,6 +167,7 @@ export const useCattle = () => {
     handleAddCattle,
     handleEditCattle,
     handleDeleteCattle,
+    handleViewExpBov, // Nueva función
     razas,
     colores,
     etapas,

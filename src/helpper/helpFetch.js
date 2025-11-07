@@ -1,4 +1,4 @@
-const baseUrl = import.meta.env.VITE_BACKEND_URL
+const baseUrl = import.meta.env.VITE_API_URL
 
 export const helpFetch = () => {
   const customFetch = async (endpoint, method, body = null) => {
@@ -13,7 +13,8 @@ export const helpFetch = () => {
         options.body = JSON.stringify(body)
       }
 
-      const response = await fetch(`${baseUrl}${endpoint}`, options)
+      const url = `${baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl}/${endpoint.startsWith('/') ? endpoint.slice(1) : endpoint}`
+      const response = await fetch(url, options)
 
       if (!response.ok) {
         const errorText = await response.text() // Intenta leer el cuerpo como texto
