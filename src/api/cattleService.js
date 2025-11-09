@@ -1,5 +1,21 @@
 const API_URL = import.meta.env.VITE_API_URL
 
+// Función auxiliar para mapear nombres de columnas de la base de datos a camelCase para el frontend
+const mapKeysToCamelCase = (data) => {
+  if (!data) return null
+  if (Array.isArray(data)) {
+    return data.map((item) => mapKeysToCamelCase(item))
+  }
+  const newObject = {}
+  for (const key in data) {
+    if (Object.prototype.hasOwnProperty.call(data, key)) {
+      const newKey = key.toLowerCase().replace(/_([a-z])/g, (g) => g[1].toUpperCase())
+      newObject[newKey] = data[key]
+    }
+  }
+  return newObject
+}
+
 export const cattleService = {
   // Servicios para Bovinos (TTRBOVINOSS)
   getAllCattle: async () => {
@@ -14,7 +30,11 @@ export const cattleService = {
       throw new Error(errorData.message || 'Error al obtener bovinos')
     }
     const data = await response.json()
-    return data
+    // Asegurarse de que los datos de bovinos tengan una propiedad 'id' para CustomTableModal
+    return mapKeysToCamelCase(data).map((item) => ({
+      ...item,
+      id: item.idbovino || item.ttrIdbovino || item.id, // Usar idbovino o ttrIdbovino como id si existe
+    }))
   },
 
   getCattleById: async (id) => {
@@ -29,7 +49,7 @@ export const cattleService = {
       throw new Error(errorData.message || 'Error al obtener bovino por ID')
     }
     const data = await response.json()
-    return data
+    return mapKeysToCamelCase(data)
   },
 
   createCattle: async (cattleData) => {
@@ -45,7 +65,7 @@ export const cattleService = {
       throw new Error(errorData.message || 'Error al crear bovino')
     }
     const data = await response.json()
-    return data
+    return mapKeysToCamelCase(data)
   },
 
   updateCattle: async (id, cattleData) => {
@@ -61,7 +81,7 @@ export const cattleService = {
       throw new Error(errorData.message || 'Error al actualizar bovino')
     }
     const data = await response.json()
-    return data
+    return mapKeysToCamelCase(data)
   },
 
   deleteCattle: async (id) => {
@@ -91,7 +111,7 @@ export const cattleService = {
       throw new Error(errorData.message || 'Error al obtener razas de bovino')
     }
     const data = await response.json()
-    return data
+    return mapKeysToCamelCase(data)
   },
 
   createRaza: async (razaData) => {
@@ -107,7 +127,7 @@ export const cattleService = {
       throw new Error(errorData.message || 'Error al crear raza')
     }
     const data = await response.json()
-    return data
+    return mapKeysToCamelCase(data)
   },
 
   updateRaza: async (id, razaData) => {
@@ -123,7 +143,7 @@ export const cattleService = {
       throw new Error(errorData.message || 'Error al actualizar raza')
     }
     const data = await response.json()
-    return data
+    return mapKeysToCamelCase(data)
   },
 
   deleteRaza: async (id) => {
@@ -153,7 +173,7 @@ export const cattleService = {
       throw new Error(errorData.message || 'Error al obtener colores de bovino')
     }
     const data = await response.json()
-    return data
+    return mapKeysToCamelCase(data)
   },
 
   createColor: async (colorData) => {
@@ -169,7 +189,7 @@ export const cattleService = {
       throw new Error(errorData.message || 'Error al crear color')
     }
     const data = await response.json()
-    return data
+    return mapKeysToCamelCase(data)
   },
 
   updateColor: async (id, colorData) => {
@@ -185,7 +205,7 @@ export const cattleService = {
       throw new Error(errorData.message || 'Error al actualizar color')
     }
     const data = await response.json()
-    return data
+    return mapKeysToCamelCase(data)
   },
 
   deleteColor: async (id) => {
@@ -215,7 +235,7 @@ export const cattleService = {
       throw new Error(errorData.message || 'Error al obtener etapas de bovino')
     }
     const data = await response.json()
-    return data
+    return mapKeysToCamelCase(data)
   },
 
   createEtapa: async (etapaData) => {
@@ -231,7 +251,7 @@ export const cattleService = {
       throw new Error(errorData.message || 'Error al crear etapa')
     }
     const data = await response.json()
-    return data
+    return mapKeysToCamelCase(data)
   },
 
   updateEtapa: async (id, etapaData) => {
@@ -247,7 +267,7 @@ export const cattleService = {
       throw new Error(errorData.message || 'Error al actualizar etapa')
     }
     const data = await response.json()
-    return data
+    return mapKeysToCamelCase(data)
   },
 
   deleteEtapa: async (id) => {
@@ -277,7 +297,7 @@ export const cattleService = {
       throw new Error(errorData.message || 'Error al obtener estados de bovino')
     }
     const data = await response.json()
-    return data
+    return mapKeysToCamelCase(data)
   },
 
   createEstado: async (estadoData) => {
@@ -293,7 +313,7 @@ export const cattleService = {
       throw new Error(errorData.message || 'Error al crear estado')
     }
     const data = await response.json()
-    return data
+    return mapKeysToCamelCase(data)
   },
 
   updateEstado: async (id, estadoData) => {
@@ -309,7 +329,7 @@ export const cattleService = {
       throw new Error(errorData.message || 'Error al actualizar estado')
     }
     const data = await response.json()
-    return data
+    return mapKeysToCamelCase(data)
   },
 
   deleteEstado: async (id) => {
