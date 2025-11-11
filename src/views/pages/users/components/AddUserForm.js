@@ -13,6 +13,7 @@ const AddUserForm = ({ addUserForm, setAddUserForm, roles }) => {
             aria-label="Nombre"
             value={addUserForm.nombre}
             onChange={(e) => setAddUserForm({ ...addUserForm, nombre: e.target.value })}
+            maxLength={100}
           />
           <small className="text-muted">Ingrese el nombre.</small>
         </CCol>
@@ -23,6 +24,7 @@ const AddUserForm = ({ addUserForm, setAddUserForm, roles }) => {
             aria-label="Apellido"
             value={addUserForm.apellido}
             onChange={(e) => setAddUserForm({ ...addUserForm, apellido: e.target.value })}
+            maxLength={100}
           />
           <small className="text-muted">Ingrese el apellido.</small>
         </CCol>
@@ -35,6 +37,7 @@ const AddUserForm = ({ addUserForm, setAddUserForm, roles }) => {
             aria-label="Correo"
             value={addUserForm.correo}
             onChange={(e) => setAddUserForm({ ...addUserForm, correo: e.target.value })}
+            maxLength={75}
           />
           <small className="text-muted">Ingrese el correo.</small>
         </CCol>
@@ -86,6 +89,7 @@ const AddUserForm = ({ addUserForm, setAddUserForm, roles }) => {
             aria-label="Contraseña"
             value={addUserForm.contrasena}
             onChange={(e) => setAddUserForm({ ...addUserForm, contrasena: e.target.value })}
+            maxLength={50}
           />
           <small className="text-muted">Ingrese la contraseña.</small>
         </CCol>

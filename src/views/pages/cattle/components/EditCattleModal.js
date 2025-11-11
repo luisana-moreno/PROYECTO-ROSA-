@@ -25,6 +25,8 @@ const EditCattleModal = ({
   etapas,
   estados,
 }) => {
+  const today = new Date().toISOString().split('T')[0]
+
   const validateForm = () => {
     if (
       !currentCattle.ttrNumerobv ||
@@ -38,6 +40,12 @@ const EditCattleModal = ({
       toast.error('Todos los campos obligatorios deben ser llenados.')
       return false
     }
+
+    if (new Date(currentCattle.ttrFecnacim) > new Date(today)) {
+      toast.error('La fecha de nacimiento no puede ser una fecha futura.')
+      return false
+    }
+
     return true
   }
 
@@ -77,6 +85,7 @@ const EditCattleModal = ({
               placeholder="Fecha de Nacimiento"
               value={formatDateToYYYYMMDD(currentCattle?.ttrFecnacim) || ''}
               onChange={(e) => setCurrentCattle({ ...currentCattle, ttrFecnacim: e.target.value })}
+              max={today}
             />
             <small className="text-muted">Ingrese la fecha.</small>
           </CCol>

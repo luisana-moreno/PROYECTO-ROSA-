@@ -24,6 +24,8 @@ const AddCattleModal = ({
   etapas,
   estados,
 }) => {
+  const today = new Date().toISOString().split('T')[0]
+
   const validateForm = () => {
     if (
       !addCattleForm.numeroBovino ||
@@ -37,6 +39,12 @@ const AddCattleModal = ({
       toast.error('Todos los campos obligatorios deben ser llenados.')
       return false
     }
+
+    if (new Date(addCattleForm.fechaNacimiento) > new Date(today)) {
+      toast.error('La fecha de nacimiento no puede ser una fecha futura.')
+      return false
+    }
+
     return true
   }
 
@@ -73,6 +81,7 @@ const AddCattleModal = ({
               onChange={(e) =>
                 setAddCattleForm({ ...addCattleForm, fechaNacimiento: e.target.value })
               }
+              max={today}
             />
             <small className="text-muted">Ingrese la fecha.</small>
           </CCol>

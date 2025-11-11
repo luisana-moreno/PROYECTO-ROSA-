@@ -13,6 +13,7 @@ const EditUserForm = ({ currentUser, setCurrentUser, roles }) => {
             aria-label="Nombre"
             value={currentUser?.nombre || ''}
             onChange={(e) => setCurrentUser({ ...currentUser, nombre: e.target.value })}
+            maxLength={100}
           />
           <small className="text-muted">Ingrese el primer nombre.</small>
         </CCol>
@@ -23,6 +24,7 @@ const EditUserForm = ({ currentUser, setCurrentUser, roles }) => {
             aria-label="Apellido"
             value={currentUser?.apellido || ''}
             onChange={(e) => setCurrentUser({ ...currentUser, apellido: e.target.value })}
+            maxLength={100}
           />
           <small className="text-muted">Ingrese el segundo nombre.</small>
         </CCol>
@@ -34,6 +36,7 @@ const EditUserForm = ({ currentUser, setCurrentUser, roles }) => {
               aria-label="Correo"
               value={currentUser?.correo || ''}
               onChange={(e) => setCurrentUser({ ...currentUser, correo: e.target.value })}
+              maxLength={100}
             />
             <small className="text-muted">Ingrese el correo.</small>
           </CCol>
@@ -85,6 +88,7 @@ const EditUserForm = ({ currentUser, setCurrentUser, roles }) => {
             placeholder="Contraseña (opcional)"
             aria-label="Contraseña"
             onChange={(e) => setCurrentUser({ ...currentUser, contrasena: e.target.value })}
+            maxLength={255}
           />
           <small className="text-muted">Ingrese la nueva contraseña si desea cambiarla.</small>
         </CCol>
