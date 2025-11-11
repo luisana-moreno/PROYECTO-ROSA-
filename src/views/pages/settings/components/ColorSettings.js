@@ -43,7 +43,7 @@ const ColorSettings = ({ colores, createColor, updateColor, deleteColor }) => {
   const handleEditColor = async () => {
     if (!currentColor) return
     try {
-      await updateColor(currentColor.tma_idcolbo, currentColor.tma_nomcolb)
+      await updateColor(currentColor.tmaIdcolbo, currentColor.tmaNomcolb)
       setVisibleEdit(false)
       toast.info('Color editado correctamente')
     } catch (error) {
@@ -55,7 +55,7 @@ const ColorSettings = ({ colores, createColor, updateColor, deleteColor }) => {
     if (!currentColor) return
     if (deleteConfirmation === 'confirmar') {
       try {
-        await deleteColor(currentColor.tma_idcolbo)
+        await deleteColor(currentColor.tmaIdcolbo)
         setVisibleDelete(false)
         toast.error('Color eliminado correctamente')
       } catch (error) {
@@ -86,9 +86,9 @@ const ColorSettings = ({ colores, createColor, updateColor, deleteColor }) => {
           </CTableHead>
           <CTableBody>
             {colores.map((color) => (
-              <CTableRow key={color.tma_idcolbo}>
-                <CTableDataCell>{color.tma_idcolbo}</CTableDataCell>
-                <CTableDataCell>{color.tma_nomcolb}</CTableDataCell>
+              <CTableRow key={color.tmaIdcolbo}>
+                <CTableDataCell>{color.tmaIdcolbo}</CTableDataCell>
+                <CTableDataCell>{color.tmaNomcolb}</CTableDataCell>
                 <CTableDataCell>
                   <CButton
                     color="info"
@@ -151,8 +151,8 @@ const ColorSettings = ({ colores, createColor, updateColor, deleteColor }) => {
             <CFormInput
               type="text"
               label="Nombre del Color"
-              value={currentColor ? currentColor.tma_nomcolb : ''}
-              onChange={(e) => setCurrentColor({ ...currentColor, tma_nomcolb: e.target.value })}
+              value={currentColor ? currentColor.tmaNomcolb : ''}
+              onChange={(e) => setCurrentColor({ ...currentColor, tmaNomcolb: e.target.value })}
               placeholder="Ingrese el nuevo nombre del color"
             />
           </CModalBody>
@@ -174,7 +174,7 @@ const ColorSettings = ({ colores, createColor, updateColor, deleteColor }) => {
           <CModalBody>
             <p>
               ¿Está seguro de que desea eliminar el color{' '}
-              <strong>{currentColor ? currentColor.tma_nomcolb : ''}</strong>?
+              <strong>{currentColor ? currentColor.tmaNomcolb : ''}</strong>?
             </p>
             <CFormInput
               type="text"

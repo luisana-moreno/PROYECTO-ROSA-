@@ -12,6 +12,7 @@ import {
   CFormSelect,
 } from '@coreui/react'
 import { toast } from 'react-toastify' // Importa toast de react-toastify
+import { formatDateToYYYYMMDD } from 'src/utils/dateFormatter'
 
 const EditCattleModal = ({
   editVisible,
@@ -26,13 +27,13 @@ const EditCattleModal = ({
 }) => {
   const validateForm = () => {
     if (
-      !currentCattle.ttr_numerobv ||
-      !currentCattle.ttr_idrazabo ||
-      !currentCattle.ttr_fecnacim ||
-      !currentCattle.ttr_idcolorb ||
-      !currentCattle.ttr_pesokilo ||
-      !currentCattle.ttr_idetapav ||
-      !currentCattle.ttr_idestadb
+      !currentCattle.ttrNumerobv ||
+      !currentCattle.ttrIdrazabo ||
+      !currentCattle.ttrFecnacim ||
+      !currentCattle.ttrIdcolorb ||
+      !currentCattle.ttrPesokilo ||
+      !currentCattle.ttrIdetapav ||
+      !currentCattle.ttrIdestadb
     ) {
       toast.error('Todos los campos obligatorios deben ser llenados.')
       return false
@@ -58,24 +59,24 @@ const EditCattleModal = ({
       </CModalHeader>
       <CModalBody style={{ maxHeight: '70vh', overflowY: 'auto' }}>
         <CRow className="g-3 mt-2">
-          <h4 className="text-green mt-1 me-5">Cattle Data</h4>
+          <h4 className="text-green mt-1 me-5">Datos del Bovino</h4>
           <CCol md={6}>
             <CFormInput
               className="modal-name custom-select"
-              placeholder="Numero de Arete"
-              aria-label="Numero de Arete"
-              value={currentCattle?.ttr_numerobv || ''}
-              onChange={(e) => setCurrentCattle({ ...currentCattle, ttr_numerobv: e.target.value })}
+              placeholder="Número de Arete"
+              aria-label="Número de Arete"
+              value={currentCattle?.ttrNumerobv || ''}
+              onChange={(e) => setCurrentCattle({ ...currentCattle, ttrNumerobv: e.target.value })}
             />
-            <small className="text-muted">Ingrese el codigo del bovino.</small>
+            <small className="text-muted">Ingrese el código del bovino.</small>
           </CCol>
           <CCol md={6}>
             <CFormInput
               className="modal-name custom-select"
               type="date"
               placeholder="Fecha de Nacimiento"
-              value={currentCattle?.ttr_fecnacim || ''}
-              onChange={(e) => setCurrentCattle({ ...currentCattle, ttr_fecnacim: e.target.value })}
+              value={formatDateToYYYYMMDD(currentCattle?.ttrFecnacim) || ''}
+              onChange={(e) => setCurrentCattle({ ...currentCattle, ttrFecnacim: e.target.value })}
             />
             <small className="text-muted">Ingrese la fecha.</small>
           </CCol>
@@ -86,13 +87,15 @@ const EditCattleModal = ({
               className="modal-name custom-select"
               placeholder="Raza"
               aria-label="Raza"
-              value={currentCattle?.ttr_idrazabo || ''}
-              onChange={(e) => setCurrentCattle({ ...currentCattle, ttr_idrazabo: e.target.value })}
+              value={String(currentCattle?.ttrIdrazabo || '')}
+              onChange={(e) =>
+                setCurrentCattle({ ...currentCattle, ttrIdrazabo: Number(e.target.value) })
+              }
             >
               <option value="">Seleccione la Raza</option>
               {razas.map((raza) => (
-                <option key={raza.tma_idrazab} value={raza.tma_idrazab}>
-                  {raza.tma_nomraza}
+                <option key={raza.tmaIdrazab} value={String(raza.tmaIdrazab)}>
+                  {raza.tmaNomraza}
                 </option>
               ))}
             </CFormSelect>
@@ -103,17 +106,19 @@ const EditCattleModal = ({
               className="modal-name custom-select"
               placeholder="Color"
               aria-label="Color"
-              value={currentCattle?.ttr_idcolorb || ''}
-              onChange={(e) => setCurrentCattle({ ...currentCattle, ttr_idcolorb: e.target.value })}
+              value={String(currentCattle?.ttrIdcolorb || '')}
+              onChange={(e) =>
+                setCurrentCattle({ ...currentCattle, ttrIdcolorb: Number(e.target.value) })
+              }
             >
               <option value="">Seleccione el Color</option>
               {colores.map((color) => (
-                <option key={color.tma_idcolbo} value={color.tma_idcolbo}>
-                  {color.tma_nomcolb}
+                <option key={color.tmaIdcolbo} value={String(color.tmaIdcolbo)}>
+                  {color.tmaNomcolb}
                 </option>
               ))}
             </CFormSelect>
-            <small className="text-muted">Please add cattle color.</small>
+            <small className="text-muted">Ingrese el color del bovino.</small>
           </CCol>
         </CRow>
         <CRow className="g-3 mt-2">
@@ -121,51 +126,55 @@ const EditCattleModal = ({
             <CFormInput
               className="modal-name custom-select"
               type="number"
-              placeholder="Weight"
-              value={currentCattle?.ttr_pesokilo || ''}
+              placeholder="Peso"
+              value={currentCattle?.ttrPesokilo || ''}
               onChange={(e) =>
                 setCurrentCattle({
                   ...currentCattle,
-                  ttr_pesokilo: parseFloat(e.target.value) || '',
+                  ttrPesokilo: parseFloat(e.target.value) || '',
                 })
               }
             />
-            <small className="text-muted">Please add cattle weigth.</small>
+            <small className="text-muted">Ingrese el peso del bovino.</small>
           </CCol>
           <CCol md={6}>
             <CFormSelect
               className="modal-name custom-select"
               placeholder="Etapa"
               aria-label="Etapa"
-              value={currentCattle?.ttr_idetapav || ''}
-              onChange={(e) => setCurrentCattle({ ...currentCattle, ttr_idetapav: e.target.value })}
+              value={String(currentCattle?.ttrIdetapav || '')}
+              onChange={(e) =>
+                setCurrentCattle({ ...currentCattle, ttrIdetapav: Number(e.target.value) })
+              }
             >
               <option value="">Seleccione la Etapa</option>
               {etapas.map((etapa) => (
-                <option key={etapa.tma_idetabo} value={etapa.tma_idetabo}>
-                  {etapa.tma_nometab}
+                <option key={etapa.tmaIdetabo} value={String(etapa.tmaIdetabo)}>
+                  {etapa.tmaNometab}
                 </option>
               ))}
             </CFormSelect>
-            <small className="text-muted">Please add cattle stage.</small>
+            <small className="text-muted">Ingrese la etapa del bovino.</small>
           </CCol>
         </CRow>
         <CRow className="g-3 mt-2">
           <CCol md={6}>
             <CFormSelect
               className="modal-name custom-select"
-              placeholder="Statu Cattle"
-              value={currentCattle?.ttr_idestadb || ''}
-              onChange={(e) => setCurrentCattle({ ...currentCattle, ttr_idestadb: e.target.value })}
+              placeholder="Estado del Bovino"
+              value={String(currentCattle?.ttrIdestadb || '')}
+              onChange={(e) =>
+                setCurrentCattle({ ...currentCattle, ttrIdestadb: Number(e.target.value) })
+              }
             >
-              <option value="">Status cattle</option>
+              <option value="">Estado del bovino</option>
               {estados.map((estado) => (
-                <option key={estado.tma_idestbo} value={estado.tma_idestbo}>
-                  {estado.tma_nomestb}
+                <option key={estado.tmaIdestbo} value={String(estado.tmaIdestbo)}>
+                  {estado.tmaNomestb}
                 </option>
               ))}
             </CFormSelect>
-            <small className="text-muted">Please add statu cattle.</small>
+            <small className="text-muted">Ingrese el estado del bovino.</small>
           </CCol>
         </CRow>
       </CModalBody>

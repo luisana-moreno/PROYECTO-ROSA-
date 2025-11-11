@@ -43,7 +43,7 @@ const BreedSettings = ({ razas, createRaza, updateRaza, deleteRaza }) => {
   const handleEditRaza = async () => {
     if (!currentRaza) return
     try {
-      await updateRaza(currentRaza.tma_idrazab, currentRaza.tma_nomraza)
+      await updateRaza(currentRaza.tmaIdrazab, currentRaza.tmaNomraza)
       setVisibleEdit(false)
       toast.info('Raza editada correctamente')
     } catch (error) {
@@ -55,7 +55,7 @@ const BreedSettings = ({ razas, createRaza, updateRaza, deleteRaza }) => {
     if (!currentRaza) return
     if (deleteConfirmation === 'confirmar') {
       try {
-        await deleteRaza(currentRaza.tma_idrazab)
+        await deleteRaza(currentRaza.tmaIdrazab)
         setVisibleDelete(false)
         toast.error('Raza eliminada correctamente')
       } catch (error) {
@@ -86,9 +86,9 @@ const BreedSettings = ({ razas, createRaza, updateRaza, deleteRaza }) => {
           </CTableHead>
           <CTableBody>
             {razas.map((raza) => (
-              <CTableRow key={raza.tma_idrazab}>
-                <CTableDataCell>{raza.tma_idrazab}</CTableDataCell>
-                <CTableDataCell>{raza.tma_nomraza}</CTableDataCell>
+              <CTableRow key={raza.tmaIdrazab}>
+                <CTableDataCell>{raza.tmaIdrazab}</CTableDataCell>
+                <CTableDataCell>{raza.tmaNomraza}</CTableDataCell>
                 <CTableDataCell>
                   <CButton
                     color="info"
@@ -151,8 +151,8 @@ const BreedSettings = ({ razas, createRaza, updateRaza, deleteRaza }) => {
             <CFormInput
               type="text"
               label="Nombre de la Raza"
-              value={currentRaza ? currentRaza.tma_nomraza : ''}
-              onChange={(e) => setCurrentRaza({ ...currentRaza, tma_nomraza: e.target.value })}
+              value={currentRaza ? currentRaza.tmaNomraza : ''}
+              onChange={(e) => setCurrentRaza({ ...currentRaza, tmaNomraza: e.target.value })}
               placeholder="Ingrese el nuevo nombre de la raza"
             />
           </CModalBody>
@@ -174,7 +174,7 @@ const BreedSettings = ({ razas, createRaza, updateRaza, deleteRaza }) => {
           <CModalBody>
             <p>
               ¿Está seguro de que desea eliminar la raza{' '}
-              <strong>{currentRaza ? currentRaza.tma_nomraza : ''}</strong>?
+              <strong>{currentRaza ? currentRaza.tmaNomraza : ''}</strong>?
             </p>
             <CFormInput
               type="text"

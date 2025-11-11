@@ -26,6 +26,7 @@ import CIcon from '@coreui/icons-react'
 import { cilMedicalCross, cilList, cilInfo } from '@coreui/icons' // Eliminado cilDrop, se usará cilList para Producción de Leche
 import PropTypes from 'prop-types'
 import { helpFetch } from 'src/helpper/helpFetch'
+import { formatDateToDDMMYYYY } from 'src/utils/dateFormatter'
 
 const { get } = helpFetch()
 
@@ -60,10 +61,9 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
     }
   }, [expBovVisible, currentCattle])
 
+  // Usar la función de utilidad formatDateToDDMMYYYY
   const formatDate = (dateString) => {
-    if (!dateString) return 'N/A'
-    const options = { year: 'numeric', month: 'long', day: 'numeric' }
-    return new Date(dateString).toLocaleDateString('es-ES', options)
+    return formatDateToDDMMYYYY(dateString) || 'N/A'
   }
 
   return (
@@ -128,29 +128,29 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
               <CCol md={6}>
                 <CListGroup flush>
                   <CListGroupItem>
-                    <strong>Número de Bovino:</strong> {currentCattle?.ttr_numerobv}
+                    <strong>Número de Bovino:</strong> {currentCattle?.ttrNumerobv}
                   </CListGroupItem>
                   <CListGroupItem>
-                    <strong>Raza:</strong> {currentCattle?.raza_nombre || 'N/A'}
+                    <strong>Raza:</strong> {currentCattle?.razaNombre || 'N/A'}
                   </CListGroupItem>
                   <CListGroupItem>
-                    <strong>Fecha de Nacimiento:</strong> {formatDate(currentCattle?.ttr_fecnacim)}
+                    <strong>Fecha de Nacimiento:</strong> {formatDate(currentCattle?.ttrFecnacim)}
                   </CListGroupItem>
                   <CListGroupItem>
-                    <strong>Color:</strong> {currentCattle?.color_nombre || 'N/A'}
+                    <strong>Color:</strong> {currentCattle?.colorNombre || 'N/A'}
                   </CListGroupItem>
                 </CListGroup>
               </CCol>
               <CCol md={6}>
                 <CListGroup flush>
                   <CListGroupItem>
-                    <strong>Peso (kg):</strong> {currentCattle?.ttr_pesokilo}
+                    <strong>Peso (kg):</strong> {currentCattle?.ttrPesokilo}
                   </CListGroupItem>
                   <CListGroupItem>
-                    <strong>Etapa:</strong> {currentCattle?.etapa_nombre || 'N/A'}
+                    <strong>Etapa:</strong> {currentCattle?.etapaNombre || 'N/A'}
                   </CListGroupItem>
                   <CListGroupItem>
-                    <strong>Estado:</strong> {currentCattle?.estado_nombre || 'N/A'}
+                    <strong>Estado:</strong> {currentCattle?.estadoNombre || 'N/A'}
                   </CListGroupItem>
                 </CListGroup>
               </CCol>

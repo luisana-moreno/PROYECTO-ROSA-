@@ -74,7 +74,8 @@ const CustomTableModal = ({
         <CTable hover responsive>
           <CTableHead>
             <CTableRow>
-              <CTableHeaderCell></CTableHeaderCell> {/* Checkbox column */}
+              <CTableHeaderCell></CTableHeaderCell>
+              {/* Checkbox column */}
               {columns.map((col) => (
                 <CTableHeaderCell key={col.key}>{col.label}</CTableHeaderCell>
               ))}

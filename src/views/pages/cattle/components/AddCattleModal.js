@@ -84,12 +84,14 @@ const AddCattleModal = ({
               placeholder="Raza"
               aria-label="Raza"
               value={addCattleForm.idRazaBovino}
-              onChange={(e) => setAddCattleForm({ ...addCattleForm, idRazaBovino: e.target.value })}
+              onChange={(e) =>
+                setAddCattleForm({ ...addCattleForm, idRazaBovino: Number(e.target.value) })
+              }
             >
               <option value="">Seleccione la Raza</option>
               {razas.map((raza) => (
-                <option key={raza.tma_idrazab} value={raza.tma_idrazab}>
-                  {raza.tma_nomraza}
+                <option key={raza.tmaIdrazab} value={String(raza.tmaIdrazab)}>
+                  {raza.tmaNomraza}
                 </option>
               ))}
             </CFormSelect>
@@ -102,17 +104,18 @@ const AddCattleModal = ({
               aria-label="Color"
               value={addCattleForm.idColorBovino}
               onChange={(e) =>
-                setAddCattleForm({ ...addCattleForm, idColorBovino: e.target.value })
+                setAddCattleForm({ ...addCattleForm, idColorBovino: Number(e.target.value) })
               }
             >
               <option value="">Seleccione el Color</option>
               {colores.map((color) => (
-                <option key={color.tma_idcolbo} value={color.tma_idcolbo}>
-                  {color.tma_nomcolb}
+                <option key={color.tmaIdcolbo} value={String(color.tmaIdcolbo)}>
+                  {color.tmaNomcolb}
+                  {console.log(color)}
                 </option>
               ))}
             </CFormSelect>
-            <small className="text-muted">Please add cattle color.</small>
+            <small className="text-muted">Ingrese el color del bovino.</small>
           </CCol>
         </CRow>
         <CRow className="g-3 mt-2">
@@ -120,13 +123,13 @@ const AddCattleModal = ({
             <CFormInput
               className="modal-name custom-select"
               type="number"
-              placeholder="Weight"
+              placeholder="Peso"
               value={addCattleForm.pesoKilo}
               onChange={(e) =>
                 setAddCattleForm({ ...addCattleForm, pesoKilo: parseFloat(e.target.value) || '' })
               }
             />
-            <small className="text-muted">Please add cattle weigth.</small>
+            <small className="text-muted">Ingrese el peso del bovino.</small>
           </CCol>
           <CCol md={6}>
             <CFormSelect
@@ -135,37 +138,38 @@ const AddCattleModal = ({
               aria-label="Etapa"
               value={addCattleForm.idEtapaBovino}
               onChange={(e) =>
-                setAddCattleForm({ ...addCattleForm, idEtapaBovino: e.target.value })
+                setAddCattleForm({ ...addCattleForm, idEtapaBovino: Number(e.target.value) })
               }
             >
               <option value="">Seleccione la Etapa</option>
               {etapas.map((etapa) => (
-                <option key={etapa.tma_idetabo} value={etapa.tma_idetabo}>
-                  {etapa.tma_nometab}
+                <option key={etapa.tmaIdetabo} value={String(etapa.tmaIdetabo)}>
+                  {etapa.tmaNometab}
+                  {console.log(etapa)}
                 </option>
               ))}
             </CFormSelect>
-            <small className="text-muted">Please add cattle stage.</small>
+            <small className="text-muted">Ingrese la etapa del bovino.</small>
           </CCol>
         </CRow>
         <CRow className="g-3 mt-2">
           <CCol md={6}>
             <CFormSelect
               className="modal-name custom-select"
-              placeholder="Statu Cattle"
+              placeholder="Estado del Bovino"
               value={addCattleForm.idEstadoBovino}
               onChange={(e) =>
-                setAddCattleForm({ ...addCattleForm, idEstadoBovino: e.target.value })
+                setAddCattleForm({ ...addCattleForm, idEstadoBovino: Number(e.target.value) })
               }
             >
-              <option value="">Status cattle</option>
+              <option value="">Estado del bovino</option>
               {estados.map((estado) => (
-                <option key={estado.tma_idestbo} value={estado.tma_idestbo}>
-                  {estado.tma_nomestb}
+                <option key={estado.tmaIdestbo} value={String(estado.tmaIdestbo)}>
+                  {estado.tmaNomestb}
                 </option>
               ))}
             </CFormSelect>
-            <small className="text-muted">Please add statu cattle.</small>
+            <small className="text-muted">Ingrese el estado del bovino.</small>
           </CCol>
         </CRow>
       </CModalBody>

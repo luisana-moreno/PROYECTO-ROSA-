@@ -42,6 +42,10 @@ export const useUsers = () => {
       toast.warning('El campo "Teléfono" es requerido.')
       return false
     }
+    if (form.telefono.length !== 11) {
+      toast.warning('El campo "Teléfono" debe tener exactamente 11 dígitos.')
+      return false
+    }
     if (!form.idRol) {
       toast.warning('El campo "Rol" es requerido.')
       return false
@@ -77,7 +81,7 @@ export const useUsers = () => {
     try {
       const newUser = await userService.createUser(addUserForm)
       if (newUser) {
-        setUsers([...users, newUser])
+        fetchUsers() // Recargar la lista de usuarios
         setAddUserForm({
           nombre: '',
           apellido: '',
@@ -106,7 +110,7 @@ export const useUsers = () => {
     try {
       const updated = await userService.updateUser(currentUser.ttr_idusuar, currentUser)
       if (updated) {
-        setUsers(users.map((u) => (u.ttr_idusuar === updated.ttr_idusuar ? updated : u)))
+        fetchUsers() // Recargar la lista de usuarios
         setEditVisible(false)
         toast.info('Usuario actualizado correctamente.')
       }
