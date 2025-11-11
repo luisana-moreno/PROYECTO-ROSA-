@@ -115,7 +115,7 @@ const AddCattleModal = ({
                 </option>
               ))}
             </CFormSelect>
-            <small className="text-muted">Please add cattle color.</small>
+            <small className="text-muted">Ingrese el color del bovino.</small>
           </CCol>
         </CRow>
         <CRow className="g-3 mt-2">
@@ -123,13 +123,13 @@ const AddCattleModal = ({
             <CFormInput
               className="modal-name custom-select"
               type="number"
-              placeholder="Weight"
+              placeholder="Peso"
               value={addCattleForm.pesoKilo}
               onChange={(e) =>
                 setAddCattleForm({ ...addCattleForm, pesoKilo: parseFloat(e.target.value) || '' })
               }
             />
-            <small className="text-muted">Please add cattle weigth.</small>
+            <small className="text-muted">Ingrese el peso del bovino.</small>
           </CCol>
           <CCol md={6}>
             <CFormSelect
@@ -149,27 +149,27 @@ const AddCattleModal = ({
                 </option>
               ))}
             </CFormSelect>
-            <small className="text-muted">Please add cattle stage.</small>
+            <small className="text-muted">Ingrese la etapa del bovino.</small>
           </CCol>
         </CRow>
         <CRow className="g-3 mt-2">
           <CCol md={6}>
             <CFormSelect
               className="modal-name custom-select"
-              placeholder="Statu Cattle"
+              placeholder="Estado del Bovino"
               value={addCattleForm.idEstadoBovino}
               onChange={(e) =>
                 setAddCattleForm({ ...addCattleForm, idEstadoBovino: Number(e.target.value) })
               }
             >
-              <option value="">Status cattle</option>
+              <option value="">Estado del bovino</option>
               {estados.map((estado) => (
                 <option key={estado.tmaIdestbo} value={String(estado.tmaIdestbo)}>
                   {estado.tmaNomestb}
                 </option>
               ))}
             </CFormSelect>
-            <small className="text-muted">Please add statu cattle.</small>
+            <small className="text-muted">Ingrese el estado del bovino.</small>
           </CCol>
         </CRow>
       </CModalBody>
