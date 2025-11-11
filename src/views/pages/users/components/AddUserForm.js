@@ -41,12 +41,24 @@ const AddUserForm = ({ addUserForm, setAddUserForm, roles }) => {
         <CCol md={6}>
           <CFormInput
             className="modal-name custom-select"
+            type="tel"
             placeholder="Telefono"
             aria-label="Telefono"
             value={addUserForm.telefono}
-            onChange={(e) => setAddUserForm({ ...addUserForm, telefono: e.target.value })}
+            onChange={(e) => {
+              const value = e.target.value
+              if (value.length <= 11 && /^\d*$/.test(value)) {
+                setAddUserForm({ ...addUserForm, telefono: value })
+              }
+            }}
+            maxLength="11"
+            pattern="[0-9]{11}"
+            required
           />
-          <small className="text-muted">Ingrese el telefono.</small>
+          {addUserForm.telefono && addUserForm.telefono.length !== 11 && (
+            <small className="text-danger">El teléfono debe tener exactamente 11 dígitos.</small>
+          )}
+          <small className="text-muted">Ingrese el telefono (11 dígitos).</small>
         </CCol>
       </CRow>
       <CRow className="g-3 mt-2">

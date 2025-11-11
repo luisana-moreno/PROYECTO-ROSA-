@@ -40,12 +40,24 @@ const EditUserForm = ({ currentUser, setCurrentUser, roles }) => {
           <CCol md={6}>
             <CFormInput
               className="modal-name custom-select"
+              type="tel"
               placeholder="Telefono"
               aria-label="Telefono"
               value={currentUser?.telefono || ''}
-              onChange={(e) => setCurrentUser({ ...currentUser, telefono: e.target.value })}
+              onChange={(e) => {
+                const value = e.target.value
+                if (value.length <= 11 && /^\d*$/.test(value)) {
+                  setCurrentUser({ ...currentUser, telefono: value })
+                }
+              }}
+              maxLength="11"
+              pattern="[0-9]{11}"
+              required
             />
-            <small className="text-muted">Ingrese el telefono.</small>
+            {currentUser?.telefono && currentUser.telefono.length !== 11 && (
+              <small className="text-danger">El teléfono debe tener exactamente 11 dígitos.</small>
+            )}
+            <small className="text-muted">Ingrese el telefono (11 dígitos).</small>
           </CCol>
         </CRow>
       </CRow>

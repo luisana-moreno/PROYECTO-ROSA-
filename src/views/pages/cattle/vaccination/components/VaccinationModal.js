@@ -31,8 +31,8 @@ const VaccinationModal = ({
   console.log('visibleCattleModal en VaccinationModal:', visibleCattleModal)
   const cattleColumns = [
     { key: 'id', label: 'ID' },
-    { key: 'cattle_number', label: 'Número de Bovino' },
-    { key: 'breed_bovine', label: 'Raza' },
+    { key: 'cattleNumber', label: 'Número de Bovino' },
+    { key: 'razaNombre', label: 'Raza' },
   ]
 
   // Obtener los objetos de bovinos seleccionados para mostrar en el modal
@@ -64,7 +64,7 @@ const VaccinationModal = ({
                 {selectedCattleObjects.length > 0 ? (
                   selectedCattleObjects.map((b) => (
                     <CBadge key={b.id} color="info" className="me-1 mb-1">
-                      {b.cattle_number || b.id} - {b.breed_bovine}
+                      {b.ttrNumerobv || b.id} - {b.razaNombre}
                     </CBadge>
                   ))
                 ) : (
@@ -80,8 +80,8 @@ const VaccinationModal = ({
             >
               <option value="">Seleccione el empleado</option>
               {employees.map((emp) => (
-                <option key={emp.ttr_idemplo} value={emp.ttr_idemplo}>
-                  {emp.ttr_nombrel} {emp.ttr_apellid} ({emp.cargo_nombre})
+                <option key={emp.ttrIdemplo} value={emp.ttrIdemplo}>
+                  {emp.ttrNombrel} {emp.ttrApellid} ({emp.cargoNombre})
                 </option>
               ))}
             </CFormSelect>
@@ -113,9 +113,9 @@ const VaccinationModal = ({
               className="modal-name mb-3"
               type="date"
               placeholder="Fecha de Vacunación"
-              name="date_vaccination"
-              value={formData.date_vaccination}
-              onChange={(e) => setFormData({ ...formData, date_vaccination: e.target.value })}
+              name="dateVaccination"
+              value={formData.dateVaccination}
+              onChange={(e) => setFormData({ ...formData, dateVaccination: e.target.value })}
             />
           </CForm>
         </CModalBody>

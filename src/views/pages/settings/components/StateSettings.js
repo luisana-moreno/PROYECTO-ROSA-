@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
   CCard,
   CCardHeader,
@@ -19,11 +19,9 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPlus, cilPencil, cilTrash } from '@coreui/icons'
-import { cattleService } from 'src/api/cattleService'
 import { toast } from 'react-toastify'
 
-const StateSettings = () => {
-  const [estados, setEstados] = useState([])
+const StateSettings = ({ estados, createEstado, updateEstado, deleteEstado }) => {
   const [visibleAdd, setVisibleAdd] = useState(false)
   const [visibleEdit, setVisibleEdit] = useState(false)
   const [visibleDelete, setVisibleDelete] = useState(false)
@@ -31,24 +29,9 @@ const StateSettings = () => {
   const [currentState, setCurrentState] = useState(null)
   const [deleteConfirmation, setDeleteConfirmation] = useState('')
 
-  useEffect(() => {
-    fetchEstados()
-  }, [])
-
-  const fetchEstados = async () => {
-    try {
-      const data = await cattleService.getAllEstados()
-      setEstados(data)
-    } catch (error) {
-      console.error('Error fetching estados:', error)
-      toast.error('Error al cargar estados')
-    }
-  }
-
   const handleAddEstado = async () => {
     try {
-      const newEstado = await cattleService.createEstado({ nombre: newStateName })
-      setEstados([...estados, newEstado])
+      const newEstado = await createEstado({ nombre: newStateName })
       setNewStateName('')
       setVisibleAdd(false)
       toast.success('Estado agregado correctamente')
@@ -61,12 +44,9 @@ const StateSettings = () => {
   const handleEditEstado = async () => {
     if (!currentState) return
     try {
-      const updatedEstado = await cattleService.updateEstado(currentState.tma_idestbo, {
-        nombre: currentState.tma_nomestb,
+      const updatedEstado = await updateEstado(currentState.tmaIdestbo, {
+        nombre: currentState.tmaNomestb,
       })
-      setEstados(
-        estados.map((e) => (e.tma_idestbo === updatedEstado.tma_idestbo ? updatedEstado : e)),
-      )
       setVisibleEdit(false)
       toast.info('Estado editado correctamente')
     } catch (error) {
@@ -79,8 +59,7 @@ const StateSettings = () => {
     if (!currentState) return
     if (deleteConfirmation === 'confirmar') {
       try {
-        await cattleService.deleteEstado(currentState.tma_idestbo)
-        setEstados(estados.filter((e) => e.tma_idestbo !== currentState.tma_idestbo))
+        await deleteEstado(currentState.tmaIdestbo)
         setVisibleDelete(false)
         toast.error('Estado eliminado correctamente')
       } catch (error) {
@@ -112,9 +91,9 @@ const StateSettings = () => {
           </CTableHead>
           <CTableBody>
             {estados.map((estado) => (
-              <CTableRow key={estado.tma_idestbo}>
-                <CTableDataCell>{estado.tma_idestbo}</CTableDataCell>
-                <CTableDataCell>{estado.tma_nomestb}</CTableDataCell>
+              <CTableRow key={estado.tmaIdestbo}>
+                <CTableDataCell>{estado.tmaIdestbo}</CTableDataCell>
+                <CTableDataCell>{estado.tmaNomestb}</CTableDataCell>
                 <CTableDataCell>
                   <CButton
                     color="info"
@@ -176,8 +155,8 @@ const StateSettings = () => {
             <CFormInput
               type="text"
               label="Nombre del Estado"
-              value={currentState ? currentState.tma_nomestb : ''}
-              onChange={(e) => setCurrentState({ ...currentState, tma_nomestb: e.target.value })}
+              value={currentState ? currentState.tmaNomestb : ''}
+              onChange={(e) => setCurrentState({ ...currentState, tmaNomestb: e.target.value })}
               placeholder="Ingrese el nuevo nombre del estado"
             />
           </CModalBody>
@@ -199,7 +178,7 @@ const StateSettings = () => {
           <CModalBody>
             <p>
               ¿Está seguro de que desea eliminar el estado{' '}
-              <strong>{currentState ? currentState.tma_nomestb : ''}</strong>?
+              <strong>{currentState ? currentState.tmaNomestb : ''}</strong>?
             </p>
             <CFormInput
               type="text"

@@ -8,6 +8,7 @@ import {
   CTableHeaderCell,
   CTableBody,
 } from '@coreui/react'
+import { formatDateToDDMMYYYY } from 'src/utils/dateFormatter'
 
 const CattleTable = ({
   cattle,
@@ -33,14 +34,14 @@ const CattleTable = ({
       </CTableHead>
       <CTableBody>
         {cattle.map((cattleItem) => (
-          <CTableRow key={cattleItem.ttr_idbovino}>
-            <CTableDataCell>{cattleItem?.ttr_numerobv || ''}</CTableDataCell>
-            <CTableDataCell>{cattleItem?.raza_nombre || ''}</CTableDataCell>
-            <CTableDataCell>{cattleItem?.ttr_fecnacim || ''}</CTableDataCell>
-            <CTableDataCell>{cattleItem?.color_nombre || ''}</CTableDataCell>
-            <CTableDataCell>{cattleItem?.ttr_pesokilo || ''}</CTableDataCell>
-            <CTableDataCell>{cattleItem?.etapa_nombre || ''}</CTableDataCell>
-            <CTableDataCell>{cattleItem?.estado_nombre || ''}</CTableDataCell>
+          <CTableRow key={cattleItem.ttrIdbovino}>
+            <CTableDataCell>{cattleItem?.ttrNumerobv || ''}</CTableDataCell>
+            <CTableDataCell>{cattleItem?.razaNombre || ''}</CTableDataCell>
+            <CTableDataCell>{formatDateToDDMMYYYY(cattleItem?.ttrFecnacim) || ''}</CTableDataCell>
+            <CTableDataCell>{cattleItem?.colorNombre || ''}</CTableDataCell>
+            <CTableDataCell>{cattleItem?.ttrPesokilo || ''}</CTableDataCell>
+            <CTableDataCell>{cattleItem?.etapaNombre || ''}</CTableDataCell>
+            <CTableDataCell>{cattleItem?.estadoNombre || ''}</CTableDataCell>
             <CTableDataCell>
               <div className="d-flex">
                 <CButton

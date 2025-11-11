@@ -84,12 +84,14 @@ const AddCattleModal = ({
               placeholder="Raza"
               aria-label="Raza"
               value={addCattleForm.idRazaBovino}
-              onChange={(e) => setAddCattleForm({ ...addCattleForm, idRazaBovino: e.target.value })}
+              onChange={(e) =>
+                setAddCattleForm({ ...addCattleForm, idRazaBovino: Number(e.target.value) })
+              }
             >
               <option value="">Seleccione la Raza</option>
               {razas.map((raza) => (
-                <option key={raza.tma_idrazab} value={raza.tma_idrazab}>
-                  {raza.tma_nomraza}
+                <option key={raza.tmaIdrazab} value={String(raza.tmaIdrazab)}>
+                  {raza.tmaNomraza}
                 </option>
               ))}
             </CFormSelect>
@@ -102,13 +104,14 @@ const AddCattleModal = ({
               aria-label="Color"
               value={addCattleForm.idColorBovino}
               onChange={(e) =>
-                setAddCattleForm({ ...addCattleForm, idColorBovino: e.target.value })
+                setAddCattleForm({ ...addCattleForm, idColorBovino: Number(e.target.value) })
               }
             >
               <option value="">Seleccione el Color</option>
               {colores.map((color) => (
-                <option key={color.tma_idcolbo} value={color.tma_idcolbo}>
-                  {color.tma_nomcolb}
+                <option key={color.tmaIdcolbo} value={String(color.tmaIdcolbo)}>
+                  {color.tmaNomcolb}
+                  {console.log(color)}
                 </option>
               ))}
             </CFormSelect>
@@ -135,13 +138,14 @@ const AddCattleModal = ({
               aria-label="Etapa"
               value={addCattleForm.idEtapaBovino}
               onChange={(e) =>
-                setAddCattleForm({ ...addCattleForm, idEtapaBovino: e.target.value })
+                setAddCattleForm({ ...addCattleForm, idEtapaBovino: Number(e.target.value) })
               }
             >
               <option value="">Seleccione la Etapa</option>
               {etapas.map((etapa) => (
-                <option key={etapa.tma_idetabo} value={etapa.tma_idetabo}>
-                  {etapa.tma_nometab}
+                <option key={etapa.tmaIdetabo} value={String(etapa.tmaIdetabo)}>
+                  {etapa.tmaNometab}
+                  {console.log(etapa)}
                 </option>
               ))}
             </CFormSelect>
@@ -155,13 +159,13 @@ const AddCattleModal = ({
               placeholder="Statu Cattle"
               value={addCattleForm.idEstadoBovino}
               onChange={(e) =>
-                setAddCattleForm({ ...addCattleForm, idEstadoBovino: e.target.value })
+                setAddCattleForm({ ...addCattleForm, idEstadoBovino: Number(e.target.value) })
               }
             >
               <option value="">Status cattle</option>
               {estados.map((estado) => (
-                <option key={estado.tma_idestbo} value={estado.tma_idestbo}>
-                  {estado.tma_nomestb}
+                <option key={estado.tmaIdestbo} value={String(estado.tmaIdestbo)}>
+                  {estado.tmaNomestb}
                 </option>
               ))}
             </CFormSelect>

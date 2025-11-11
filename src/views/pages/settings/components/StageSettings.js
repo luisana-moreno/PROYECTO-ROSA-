@@ -43,7 +43,7 @@ const StageSettings = ({ etapas, createEtapa, updateEtapa, deleteEtapa }) => {
   const handleEditEtapa = async () => {
     if (!currentEtapa) return
     try {
-      await updateEtapa(currentEtapa.tma_idetabo, currentEtapa.tma_nometab)
+      await updateEtapa(currentEtapa.tmaIdetabo, currentEtapa.tmaNometab)
       setVisibleEdit(false)
       toast.info('Etapa editada correctamente')
     } catch (error) {
@@ -55,7 +55,7 @@ const StageSettings = ({ etapas, createEtapa, updateEtapa, deleteEtapa }) => {
     if (!currentEtapa) return
     if (deleteConfirmation === 'confirmar') {
       try {
-        await deleteEtapa(currentEtapa.tma_idetabo)
+        await deleteEtapa(currentEtapa.tmaIdetabo)
         setVisibleDelete(false)
         toast.error('Etapa eliminada correctamente')
       } catch (error) {
@@ -86,9 +86,9 @@ const StageSettings = ({ etapas, createEtapa, updateEtapa, deleteEtapa }) => {
           </CTableHead>
           <CTableBody>
             {etapas.map((etapa) => (
-              <CTableRow key={etapa.tma_idetabo}>
-                <CTableDataCell>{etapa.tma_idetabo}</CTableDataCell>
-                <CTableDataCell>{etapa.tma_nometab}</CTableDataCell>
+              <CTableRow key={etapa.tmaIdetabo}>
+                <CTableDataCell>{etapa.tmaIdetabo}</CTableDataCell>
+                <CTableDataCell>{etapa.tmaNometab}</CTableDataCell>
                 <CTableDataCell>
                   <CButton
                     color="info"
@@ -151,8 +151,8 @@ const StageSettings = ({ etapas, createEtapa, updateEtapa, deleteEtapa }) => {
             <CFormInput
               type="text"
               label="Nombre de la Etapa"
-              value={currentEtapa ? currentEtapa.tma_nometab : ''}
-              onChange={(e) => setCurrentEtapa({ ...currentEtapa, tma_nometab: e.target.value })}
+              value={currentEtapa ? currentEtapa.tmaNometab : ''}
+              onChange={(e) => setCurrentEtapa({ ...currentEtapa, tmaNometab: e.target.value })}
               placeholder="Ingrese el nuevo nombre de la etapa"
             />
           </CModalBody>
@@ -174,7 +174,7 @@ const StageSettings = ({ etapas, createEtapa, updateEtapa, deleteEtapa }) => {
           <CModalBody>
             <p>
               ¿Está seguro de que desea eliminar la etapa{' '}
-              <strong>{currentEtapa ? currentEtapa.tma_nometab : ''}</strong>?
+              <strong>{currentEtapa ? currentEtapa.tmaNometab : ''}</strong>?
             </p>
             <CFormInput
               type="text"

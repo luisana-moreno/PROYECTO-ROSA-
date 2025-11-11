@@ -2,6 +2,15 @@ import { useState, useEffect } from 'react'
 import { cattleService } from 'src/api/cattleService'
 import { toast } from 'react-toastify' // Importa toast de react-toastify
 
+const formatDateToDDMMYYYY = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+  return `${day}/${month}/${year}`
+}
+
 export const useCattle = () => {
   const [visible, setVisible] = useState(false)
   const [editVisible, setEditVisible] = useState(false)
@@ -56,23 +65,23 @@ export const useCattle = () => {
       if (newCattleResponse) {
         // Obtener los nombres de las propiedades relacionadas
         const razaNombre =
-          razas.find((r) => r.tma_idrazab === newCattleResponse.ttr_idrazabo)?.tma_nomraza || ''
+          razas.find((r) => r.tmaIdrazab === newCattleResponse.ttrIdrazabo)?.tmaNomraza || ''
         const colorNombre =
-          colores.find((c) => c.tma_idcolbo === newCattleResponse.ttr_idcolorb)?.tma_nomcolb || ''
+          colores.find((c) => c.tmaIdcolbo === newCattleResponse.ttrIdcolorb)?.tmaNomcolb || ''
         const etapaNombre =
-          etapas.find((e) => e.tma_idetabo === newCattleResponse.ttr_idetapav)?.tma_nometab || ''
+          etapas.find((e) => e.tmaIdetabo === newCattleResponse.ttrIdetapav)?.tmaNometab || ''
         const estadoNombre =
-          estados.find((s) => s.tma_idestbo === newCattleResponse.ttr_idestadb)?.tma_nomestb || ''
+          estados.find((s) => s.tmaIdestbo === newCattleResponse.ttrIdestadb)?.tmaNomestb || ''
 
         const formattedNewCattle = {
           ...newCattleResponse,
-          raza_nombre: razaNombre,
-          color_nombre: colorNombre,
-          etapa_nombre: etapaNombre,
-          estado_nombre: estadoNombre,
+          razaNombre: razaNombre,
+          colorNombre: colorNombre,
+          etapaNombre: etapaNombre,
+          estadoNombre: estadoNombre,
         }
 
-        setCattle((prevCattle) => [...prevCattle, formattedNewCattle])
+        loadInitialData() // Recargar la lista de bovinos
         setAddCattleForm({
           numeroBovino: '',
           idRazaBovino: '',
@@ -92,24 +101,31 @@ export const useCattle = () => {
   }
 
   const handleEditCattle = async () => {
-    if (!currentCattle || !currentCattle.ttr_idbovino) {
+    if (!currentCattle || !currentCattle.ttrIdbovino) {
       toast.warning('No cattle selected for editing.')
       return
     }
     try {
-      const updated = await cattleService.updateCattle(currentCattle.ttr_idbovino, {
-        numeroBovino: currentCattle.ttr_numerobv,
-        idRazaBovino: currentCattle.ttr_idrazabo,
-        fechaNacimiento: currentCattle.ttr_fecnacim,
-        idColorBovino: currentCattle.ttr_idcolorb,
-        pesoKilo: currentCattle.ttr_pesokilo,
-        idEtapaBovino: currentCattle.ttr_idetapav,
-        idEstadoBovino: currentCattle.ttr_idestadb,
+      const updated = await cattleService.updateCattle(currentCattle.ttrIdbovino, {
+        numeroBovino: currentCattle.ttrNumerobv,
+        idRazaBovino: currentCattle.ttrIdrazabo,
+        fechaNacimiento: currentCattle.ttrFecnacim,
+        idColorBovino: currentCattle.ttrIdcolorb,
+        pesoKilo: currentCattle.ttrPesokilo,
+        idEtapaBovino: currentCattle.ttrIdetapav,
+        idEstadoBovino: currentCattle.ttrIdestadb,
       })
       if (updated) {
+        const formattedUpdated = {
+          ...updated,
+          ttrFecnacim: formatDateToDDMMYYYY(updated.ttrFecnacim),
+        }
         setCattle((prevCattle) =>
-          prevCattle.map((c) => (c.ttr_idbovino === updated.ttr_idbovino ? updated : c)),
+          prevCattle.map((c) =>
+            c.ttrIdbovino === formattedUpdated.ttrIdbovino ? formattedUpdated : c,
+          ),
         )
+        loadInitialData() // Recargar la lista de bovinos
         setEditVisible(false)
         toast.info('Registro editado correctamente')
       }
@@ -120,15 +136,15 @@ export const useCattle = () => {
   }
 
   const handleDeleteCattle = async () => {
-    if (!currentCattle || !currentCattle.ttr_idbovino) {
+    if (!currentCattle || !currentCattle.ttrIdbovino) {
       toast.warning('No cattle selected for deletion.')
       return
     }
     if (deleteConfirmation === 'confirmar') {
       try {
-        await cattleService.deleteCattle(currentCattle.ttr_idbovino)
+        await cattleService.deleteCattle(currentCattle.ttrIdbovino)
         setCattle((prevCattle) =>
-          prevCattle.filter((c) => c.ttr_idbovino !== currentCattle.ttr_idbovino),
+          prevCattle.filter((c) => c.ttrIdbovino !== currentCattle.ttrIdbovino),
         )
         setDeleteVisible(false)
         toast.error('Bovino eliminado exitosamente')
@@ -142,7 +158,10 @@ export const useCattle = () => {
   }
 
   const handleViewExpBov = (cattle) => {
-    setCurrentCattle(cattle)
+    setCurrentCattle({
+      ...cattle,
+      ttrFecnacim: formatDateToDDMMYYYY(cattle.ttrFecnacim),
+    })
     setExpBovVisible(true)
   }
 
