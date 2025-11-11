@@ -108,13 +108,6 @@ const _nav = [
       },
       {
         component: CNavItem,
-        name: 'Expediente Bovino',
-        to: '/expmed',
-        icon: <CIcon icon={cilClipboard} customClassName="nav-icon" />,
-        roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
-      },
-      {
-        component: CNavItem,
         name: 'Produccion de Leche',
         to: '/milkProduction',
         icon: <CIcon icon={cilGraph} customClassName="nav-icon" />,

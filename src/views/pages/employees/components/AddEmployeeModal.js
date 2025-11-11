@@ -21,6 +21,8 @@ const AddEmployeeModal = ({
   handleAddEmployee,
   positions,
 }) => {
+  const today = new Date().toISOString().split('T')[0]
+
   const validateForm = () => {
     if (
       !addEmployee.ttr_nombrel ||
@@ -36,6 +38,45 @@ const AddEmployeeModal = ({
       toast.error('Todos los campos obligatorios deben ser llenados.')
       return false
     }
+
+    if (addEmployee.ttr_nombrel.length > 100) {
+      toast.error('El primer nombre no puede exceder los 100 caracteres.')
+      return false
+    }
+    if (addEmployee.ttr_nomsegu && addEmployee.ttr_nomsegu.length > 100) {
+      toast.error('El segundo nombre no puede exceder los 100 caracteres.')
+      return false
+    }
+    if (addEmployee.ttr_apellid.length > 100) {
+      toast.error('El primer apellido no puede exceder los 100 caracteres.')
+      return false
+    }
+    if (addEmployee.ttr_apesegu && addEmployee.ttr_apesegu.length > 100) {
+      toast.error('El segundo apellido no puede exceder los 100 caracteres.')
+      return false
+    }
+    if (addEmployee.ttr_documen.length > 8) {
+      toast.error('El número de documento no puede exceder los 8 caracteres.')
+      return false
+    }
+    if (addEmployee.ttr_telefon.length > 11) {
+      toast.error('El teléfono no puede exceder los 11 caracteres.')
+      return false
+    }
+    if (addEmployee.ttr_direcci.length > 255) {
+      toast.error('La dirección no puede exceder los 255 caracteres.')
+      return false
+    }
+
+    if (new Date(addEmployee.ttr_fecnaci) > new Date(today)) {
+      toast.error('La fecha de nacimiento no puede ser una fecha futura.')
+      return false
+    }
+    if (new Date(addEmployee.ttr_feccont) > new Date(today)) {
+      toast.error('La fecha de contrato no puede ser una fecha futura.')
+      return false
+    }
+
     return true
   }
 
@@ -68,6 +109,7 @@ const AddEmployeeModal = ({
               aria-label="primer nombre"
               value={addEmployee.ttr_nombrel}
               onChange={(e) => setAddEmployee({ ...addEmployee, ttr_nombrel: e.target.value })}
+              maxLength={100}
             />
             <small className="text-muted">Ingrese el primer nombre.</small>
           </CCol>
@@ -79,6 +121,7 @@ const AddEmployeeModal = ({
               aria-label="segundo nombre"
               value={addEmployee.ttr_nomsegu}
               onChange={(e) => setAddEmployee({ ...addEmployee, ttr_nomsegu: e.target.value })}
+              maxLength={100}
             />
             <small className="text-muted">Ingrese el segundo nombre.</small>
           </CCol>
@@ -91,6 +134,7 @@ const AddEmployeeModal = ({
               aria-label="Primer apellido"
               value={addEmployee.ttr_apellid}
               onChange={(e) => setAddEmployee({ ...addEmployee, ttr_apellid: e.target.value })}
+              maxLength={100}
             />
             <small className="text-muted">Ingrese el primer apellido.</small>
           </CCol>
@@ -102,6 +146,7 @@ const AddEmployeeModal = ({
               aria-label="Segundo apellido"
               value={addEmployee.ttr_apesegu}
               onChange={(e) => setAddEmployee({ ...addEmployee, ttr_apesegu: e.target.value })}
+              maxLength={100}
             />
             <small className="text-muted">Ingrese el segundo apellido.</small>
           </CCol>
@@ -114,6 +159,7 @@ const AddEmployeeModal = ({
               aria-label="Numero de documento"
               value={addEmployee.ttr_documen}
               onChange={(e) => setAddEmployee({ ...addEmployee, ttr_documen: e.target.value })}
+              maxLength={8}
             />
             <small className="text-muted">Ingrese el numero de documento.</small>
           </CCol>
@@ -125,6 +171,7 @@ const AddEmployeeModal = ({
               placeholder="Fecha de nacimiento"
               value={addEmployee.ttr_fecnaci}
               onChange={(e) => setAddEmployee({ ...addEmployee, ttr_fecnaci: e.target.value })}
+              max={today}
             />
             <small className="text-muted">Ingrese la fecha de nacimiento.</small>
           </CCol>
@@ -137,6 +184,7 @@ const AddEmployeeModal = ({
               aria-label="Telefono"
               value={addEmployee.ttr_telefon}
               onChange={(e) => setAddEmployee({ ...addEmployee, ttr_telefon: e.target.value })}
+              maxLength={11}
             />
             <small className="text-muted">Ingrese el numero de Telefono.</small>
           </CCol>
@@ -148,6 +196,7 @@ const AddEmployeeModal = ({
               aria-label="Direccion"
               value={addEmployee.ttr_direcci}
               onChange={(e) => setAddEmployee({ ...addEmployee, ttr_direcci: e.target.value })}
+              maxLength={255}
             />
             <small className="text-muted">Ingrese la Direccion.</small>
           </CCol>
@@ -160,6 +209,7 @@ const AddEmployeeModal = ({
               aria-label="Fecha de Contrato"
               value={addEmployee.ttr_feccont}
               onChange={(e) => setAddEmployee({ ...addEmployee, ttr_feccont: e.target.value })}
+              max={today}
             />
             <small className="text-muted">Ingrese la fecha de Contrato.</small>
           </CCol>

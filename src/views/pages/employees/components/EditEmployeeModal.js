@@ -21,6 +21,8 @@ const EditEmployeeModal = ({
   handleEditEmployee,
   positions,
 }) => {
+  const today = new Date().toISOString().split('T')[0]
+
   const validateForm = () => {
     if (
       !currentEmployee.ttr_nombrel ||
@@ -36,6 +38,45 @@ const EditEmployeeModal = ({
       toast.error('Todos los campos obligatorios deben ser llenados.')
       return false
     }
+
+    if (currentEmployee.ttr_nombrel.length > 100) {
+      toast.error('El primer nombre no puede exceder los 100 caracteres.')
+      return false
+    }
+    if (currentEmployee.ttr_nomsegu && currentEmployee.ttr_nomsegu.length > 100) {
+      toast.error('El segundo nombre no puede exceder los 100 caracteres.')
+      return false
+    }
+    if (currentEmployee.ttr_apellid.length > 100) {
+      toast.error('El primer apellido no puede exceder los 100 caracteres.')
+      return false
+    }
+    if (currentEmployee.ttr_apesegu && currentEmployee.ttr_apesegu.length > 100) {
+      toast.error('El segundo apellido no puede exceder los 100 caracteres.')
+      return false
+    }
+    if (currentEmployee.ttr_documen.length > 8) {
+      toast.error('El número de documento no puede exceder los 8 caracteres.')
+      return false
+    }
+    if (currentEmployee.ttr_telefon.length > 11) {
+      toast.error('El teléfono no puede exceder los 11 caracteres.')
+      return false
+    }
+    if (currentEmployee.ttr_direcci.length > 255) {
+      toast.error('La dirección no puede exceder los 255 caracteres.')
+      return false
+    }
+
+    if (new Date(currentEmployee.ttr_fecnaci) > new Date(today)) {
+      toast.error('La fecha de nacimiento no puede ser una fecha futura.')
+      return false
+    }
+    if (new Date(currentEmployee.ttr_feccont) > new Date(today)) {
+      toast.error('La fecha de contrato no puede ser una fecha futura.')
+      return false
+    }
+
     return true
   }
 
@@ -70,6 +111,7 @@ const EditEmployeeModal = ({
               onChange={(e) =>
                 setCurrentEmployee({ ...currentEmployee, ttr_nombrel: e.target.value })
               }
+              maxLength={100}
             />
             <small className="text-muted">Ingrese el primer nombre.</small>
           </CCol>
@@ -83,6 +125,7 @@ const EditEmployeeModal = ({
               onChange={(e) =>
                 setCurrentEmployee({ ...currentEmployee, ttr_nomsegu: e.target.value })
               }
+              maxLength={100}
             />
             <small className="text-muted">Ingrese el segundo nombre.</small>
           </CCol>
@@ -97,6 +140,7 @@ const EditEmployeeModal = ({
                 onChange={(e) =>
                   setCurrentEmployee({ ...currentEmployee, ttr_apellid: e.target.value })
                 }
+                maxLength={100}
               />
               <small className="text-muted">Ingrese el primer Apellido.</small>
             </CCol>
@@ -110,6 +154,7 @@ const EditEmployeeModal = ({
                 onChange={(e) =>
                   setCurrentEmployee({ ...currentEmployee, ttr_apesegu: e.target.value })
                 }
+                maxLength={100}
               />
               <small className="text-muted">Ingrese el segundo Apellido.</small>
             </CCol>
@@ -125,6 +170,7 @@ const EditEmployeeModal = ({
               onChange={(e) =>
                 setCurrentEmployee({ ...currentEmployee, ttr_documen: e.target.value })
               }
+              maxLength={8}
             />
             <small className="text-muted">Ingrese el numero de documento.</small>
           </CCol>
@@ -138,6 +184,7 @@ const EditEmployeeModal = ({
               onChange={(e) =>
                 setCurrentEmployee({ ...currentEmployee, ttr_fecnaci: e.target.value })
               }
+              max={today}
             />
             <small className="text-muted">Ingrese la fecha de nacimiento.</small>
           </CCol>
@@ -152,6 +199,7 @@ const EditEmployeeModal = ({
               onChange={(e) =>
                 setCurrentEmployee({ ...currentEmployee, ttr_telefon: e.target.value })
               }
+              maxLength={11}
             />
             <small className="text-muted">Ingrese el numero de telefono.</small>
           </CCol>
@@ -165,13 +213,14 @@ const EditEmployeeModal = ({
               onChange={(e) =>
                 setCurrentEmployee({ ...currentEmployee, ttr_direcci: e.target.value })
               }
+              maxLength={255}
             />
             <small className="text-muted">Ingrese la direccion.</small>
           </CCol>
 
           <CCol md={6}>
             <CFormInput
-              className="modal-nam custom-selecte"
+              className="modal-name custom-select"
               type="date"
               placeholder="Fecha de Contrato"
               aria-label="Fecha de Contrato"
@@ -179,6 +228,7 @@ const EditEmployeeModal = ({
               onChange={(e) =>
                 setCurrentEmployee({ ...currentEmployee, ttr_feccont: e.target.value })
               }
+              max={today}
             />
             <small className="text-muted">Ingrese la fecha de contrato.</small>
           </CCol>
