@@ -10,6 +10,7 @@ import UsersTable from './components/UsersTable'
 import AddUserModal from './components/AddUserModal'
 import EditUserModal from './components/EditUserModal'
 import DeleteUserModal from './components/DeleteUserModal'
+import UserFilters from './components/UserFilters' // Importar el nuevo componente de filtros
 
 const Users = () => {
   const {
@@ -30,6 +31,11 @@ const Users = () => {
     handleEditUser,
     handleDeleteUser,
     roles, // Obtener roles del hook
+    searchTerm, // Nuevo estado de búsqueda
+    setSearchTerm, // Nuevo setter de búsqueda
+    filterRole, // Nuevo estado de filtro por rol
+    setFilterRole, // Nuevo setter de filtro por rol
+    filteredUsers, // Usuarios filtrados
   } = useUsers()
 
   return (
@@ -45,10 +51,17 @@ const Users = () => {
             Agregar Usuario
           </CButton>
         </h4>
+        <UserFilters
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          filterRole={filterRole}
+          setFilterRole={setFilterRole}
+          roles={roles}
+        />
       </CCardHeader>
       <CCardBody>
         <UsersTable
-          users={users}
+          users={filteredUsers}
           setCurrentUser={setCurrentUser}
           setEditVisible={setEditVisible}
           setDeleteVisible={setDeleteVisible}

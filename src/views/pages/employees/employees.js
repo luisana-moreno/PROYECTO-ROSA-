@@ -2,8 +2,6 @@ import React from 'react'
 import CIcon from '@coreui/icons-react'
 import { cilPlus } from '@coreui/icons'
 import { CCard, CButton, CCardBody, CCardHeader } from '@coreui/react'
-import { ToastContainer, toast } from 'react-toastify' // Importa ToastContainer y toast
-import 'react-toastify/dist/ReactToastify.css' // Importa los estilos de react-toastify
 
 import { useEmployees } from './hooks/useEmployees'
 import EmployeesTable from './components/EmployeesTable'
@@ -11,6 +9,7 @@ import AddEmployeeModal from './components/AddEmployeeModal'
 import EditEmployeeModal from './components/EditEmployeeModal'
 import DeleteEmployeeModal from './components/DeleteEmployeeModal'
 import ViewEmployeeModal from './components/ViewEmployeeModal'
+import EmployeeFilters from './components/EmployeeFilters' // Importar el nuevo componente de filtros
 
 const Employees = () => {
   const {
@@ -38,6 +37,11 @@ const Employees = () => {
     currentPage,
     paginate,
     positions,
+    searchTerm, // Nuevo estado de búsqueda
+    setSearchTerm, // Nuevo setter de búsqueda
+    filterPosition, // Nuevo estado de filtro por cargo
+    setFilterPosition, // Nuevo setter de filtro por cargo
+    filteredEmployees, // Empleados filtrados
   } = useEmployees()
 
   return (
@@ -53,10 +57,17 @@ const Employees = () => {
             Agregar Empleado
           </CButton>
         </h4>
+        <EmployeeFilters
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          filterPosition={filterPosition}
+          setFilterPosition={setFilterPosition}
+          positions={positions}
+        />
       </CCardHeader>
       <CCardBody>
         <EmployeesTable
-          employees={currentEmployees}
+          employees={filteredEmployees}
           indexOfFirstEmployee={indexOfFirstEmployee}
           setEditVisible={setEditVisible}
           setDeleteVisible={setDeleteVisible}
@@ -95,7 +106,6 @@ const Employees = () => {
         setViewVisible={setViewVisible}
         currentEmployee={currentEmployee}
       />
-      <ToastContainer /> {/* Reemplaza CAlert con ToastContainer */}
     </CCard>
   )
 }

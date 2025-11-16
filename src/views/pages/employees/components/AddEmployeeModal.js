@@ -125,7 +125,9 @@ const AddEmployeeModal = ({
               placeholder="Numero de documento"
               aria-label="Numero de documento"
               value={addEmployee.ttr_documen}
-              onChange={(e) => setAddEmployee({ ...addEmployee, ttr_documen: e.target.value })}
+              onChange={(e) =>
+                setAddEmployee({ ...addEmployee, ttr_documen: e.target.value.replace(/\D/g, '') })
+              }
               maxLength={8}
             />
             <small className="text-muted">Ingrese el numero de documento.</small>
@@ -150,7 +152,9 @@ const AddEmployeeModal = ({
               placeholder="Telefono"
               aria-label="Telefono"
               value={addEmployee.ttr_telefon}
-              onChange={(e) => setAddEmployee({ ...addEmployee, ttr_telefon: e.target.value })}
+              onChange={(e) =>
+                setAddEmployee({ ...addEmployee, ttr_telefon: e.target.value.replace(/\D/g, '') })
+              }
               maxLength={11}
             />
             <small className="text-muted">Ingrese el numero de Telefono.</small>

@@ -21,6 +21,8 @@ export const useEmployees = () => {
     ttr_idcargp: '', // Almacenará el ID del cargo
     Contact_Person: '', // Mantener por ahora, pero no se enviará al backend
   })
+  const [searchTerm, setSearchTerm] = useState('') // Nuevo estado para el término de búsqueda
+  const [filterPosition, setFilterPosition] = useState('') // Nuevo estado para el filtro por cargo
   // const [toast, setToast] = useState({ show: false, message: '', color: 'success' }) // Eliminado
   const [currentPage, setCurrentPage] = useState(1)
   const [employeesPerPage] = useState(10)
@@ -30,6 +32,55 @@ export const useEmployees = () => {
   //   setToast({ show: true, message, color })
   //   setTimeout(() => setToast({ show: false, message: '', color: 'success' }), 2500)
   // }
+
+  // Función de validación
+  const validateEmployeeForm = (form) => {
+    if (!form.ttr_nombrel) {
+      toast.warning('El campo "Primer Nombre" es requerido.')
+      return false
+    }
+    if (!form.ttr_apellid) {
+      toast.warning('El campo "Primer Apellido" es requerido.')
+      return false
+    }
+    if (!form.ttr_documen) {
+      toast.warning('El campo "Cédula de Identidad" es requerido.')
+      return false
+    }
+    if (!/^\d+$/.test(form.ttr_documen)) {
+      toast.warning('El campo "Cédula de Identidad" solo debe contener números.')
+      return false
+    }
+    if (!form.ttr_fecnaci) {
+      toast.warning('El campo "Fecha de Nacimiento" es requerido.')
+      return false
+    }
+    if (!form.ttr_telefon) {
+      toast.warning('El campo "Número de Teléfono" es requerido.')
+      return false
+    }
+    if (!/^\d+$/.test(form.ttr_telefon)) {
+      toast.warning('El campo "Número de Teléfono" solo debe contener números.')
+      return false
+    }
+    if (form.ttr_telefon.length !== 11) {
+      toast.warning('El campo "Número de Teléfono" debe tener exactamente 11 dígitos.')
+      return false
+    }
+    if (!form.ttr_direcci) {
+      toast.warning('El campo "Dirección" es requerido.')
+      return false
+    }
+    if (!form.ttr_feccont) {
+      toast.warning('El campo "Fecha de Contratación" es requerido.')
+      return false
+    }
+    if (!form.ttr_idcargp) {
+      toast.warning('El campo "Cargo" es requerido.')
+      return false
+    }
+    return true
+  }
 
   // Get current employees
   const indexOfLastEmployee = currentPage * employeesPerPage
@@ -70,6 +121,9 @@ export const useEmployees = () => {
   }, [])
 
   const handleAddEmployee = async () => {
+    if (!validateEmployeeForm(addEmployeeForm)) {
+      return
+    }
     const employeeToSend = {
       ttr_nombrel: addEmployeeForm.ttr_nombrel,
       ttr_apellid: addEmployeeForm.ttr_apellid,
@@ -108,6 +162,9 @@ export const useEmployees = () => {
   const handleEditEmployee = async () => {
     if (!currentEmployee || !currentEmployee.ttr_idemplo) {
       toast.warning('No employee selected for editing.')
+      return
+    }
+    if (!validateEmployeeForm(currentEmployee)) {
       return
     }
     const employeeToSend = {
@@ -162,6 +219,24 @@ export const useEmployees = () => {
     }
   }
 
+  const filteredEmployees = employees.filter((employee) => {
+    const employeeName = employee.ttr_nombrel ? employee.ttr_nombrel.trim().toLowerCase() : ''
+    const employeeApellido = employee.ttr_apellid ? employee.ttr_apellid.trim().toLowerCase() : ''
+    const employeeDocument = employee.ttr_documen ? employee.ttr_documen.trim().toLowerCase() : ''
+
+    const lowerCaseSearchTerm = searchTerm.toLowerCase()
+
+    const matchesSearchTerm = searchTerm
+      ? employeeName.includes(lowerCaseSearchTerm) ||
+        employeeApellido.includes(lowerCaseSearchTerm) ||
+        employeeDocument.includes(lowerCaseSearchTerm)
+      : true
+    const matchesPosition = filterPosition
+      ? employee.ttr_idcargp === parseInt(filterPosition, 10)
+      : true
+    return matchesSearchTerm && matchesPosition
+  })
+
   return {
     visible,
     setVisible,
@@ -188,5 +263,10 @@ export const useEmployees = () => {
     currentPage,
     paginate,
     positions,
+    searchTerm,
+    setSearchTerm,
+    filterPosition,
+    setFilterPosition,
+    filteredEmployees,
   }
 }

@@ -19,6 +19,8 @@ export const useUsers = () => {
     idRol: '',
     contrasena: '',
   })
+  const [searchTerm, setSearchTerm] = useState('') // Nuevo estado para el término de búsqueda
+  const [filterRole, setFilterRole] = useState('') // Nuevo estado para el filtro por rol
 
   // Función de validación
   const validateUserForm = (form, isEdit = false) => {
@@ -68,7 +70,7 @@ export const useUsers = () => {
       const data = await userService.getUsers()
       setUsers(data)
     } catch (error) {
-      console.error('Error al cargar usuarios:', error) // Mantener console.error para depuración interna
+      console.error('Error al cargar usuarios:', error)
       toast.error(error.message || 'Error al cargar usuarios.')
       setUsers([]) // Asegura que 'users' siempre sea un array
     }
@@ -146,11 +148,28 @@ export const useUsers = () => {
       const data = await roleService.getRoles()
       setRoles(data)
     } catch (error) {
-      console.error('Error al cargar roles:', error) // Mantener console.error para depuración interna
+      console.error('Error al cargar roles:', error)
       toast.error(error.message || 'Error al cargar roles.')
       setRoles([])
     }
   }
+
+  const filteredUsers = users.filter((user) => {
+    const userName = user.ttr_nombrel ? user.ttr_nombrel.trim().toLowerCase() : ''
+    const userApellido = user.ttr_apellid ? user.ttr_apellid.trim().toLowerCase() : ''
+    const userCorreo = user.ttr_correoe ? user.ttr_correoe.trim().toLowerCase() : ''
+
+    const lowerCaseSearchTerm = searchTerm.toLowerCase()
+
+    const matchesSearchTerm = searchTerm
+      ? userName.includes(lowerCaseSearchTerm) ||
+        userApellido.includes(lowerCaseSearchTerm) ||
+        userCorreo.includes(lowerCaseSearchTerm)
+      : true
+    const matchesRole = filterRole ? user.ttr_idrolus === parseInt(filterRole, 10) : true
+
+    return matchesSearchTerm && matchesRole
+  })
 
   return {
     visible,
@@ -171,5 +190,10 @@ export const useUsers = () => {
     handleEditUser,
     handleDeleteUser,
     roles, // Estado de roles de usuario
+    searchTerm,
+    setSearchTerm,
+    filterRole,
+    setFilterRole,
+    filteredUsers,
   }
 }

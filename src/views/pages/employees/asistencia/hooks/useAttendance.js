@@ -233,6 +233,7 @@ const useAttendance = () => {
       setEmployees((prevEmployees) =>
         prevEmployees.map((emp) => (emp.id === employeeId ? updatedEmployee : emp)),
       )
+      fetchAttendanceData() // Recargar los datos de asistencia después de un check-in/out exitoso
     } catch (error) {
       console.error('Error al registrar asistencia:', error)
       // El toast.error ya se maneja en attendanceService.js

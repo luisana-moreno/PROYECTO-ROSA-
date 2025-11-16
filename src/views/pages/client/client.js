@@ -2,8 +2,6 @@ import React from 'react'
 import CIcon from '@coreui/icons-react'
 import { cilPlus } from '@coreui/icons'
 import { CCard, CButton, CCardBody, CCardHeader } from '@coreui/react'
-import { ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
 
 import { useClients } from './useClients'
 import ClientTable from './ClientTable'
@@ -76,7 +74,6 @@ const Client = () => {
         setDeleteConfirmationClient={setDeleteConfirmationClient}
         handleDeleteClient={handleDeleteClient}
       />
-      <ToastContainer />
     </CCard>
   )
 }

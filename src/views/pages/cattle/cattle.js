@@ -2,8 +2,6 @@ import React from 'react'
 import CIcon from '@coreui/icons-react'
 import { cilPlus } from '@coreui/icons'
 import { CCard, CButton, CCardBody, CCardHeader } from '@coreui/react'
-import { ToastContainer } from 'react-toastify' // Importa ToastContainer
-import 'react-toastify/dist/ReactToastify.css' // Importa los estilos de react-toastify
 
 import { useCattle } from './hooks/useCattle'
 import CattleTable from './components/CattleTable'
@@ -105,7 +103,6 @@ const Cattle = () => {
         setExpBovVisible={setExpBovVisible}
         currentCattle={currentCattle}
       />
-      <ToastContainer /> {/* Agrega ToastContainer aquí */}
     </CCard>
   )
 }

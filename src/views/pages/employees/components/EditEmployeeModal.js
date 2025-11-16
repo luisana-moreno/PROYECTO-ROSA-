@@ -130,7 +130,10 @@ const EditEmployeeModal = ({
               aria-label="Numero de documento"
               value={currentEmployee?.ttr_documen || ''}
               onChange={(e) =>
-                setCurrentEmployee({ ...currentEmployee, ttr_documen: e.target.value })
+                setCurrentEmployee({
+                  ...currentEmployee,
+                  ttr_documen: e.target.value.replace(/\D/g, ''),
+                })
               }
               maxLength={8}
             />
@@ -159,7 +162,10 @@ const EditEmployeeModal = ({
               aria-label="Telefono"
               value={currentEmployee?.ttr_telefon || ''}
               onChange={(e) =>
-                setCurrentEmployee({ ...currentEmployee, ttr_telefon: e.target.value })
+                setCurrentEmployee({
+                  ...currentEmployee,
+                  ttr_telefon: e.target.value.replace(/\D/g, ''),
+                })
               }
               maxLength={11}
             />
