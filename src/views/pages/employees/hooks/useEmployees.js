@@ -12,9 +12,7 @@ export const useEmployees = () => {
   const [employees, setEmployees] = useState([])
   const [addEmployeeForm, setAddEmployeeForm] = useState({
     ttr_nombrel: '',
-    ttr_nomsegu: '',
     ttr_apellid: '',
-    ttr_apesegu: '',
     ttr_documen: '',
     ttr_fecnaci: '',
     ttr_telefon: '',
@@ -50,8 +48,7 @@ export const useEmployees = () => {
           setEmployees(
             employeesData.map((emp) => ({
               ...emp,
-              ttr_idcargp: emp.ttr_idcargp ? parseInt(emp.ttr_idcargp, 10) : '', // Usar ttr_idcargp del backend (minúsculas)
-              // También asegurarse de que las fechas sean strings en formato YYYY-MM-DD si es necesario para los inputs type="date"
+              ttr_idcargp: emp.ttr_idcargp ? parseInt(emp.ttr_idcargp, 10) : '',
               ttr_fecnaci: emp.ttr_fecnaci
                 ? new Date(emp.ttr_fecnaci).toISOString().split('T')[0]
                 : '',
@@ -74,16 +71,15 @@ export const useEmployees = () => {
 
   const handleAddEmployee = async () => {
     const employeeToSend = {
-      nombre1: addEmployeeForm.ttr_nombrel,
-      nombre2: addEmployeeForm.ttr_nomsegu,
-      apellido1: addEmployeeForm.ttr_apellid,
-      apellido2: addEmployeeForm.ttr_apesegu,
-      documento: addEmployeeForm.ttr_documen,
-      fechaNacimiento: addEmployeeForm.ttr_fecnaci,
-      telefono: addEmployeeForm.ttr_telefon,
-      direccion: addEmployeeForm.ttr_direcci,
-      fechaContratacion: addEmployeeForm.ttr_feccont,
-      idCargo: addEmployeeForm.ttr_idcargp, // Ya es el ID numérico
+      ttr_nombrel: addEmployeeForm.ttr_nombrel,
+      ttr_apellid: addEmployeeForm.ttr_apellid,
+      ttr_documen: addEmployeeForm.ttr_documen,
+      ttr_fecnaci: addEmployeeForm.ttr_fecnaci,
+      ttr_telefon: addEmployeeForm.ttr_telefon,
+      ttr_direcci: addEmployeeForm.ttr_direcci,
+      ttr_feccont: addEmployeeForm.ttr_feccont,
+      ttr_idcargp: addEmployeeForm.ttr_idcargp,
+      Contact_Person: addEmployeeForm.Contact_Person,
     }
     try {
       const newEmp = await employeeService.addEmployee(employeeToSend)
@@ -92,9 +88,7 @@ export const useEmployees = () => {
         setEmployees([...employees, { ...newEmp, cargo_nombre: cargoNombre }])
         setAddEmployeeForm({
           ttr_nombrel: '',
-          ttr_nomsegu: '',
           ttr_apellid: '',
-          ttr_apesegu: '',
           ttr_documen: '',
           ttr_fecnaci: '',
           ttr_telefon: '',
@@ -104,29 +98,28 @@ export const useEmployees = () => {
           Contact_Person: '',
         })
         setVisible(false)
-        toast.success('Registro agregado correctamente') // Usar toast.success
+        toast.success('Registro agregado correctamente')
       }
     } catch (error) {
-      toast.error(error.message || 'Error al agregar empleado.') // Usar toast.error
+      toast.error(error.message || 'Error al agregar empleado.')
     }
   }
 
   const handleEditEmployee = async () => {
     if (!currentEmployee || !currentEmployee.ttr_idemplo) {
-      toast.warning('No employee selected for editing.') // Usar toast.warning
+      toast.warning('No employee selected for editing.')
       return
     }
     const employeeToSend = {
-      nombre1: currentEmployee.ttr_nombrel,
-      nombre2: currentEmployee.ttr_nomsegu,
-      apellido1: currentEmployee.ttr_apellid,
-      apellido2: currentEmployee.ttr_apesegu,
-      documento: currentEmployee.ttr_documen,
-      fechaNacimiento: currentEmployee.ttr_fecnaci,
-      telefono: currentEmployee.ttr_telefon,
-      direccion: currentEmployee.ttr_direcci,
-      fechaContratacion: currentEmployee.ttr_feccont,
-      idCargo: currentEmployee.ttr_idcargp, // Ya es el ID numérico
+      ttr_nombrel: currentEmployee.ttr_nombrel,
+      ttr_apellid: currentEmployee.ttr_apellid,
+      ttr_documen: currentEmployee.ttr_documen,
+      ttr_fecnaci: currentEmployee.ttr_fecnaci,
+      ttr_telefon: currentEmployee.ttr_telefon,
+      ttr_direcci: currentEmployee.ttr_direcci,
+      ttr_feccont: currentEmployee.ttr_feccont,
+      ttr_idcargp: currentEmployee.ttr_idcargp,
+      Contact_Person: currentEmployee.Contact_Person,
     }
     try {
       const updated = await employeeService.updateEmployee(
@@ -143,10 +136,10 @@ export const useEmployees = () => {
           ),
         )
         setEditVisible(false)
-        toast.info('Registro editado correctamente') // Usar toast.info
+        toast.info('Registro editado correctamente')
       }
     } catch (error) {
-      toast.error(error.message || 'Error al editar empleado.') // Usar toast.error
+      toast.error(error.message || 'Error al editar empleado.')
     }
   }
 

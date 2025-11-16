@@ -132,7 +132,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Actividad de Potreros',
-        to: '/activepastures',
+        to: '/pastures/activity',
         icon: <CIcon icon={cilRain} customClassName="nav-icon" />,
         roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
       },

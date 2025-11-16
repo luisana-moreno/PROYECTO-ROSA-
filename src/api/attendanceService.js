@@ -1,150 +1,245 @@
+import { toast } from 'react-toastify'
+
 const API_URL = import.meta.env.VITE_API_URL
 
 export const attendanceService = {
   getAllAttendances: async () => {
-    const response = await fetch(`${API_URL}/asistencias`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al obtener asistencias')
+    try {
+      const response = await fetch(`${API_URL}/asistencias`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Error al obtener asistencias')
+      }
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error('Error en getAllAttendances:', error)
+      toast.error(error.message || 'Error al obtener asistencias.')
+      throw error
     }
-    const data = await response.json()
-    return data
   },
 
   getAttendanceById: async (id) => {
-    const response = await fetch(`${API_URL}/asistencias/${id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al obtener asistencia por ID')
+    try {
+      const response = await fetch(`${API_URL}/asistencias/${id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Error al obtener asistencia por ID')
+      }
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error('Error en getAttendanceById:', error)
+      toast.error(error.message || 'Error al obtener asistencia por ID.')
+      throw error
     }
-    const data = await response.json()
-    return data
   },
 
   createAttendance: async (attendanceData) => {
-    const response = await fetch(`${API_URL}/asistencias`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(attendanceData),
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al crear asistencia')
+    try {
+      const formattedAttendanceData = {
+        ...attendanceData,
+        horaTrabajo: attendanceData.horaTrabajo || '00:00:00',
+        idTipoAsistencia: attendanceData.idTipoAsistencia || 1, // Default a 'Presente'
+      }
+      const response = await fetch(`${API_URL}/asistencias`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formattedAttendanceData),
+      })
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Error al crear asistencia')
+      }
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error('Error en createAttendance:', error)
+      toast.error(error.message || 'Error al crear asistencia.')
+      throw error
     }
-    const data = await response.json()
-    return data
   },
 
   updateAttendance: async (id, attendanceData) => {
-    const response = await fetch(`${API_URL}/asistencias/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(attendanceData),
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al actualizar asistencia')
+    try {
+      const formattedAttendanceData = {
+        ...attendanceData,
+        horaTrabajo: attendanceData.horaTrabajo || '00:00:00',
+        idTipoAsistencia: attendanceData.idTipoAsistencia || 1, // Default a 'Presente'
+      }
+      const response = await fetch(`${API_URL}/asistencias/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formattedAttendanceData),
+      })
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Error al actualizar asistencia')
+      }
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error('Error en updateAttendance:', error)
+      toast.error(error.message || 'Error al actualizar asistencia.')
+      throw error
     }
-    const data = await response.json()
-    return data
   },
 
   deleteAttendance: async (id) => {
-    const response = await fetch(`${API_URL}/asistencias/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al eliminar asistencia')
+    try {
+      const response = await fetch(`${API_URL}/asistencias/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Error al eliminar asistencia')
+      }
+      toast.success('Asistencia eliminada exitosamente.')
+      return true
+    } catch (error) {
+      console.error('Error en deleteAttendance:', error)
+      toast.error(error.message || 'Error al eliminar asistencia.')
+      throw error
     }
-    return true
   },
 
   recordCheckIn: async (idEmpleado, horaEntrada, fechaAsistencia) => {
-    const response = await fetch(`${API_URL}/asistencias`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        idEmpleado,
-        horaEntrada,
-        fechaAsistencia,
-        horaSalida: null,
-        horaTrabajo: 0,
-      }),
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al registrar entrada')
+    try {
+      const response = await fetch(`${API_URL}/asistencias/check-in`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          idEmpleado,
+          horaEntrada,
+          fechaAsistencia,
+          idTipoAsistencia: 4, // 'Pendiente'
+        }),
+      })
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Error al registrar entrada')
+      }
+      toast.success('Entrada registrada correctamente.')
+      return response.json()
+    } catch (error) {
+      console.error('Error en recordCheckIn:', error)
+      toast.error(error.message || 'Error al registrar entrada.')
+      throw error
     }
-    return response.json()
   },
 
   recordCheckOut: async (idAsistencia, horaSalida, horaTrabajo) => {
-    const response = await fetch(`${API_URL}/asistencias/${idAsistencia}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ horaSalida, horaTrabajo }),
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al registrar salida')
+    try {
+      const response = await fetch(`${API_URL}/asistencias/check-out/${idAsistencia}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          horaSalida,
+          horaTrabajo,
+          idTipoAsistencia: 1, // 'Presente'
+        }),
+      })
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Error al registrar salida')
+      }
+      toast.success('Salida registrada correctamente.')
+      return response.json()
+    } catch (error) {
+      console.error('Error en recordCheckOut:', error)
+      toast.error(error.message || 'Error al registrar salida.')
+      throw error
     }
-    return response.json()
   },
 
   updateAttendanceStatusAndHours: async (idAsistencia, attendanceData) => {
-    const response = await fetch(`${API_URL}/asistencias/${idAsistencia}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        idEmpleado: attendanceData.TTR_IDEMPLEA,
-        horaEntrada: attendanceData.TTR_HORAENTR,
-        horaSalida: attendanceData.TTR_HORASALI,
-        horaTrabajo: attendanceData.TTR_HORATRAB,
-        fechaAsistencia: attendanceData.TTR_FECHAASI,
-      }),
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al actualizar asistencia')
+    try {
+      const formattedAttendanceData = {
+        idTipoAsistencia: attendanceData.idTipoAsistencia,
+        horaEntrada: attendanceData.horaEntrada,
+        horaSalida: attendanceData.horaSalida,
+        horaTrabajo: attendanceData.horaTrabajo,
+      }
+      const response = await fetch(`${API_URL}/asistencias/status/${idAsistencia}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formattedAttendanceData),
+      })
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Error al actualizar estado de asistencia')
+      }
+      toast.info('Estado de asistencia actualizado correctamente.')
+      return response.json()
+    } catch (error) {
+      console.error('Error en updateAttendanceStatusAndHours:', error)
+      toast.error(error.message || 'Error al actualizar estado de asistencia.')
+      throw error
     }
-    return response.json()
   },
 
   getAttendancesByEmployeeId: async (idEmpleado) => {
-    const response = await fetch(`${API_URL}/asistencias?idEmpleado=${idEmpleado}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al obtener asistencias por empleado')
+    try {
+      const response = await fetch(`${API_URL}/asistencias/empleado/${idEmpleado}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Error al obtener asistencias por empleado')
+      }
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error('Error en getAttendancesByEmployeeId:', error)
+      toast.error(error.message || 'Error al obtener asistencias por empleado.')
+      throw error
     }
-    return response.json()
+  },
+
+  getAllAttendanceTypes: async () => {
+    try {
+      const response = await fetch(`${API_URL}/asistencias/types`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Error al obtener tipos de asistencia')
+      }
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error('Error en getAllAttendanceTypes:', error)
+      toast.error(error.message || 'Error al obtener tipos de asistencia.')
+      throw error
+    }
   },
 }

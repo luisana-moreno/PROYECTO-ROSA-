@@ -3,31 +3,40 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { attendanceService } from 'src/api/attendanceService'
 import { employeeService } from 'src/api/employeeService'
-import { getWeekRange, getDayName } from 'src/utils/dateFormatter' // Asumo que tienes un util para esto
+import { getWeekRange, getDayName, formatHoursToHHMMSS } from 'src/utils/dateFormatter'
+import { toast } from 'react-toastify' // Importa toast de react-toastify
 
 // Días de la semana para la tabla, definidos fuera del hook para estabilidad
-const DAYS_OF_WEEK = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes']
+const DAYS_OF_WEEK = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo']
 
 const useAttendance = () => {
   const [week, setWeek] = useState('')
   const [employees, setEmployees] = useState([])
-  const [selectedEmployee, setSelectedEmployee] = useState(null)
+  const [selectedEmployee, _setSelectedEmployee] = useState(null) // Renombrado para uso interno
   const [detailVisible, setDetailVisible] = useState(false)
+  const [attendanceHistory, setAttendanceHistory] = useState([]) // Nuevo estado para el historial
   const [filters, setFilters] = useState({
     name: '',
     position: '',
   })
   const [loading, setLoading] = useState(false)
+  const [attendanceTypes, setAttendanceTypes] = useState([]) // Nuevo estado para tipos de asistencia
   const isMounted = useRef(false) // Para controlar la ejecución única del useEffect
 
   const fetchAttendanceData = useCallback(async () => {
     setLoading(true)
     try {
-      const employeesData = await employeeService.getAllEmployees()
-      const attendancesData = await attendanceService.getAllAttendances()
+      const [employeesData, attendancesData, typesData] = await Promise.all([
+        employeeService.getAllEmployees(),
+        attendanceService.getAllAttendances(),
+        attendanceService.getAllAttendanceTypes(), // Obtener tipos de asistencia
+      ])
+
+      setAttendanceTypes(typesData) // Guardar tipos de asistencia
 
       console.log('Employees Data from API:', employeesData) // Log para depuración
       console.log('Attendances Data from API:', attendancesData) // Log para depuración
+      console.log('Attendance Types Data from API:', typesData) // Log para depuración
 
       const today = new Date()
       const currentWeekRange = getWeekRange(today)
@@ -35,11 +44,9 @@ const useAttendance = () => {
 
       if (employeesData) {
         const employeesWithAttendance = employeesData.map((emp) => {
-          // Asegurarse de que el objeto emp tenga las propiedades 'id', 'name' y 'position'
-          // para que los componentes de frontend y los filtros funcionen correctamente.
           const formattedEmp = {
             ...emp,
-            id: emp.ttr_idemplo, // Usar ttr_idemplo como id principal
+            id: emp.ttr_idemplo,
             name: `${emp.ttr_nombrel || ''} ${emp.ttr_nomsegu || ''} ${
               emp.ttr_apellid || ''
             } ${emp.ttr_apesegu || ''}`,
@@ -52,22 +59,25 @@ const useAttendance = () => {
 
           const attendanceByDay = {}
           let totalHoursWorked = 0
-          let currentAttendanceId = null // Para registrar la asistencia actual del día
+          let currentAttendanceId = null
 
-          // Inicializar todos los días como 'Ausente'
           DAYS_OF_WEEK.forEach((day) => {
             attendanceByDay[day] = {
-              status: 'Ausente',
+              status: 'Ausente', // Por defecto
               id: null,
               horaEntrada: null,
               horaSalida: null,
-              horaTrabajo: 0,
+              horaTrabajo: '00:00:00',
+              idTipoAsistencia:
+                typesData.find((type) => type.tma_nomtipa === 'Ausente')?.tma_idtipasi || 2,
+              tipoAsistenciaNombre: 'Ausente',
             }
           })
 
           employeeAttendances.forEach((att) => {
             const attendanceDate = new Date(att.ttr_fechaasi)
             const dayOfWeek = getDayName(attendanceDate)
+            const tipoAsistencia = typesData.find((type) => type.tma_idtipasi === att.ttr_idtipasi)
 
             if (DAYS_OF_WEEK.includes(dayOfWeek)) {
               const horaEntrada = att.ttr_horaentr
@@ -75,18 +85,20 @@ const useAttendance = () => {
               const horaTrabajo = att.ttr_horatrab
 
               attendanceByDay[dayOfWeek] = {
-                status: horaEntrada ? (horaSalida ? 'Presente' : 'Pendiente') : 'Ausente',
+                status: tipoAsistencia ? tipoAsistencia.tma_nomtipa : 'Desconocido',
                 id: att.ttr_idasisen,
                 horaEntrada: horaEntrada,
                 horaSalida: horaSalida,
                 horaTrabajo: horaTrabajo,
+                idTipoAsistencia: att.ttr_idtipasi,
+                tipoAsistenciaNombre: tipoAsistencia ? tipoAsistencia.tma_nomtipa : 'Desconocido',
               }
 
-              if (horaEntrada && horaSalida) {
-                totalHoursWorked += parseFloat(horaTrabajo || 0)
+              if (horaEntrada && horaSalida && horaTrabajo) {
+                const [h, m, s] = horaTrabajo.split(':').map(Number)
+                totalHoursWorked += h + m / 60 + s / 3600
               }
 
-              // Si es la asistencia de hoy y no tiene hora de salida, guardamos el ID
               if (
                 attendanceDate.toDateString() === today.toDateString() &&
                 horaEntrada &&
@@ -98,20 +110,21 @@ const useAttendance = () => {
           })
 
           return {
-            ...formattedEmp, // Usar el objeto formateado
+            ...formattedEmp,
             attendance: attendanceByDay,
             hoursWorked: totalHoursWorked.toFixed(2),
-            currentAttendanceId: currentAttendanceId, // ID de la asistencia activa para check-out
+            currentAttendanceId: currentAttendanceId,
           }
         })
         setEmployees(employeesWithAttendance)
       }
     } catch (error) {
       console.error('Error al obtener datos de asistencia:', error)
+      toast.error(error.message || 'Error al obtener datos de asistencia.')
     } finally {
       setLoading(false)
     }
-  }, [setEmployees, setWeek, setLoading]) // Eliminamos 'days' de las dependencias
+  }, [setEmployees, setWeek, setLoading, toast])
 
   useEffect(() => {
     if (!isMounted.current) {
@@ -124,50 +137,85 @@ const useAttendance = () => {
   const handleCheckIn = async (employeeId, type) => {
     setLoading(true)
     try {
-      const employee = employees.find((emp) => emp.id === employeeId) // 'id' ya está mapeado
+      const employee = employees.find((emp) => Number(emp.id) === Number(employeeId))
+      if (!employee) {
+        console.error('Error: Empleado no encontrado para el ID:', employeeId)
+        toast.warning('Empleado no encontrado para registrar asistencia.')
+        return
+      }
+
       const currentTime = new Date().toLocaleTimeString('es-ES', {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
         hour12: false,
       })
-      const today = new Date().toISOString().split('T')[0] // Formato YYYY-MM-DD
+      const today = new Date().toISOString().split('T')[0]
 
       const currentDayName = getDayName(new Date())
       let updatedEmployee = { ...employee }
 
+      if (!updatedEmployee.attendance) {
+        updatedEmployee.attendance = {}
+      }
+      if (!updatedEmployee.attendance[currentDayName]) {
+        updatedEmployee.attendance[currentDayName] = {
+          status: 'Ausente',
+          id: null,
+          horaEntrada: null,
+          horaSalida: null,
+          horaTrabajo: '00:00:00',
+          idTipoAsistencia:
+            attendanceTypes.find((type) => type.tma_nomtipa === 'Ausente')?.tma_idtipasi || 2,
+          tipoAsistenciaNombre: 'Ausente',
+        }
+      }
+
       if (type === 'entrada') {
-        const newAttendance = await attendanceService.recordCheckIn(employeeId, currentTime, today)
+        const newAttendance = await attendanceService.recordCheckIn(
+          Number(employeeId),
+          currentTime,
+          today,
+        )
         updatedEmployee.currentAttendanceId = newAttendance.ttr_idasisen
         updatedEmployee.attendance[currentDayName] = {
           status: 'Pendiente',
           id: newAttendance.ttr_idasisen,
           horaEntrada: newAttendance.ttr_horaentr,
           horaSalida: null,
-          horaTrabajo: 0,
+          horaTrabajo: '00:00:00',
+          idTipoAsistencia:
+            attendanceTypes.find((type) => type.tma_nomtipa === 'Pendiente')?.tma_idtipasi || 4,
+          tipoAsistenciaNombre: 'Pendiente',
         }
-      } else if (type === 'salida' && employee.currentAttendanceId) {
+      } else if (type === 'salida') {
+        if (!updatedEmployee.currentAttendanceId) {
+          toast.warning('No se ha registrado una entrada para este empleado hoy.')
+          setLoading(false)
+          return
+        }
         const employeeAttendances = await attendanceService.getAttendancesByEmployeeId(employeeId)
         const todayAttendance = employeeAttendances.find(
           (att) =>
             new Date(att.ttr_fechaasi).toDateString() === new Date().toDateString() &&
-            att.ttr_idasisen === employee.currentAttendanceId,
+            att.ttr_idasisen === updatedEmployee.currentAttendanceId,
         )
 
         if (todayAttendance && todayAttendance.ttr_horaentr) {
           const horaEntrada = new Date(`2000-01-01T${todayAttendance.ttr_horaentr}`)
           const horaSalida = new Date(`2000-01-01T${currentTime}`)
           const diffMs = horaSalida - horaEntrada
-          const hours = (diffMs / (1000 * 60 * 60)).toFixed(2)
+          const hoursDecimal = diffMs / (1000 * 60 * 60)
+          const hoursFormatted = formatHoursToHHMMSS(hoursDecimal)
 
           const updatedAttendance = await attendanceService.recordCheckOut(
-            employee.currentAttendanceId,
+            updatedEmployee.currentAttendanceId,
             currentTime,
-            hours,
+            hoursFormatted,
           )
           updatedEmployee.currentAttendanceId = null
           updatedEmployee.hoursWorked = (
-            parseFloat(updatedEmployee.hoursWorked) + parseFloat(hours)
+            parseFloat(updatedEmployee.hoursWorked) + hoursDecimal
           ).toFixed(2)
           updatedEmployee.attendance[currentDayName] = {
             status: 'Presente',
@@ -175,6 +223,9 @@ const useAttendance = () => {
             horaEntrada: updatedAttendance.ttr_horaentr,
             horaSalida: updatedAttendance.ttr_horasali,
             horaTrabajo: updatedAttendance.ttr_horatrab,
+            idTipoAsistencia:
+              attendanceTypes.find((type) => type.tma_nomtipa === 'Presente')?.tma_idtipasi || 1,
+            tipoAsistenciaNombre: 'Presente',
           }
         }
       }
@@ -184,6 +235,7 @@ const useAttendance = () => {
       )
     } catch (error) {
       console.error('Error al registrar asistencia:', error)
+      // El toast.error ya se maneja en attendanceService.js
     } finally {
       setLoading(false)
     }
@@ -192,67 +244,97 @@ const useAttendance = () => {
   const handleAttendanceChange = async (employeeId, day, value) => {
     setLoading(true)
     try {
-      const employee = employees.find((emp) => emp.id === employeeId) // 'id' ya está mapeado
-      const tempDate = new Date() // Usar una nueva instancia de Date para evitar mutaciones
+      const employee = employees.find((emp) => emp.id === employeeId)
+      if (!employee) {
+        toast.warning('Empleado no encontrado para actualizar asistencia.')
+        return
+      }
+
+      const today = new Date()
+      today.setHours(0, 0, 0, 0) // Normalizar la fecha de hoy a medianoche
+
+      const tempDate = new Date()
       const attendanceDate = new Date(
-        tempDate.setDate(tempDate.getDate() - tempDate.getDay() + days.indexOf(day) + 1),
+        tempDate.setDate(tempDate.getDate() - tempDate.getDay() + DAYS_OF_WEEK.indexOf(day) + 1),
       )
+      attendanceDate.setHours(0, 0, 0, 0) // Normalizar la fecha de asistencia a medianoche
+
+      // Si la fecha de asistencia es anterior a hoy, no permitir el cambio
+      if (attendanceDate < today) {
+        toast.warning('No se puede cambiar el estado de asistencia de días anteriores.')
+        setLoading(false)
+        return
+      }
+
       const formattedDate = attendanceDate.toISOString().split('T')[0]
 
       let existingAttendance = null
-      if (employee && employee.attendance[day] && employee.attendance[day].id) {
+      if (employee.attendance[day] && employee.attendance[day].id) {
         existingAttendance = await attendanceService.getAttendanceById(employee.attendance[day].id)
       }
 
       let updatedEmployee = { ...employee }
       let newAttendanceId = null
+      const selectedAttendanceType = attendanceTypes.find((type) => type.tma_nomtipa === value)
+
+      if (!selectedAttendanceType) {
+        toast.error('Tipo de asistencia no válido.')
+        setLoading(false)
+        return
+      }
 
       if (existingAttendance) {
-        // Actualizar asistencia existente
+        const defaultHoraEntrada = '08:00:00'
+        const defaultHoraSalida = '17:00:00'
+        const defaultHorasTrabajadasDecimal = 9
+        const defaultHorasTrabajadasFormatted = formatHoursToHHMMSS(defaultHorasTrabajadasDecimal)
+
         const updatedData = {
-          ...existingAttendance,
-          idEmpleado: employeeId,
-          fechaAsistencia: formattedDate,
-          horaEntrada: value === 'Presente' ? existingAttendance.ttr_horaentr || '08:00:00' : null,
-          horaSalida: value === 'Presente' ? existingAttendance.ttr_horasali || '17:00:00' : null,
-          horaTrabajo: value === 'Presente' ? existingAttendance.ttr_horatrab || 9 : 0,
+          idTipoAsistencia: selectedAttendanceType.tma_idtipasi,
+          horaEntrada:
+            value === 'Presente' ? existingAttendance.ttr_horaentr || defaultHoraEntrada : null,
+          horaSalida:
+            value === 'Presente' ? existingAttendance.ttr_horasali || defaultHoraSalida : null,
+          horaTrabajo:
+            value === 'Presente'
+              ? existingAttendance.ttr_horatrab || defaultHorasTrabajadasFormatted
+              : '00:00:00',
         }
         const response = await attendanceService.updateAttendanceStatusAndHours(
           existingAttendance.ttr_idasisen,
           updatedData,
         )
         updatedEmployee.attendance[day] = {
-          status: value,
+          status: selectedAttendanceType.tma_nomtipa,
           id: response.ttr_idasisen,
           horaEntrada: response.ttr_horaentr,
           horaSalida: response.ttr_horasali,
           horaTrabajo: response.ttr_horatrab,
+          idTipoAsistencia: response.ttr_idtipasi,
+          tipoAsistenciaNombre: selectedAttendanceType.tma_nomtipa,
         }
-      } else if (value === 'Presente' || value === 'Reposo') {
-        // Crear nueva asistencia si no existe y el estado es Presente o Reposo
+      } else {
+        // Crear nueva asistencia si no existe
+        const defaultHorasTrabajadasDecimal = 9
+        const defaultHorasTrabajadasFormatted = formatHoursToHHMMSS(defaultHorasTrabajadasDecimal)
+
         const newAttendance = await attendanceService.createAttendance({
           idEmpleado: employeeId,
           fechaAsistencia: formattedDate,
           horaEntrada: value === 'Presente' ? '08:00:00' : null,
           horaSalida: value === 'Presente' ? '17:00:00' : null,
-          horaTrabajo: value === 'Presente' ? 9 : 0,
+          horaTrabajo: value === 'Presente' ? defaultHorasTrabajadasFormatted : '00:00:00',
+          idTipoAsistencia: selectedAttendanceType.tma_idtipasi,
         })
         newAttendanceId = newAttendance.ttr_idasisen
         updatedEmployee.attendance[day] = {
-          status: value,
+          status: selectedAttendanceType.tma_nomtipa,
           id: newAttendanceId,
           horaEntrada: newAttendance.ttr_horaentr,
           horaSalida: newAttendance.ttr_horasali,
           horaTrabajo: newAttendance.ttr_horatrab,
-        }
-      } else {
-        // Si el valor es 'Ausente' y no hay asistencia existente, simplemente actualizamos el estado local
-        updatedEmployee.attendance[day] = {
-          status: 'Ausente',
-          id: null,
-          horaEntrada: null,
-          horaSalida: null,
-          horaTrabajo: 0,
+          idTipoAsistencia: newAttendance.ttr_idtipasi,
+          tipoAsistenciaNombre: selectedAttendanceType.tma_nomtipa,
         }
       }
 
@@ -261,6 +343,7 @@ const useAttendance = () => {
       )
     } catch (error) {
       console.error('Error al cambiar estado de asistencia:', error)
+      toast.error(error.message || 'Error al cambiar estado de asistencia.')
     } finally {
       setLoading(false)
     }
@@ -269,7 +352,11 @@ const useAttendance = () => {
   const handleHoursWorkedChange = async (employeeId, hours) => {
     setLoading(true)
     try {
-      const employee = employees.find((emp) => emp.id === employeeId) // 'id' ya está mapeado
+      const employee = employees.find((emp) => emp.id === employeeId)
+      if (!employee) {
+        toast.warning('Empleado no encontrado para actualizar horas trabajadas.')
+        return
+      }
       const today = new Date()
       const dayOfWeek = getDayName(today)
       const currentAttendance = employee.attendance[dayOfWeek]
@@ -277,8 +364,10 @@ const useAttendance = () => {
       if (currentAttendance && currentAttendance.id) {
         const existingAttendance = await attendanceService.getAttendanceById(currentAttendance.id)
         const updatedData = {
-          ...existingAttendance,
-          horaTrabajo: parseFloat(hours),
+          idTipoAsistencia: existingAttendance.ttr_idtipasi, // Mantener el tipo de asistencia actual
+          horaTrabajo: formatHoursToHHMMSS(parseFloat(hours)),
+          horaEntrada: existingAttendance.ttr_horaentr,
+          horaSalida: existingAttendance.ttr_horasali,
         }
         const response = await attendanceService.updateAttendanceStatusAndHours(
           currentAttendance.id,
@@ -290,21 +379,45 @@ const useAttendance = () => {
             emp.id === employeeId
               ? {
                   ...emp,
-                  hoursWorked: parseFloat(hours),
+                  hoursWorked: parseFloat(hours).toFixed(2),
                   attendance: {
                     ...emp.attendance,
-                    [dayOfWeek]: { ...emp.attendance[dayOfWeek], horaTrabajo: parseFloat(hours) },
+                    [dayOfWeek]: {
+                      ...emp.attendance[dayOfWeek],
+                      horaTrabajo: response.ttr_horatrab,
+                    },
                   },
                 }
               : emp,
           ),
         )
+      } else {
+        toast.warning('No hay registro de asistencia actual para actualizar las horas trabajadas.')
       }
     } catch (error) {
       console.error('Error al cambiar horas trabajadas:', error)
+      toast.error(error.message || 'Error al cambiar horas trabajadas.')
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleEmployeeSelectForDetail = async (employee) => {
+    _setSelectedEmployee(employee)
+    if (employee) {
+      setLoading(true)
+      try {
+        const history = await attendanceService.getAttendancesByEmployeeId(employee.id)
+        setAttendanceHistory(history)
+      } catch (error) {
+        console.error('Error al obtener historial de asistencia:', error)
+        toast.error(error.message || 'Error al obtener historial de asistencia.')
+        setAttendanceHistory([])
+      } finally {
+        setLoading(false)
+      }
+    }
+    setDetailVisible(true)
   }
 
   const filteredEmployees = employees.filter((emp) => {
@@ -323,15 +436,18 @@ const useAttendance = () => {
     selectedEmployee,
     detailVisible,
     filters,
-    days: DAYS_OF_WEEK, // Exportamos la constante global
+    days: DAYS_OF_WEEK,
     handleAttendanceChange,
     handleHoursWorkedChange,
     handleCheckIn,
     setFilters,
-    setSelectedEmployee,
+    setSelectedEmployee: handleEmployeeSelectForDetail,
     setDetailVisible,
     filteredEmployees,
     loading,
+    attendanceHistory,
+    attendanceTypes, // Exportar los tipos de asistencia
+    todayDayName: getDayName(new Date()), // Exportar el nombre del día actual
   }
 }
 

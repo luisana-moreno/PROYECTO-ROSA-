@@ -19,19 +19,7 @@ const ViewEmployeeModal = ({ viewVisible, setViewVisible, currentEmployee }) => 
           <>
             <p>
               <strong>Nombre Completo:</strong>{' '}
-              {`${currentEmployee.ttr_nombrel} ${currentEmployee.ttr_nomsegu} ${currentEmployee.ttr_apellid} ${currentEmployee.ttr_apesegu}`}
-            </p>
-            <p>
-              <strong>Primer Nombre:</strong> {currentEmployee.ttr_nombrel}
-            </p>
-            <p>
-              <strong>Segundo Nombre:</strong> {currentEmployee.ttr_nomsegu}
-            </p>
-            <p>
-              <strong>Primer Apellido:</strong> {currentEmployee.ttr_apellid}
-            </p>
-            <p>
-              <strong>Segundo Apellido:</strong> {currentEmployee.ttr_apesegu}
+              {`${currentEmployee.ttr_nombrel} ${currentEmployee.ttr_apellid}`}
             </p>
             <p>
               <strong>Número de Documento:</strong> {currentEmployee.ttr_documen}

@@ -40,19 +40,11 @@ const EditEmployeeModal = ({
     }
 
     if (currentEmployee.ttr_nombrel.length > 100) {
-      toast.error('El primer nombre no puede exceder los 100 caracteres.')
-      return false
-    }
-    if (currentEmployee.ttr_nomsegu && currentEmployee.ttr_nomsegu.length > 100) {
-      toast.error('El segundo nombre no puede exceder los 100 caracteres.')
+      toast.error('El nombre no puede exceder los 100 caracteres.')
       return false
     }
     if (currentEmployee.ttr_apellid.length > 100) {
-      toast.error('El primer apellido no puede exceder los 100 caracteres.')
-      return false
-    }
-    if (currentEmployee.ttr_apesegu && currentEmployee.ttr_apesegu.length > 100) {
-      toast.error('El segundo apellido no puede exceder los 100 caracteres.')
+      toast.error('El apellido no puede exceder los 100 caracteres.')
       return false
     }
     if (currentEmployee.ttr_documen.length > 8) {
@@ -105,67 +97,37 @@ const EditEmployeeModal = ({
           <CCol md={6}>
             <CFormInput
               className="modal-name custom-select"
-              placeholder="primer nombre"
-              aria-label="primer nombre"
+              placeholder="Nombre"
+              aria-label="Nombre"
               value={currentEmployee?.ttr_nombrel || ''}
               onChange={(e) =>
                 setCurrentEmployee({ ...currentEmployee, ttr_nombrel: e.target.value })
               }
               maxLength={100}
             />
-            <small className="text-muted">Ingrese el primer nombre.</small>
+            <small className="text-muted">Ingrese el nombre.</small>
           </CCol>
 
           <CCol md={6}>
             <CFormInput
               className="modal-name custom-select"
-              placeholder="segundo nombre"
-              aria-label="segundo nombre"
-              value={currentEmployee?.ttr_nomsegu || ''}
+              placeholder="Apellido"
+              aria-label="Apellido"
+              value={currentEmployee?.ttr_apellid || ''}
               onChange={(e) =>
-                setCurrentEmployee({ ...currentEmployee, ttr_nomsegu: e.target.value })
+                setCurrentEmployee({ ...currentEmployee, ttr_apellid: e.target.value })
               }
               maxLength={100}
             />
-            <small className="text-muted">Ingrese el segundo nombre.</small>
+            <small className="text-muted">Ingrese el apellido.</small>
           </CCol>
-
-          <CRow className="employees-las-name g-3 mt-2">
-            <CCol md={6}>
-              <CFormInput
-                className="modal-name custom-select"
-                placeholder="primer apellido"
-                aria-label="primer apellido"
-                value={currentEmployee?.ttr_apellid || ''}
-                onChange={(e) =>
-                  setCurrentEmployee({ ...currentEmployee, ttr_apellid: e.target.value })
-                }
-                maxLength={100}
-              />
-              <small className="text-muted">Ingrese el primer Apellido.</small>
-            </CCol>
-
-            <CCol md={6}>
-              <CFormInput
-                className="modal-name custom-select"
-                placeholder="segundo apellido"
-                aria-label="segundo apellido"
-                value={currentEmployee?.ttr_apesegu || ''}
-                onChange={(e) =>
-                  setCurrentEmployee({ ...currentEmployee, ttr_apesegu: e.target.value })
-                }
-                maxLength={100}
-              />
-              <small className="text-muted">Ingrese el segundo Apellido.</small>
-            </CCol>
-          </CRow>
         </CRow>
         <CRow className="g-3 mt-2">
           <CCol md={6}>
             <CFormInput
               className="modal-name custom-select"
-              placeholder="numero de documento"
-              aria-label="numero de documento"
+              placeholder="Numero de documento"
+              aria-label="Numero de documento"
               value={currentEmployee?.ttr_documen || ''}
               onChange={(e) =>
                 setCurrentEmployee({ ...currentEmployee, ttr_documen: e.target.value })

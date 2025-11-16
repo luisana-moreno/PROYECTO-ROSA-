@@ -9,36 +9,31 @@ import {
   CCol,
   CButton,
   CFormSelect,
-  CAlert,
   CSpinner,
 } from '@coreui/react'
+import { toast } from 'react-toastify' // Importa toast de react-toastify
 
 const CheckInOut = ({ employees, onCheckIn, loading }) => {
   const [selectedEmployeeId, setSelectedEmployeeId] = useState('')
-  const [message, setMessage] = useState(null)
 
   const handleCheckIn = async () => {
     if (!selectedEmployeeId) {
-      setMessage({ type: 'warning', text: 'Selecciona un empleado' })
+      toast.warning('Selecciona un empleado para registrar la entrada.')
       return
     }
 
     await onCheckIn(selectedEmployeeId, 'entrada')
-    setMessage({ type: 'success', text: 'Entrada registrada ✓' })
     setSelectedEmployeeId('')
-    setTimeout(() => setMessage(null), 3000)
   }
 
   const handleCheckOut = async () => {
     if (!selectedEmployeeId) {
-      setMessage({ type: 'warning', text: 'Selecciona un empleado' })
+      toast.warning('Selecciona un empleado para registrar la salida.')
       return
     }
 
     await onCheckIn(selectedEmployeeId, 'salida')
-    setMessage({ type: 'info', text: 'Salida registrada ✓' })
     setSelectedEmployeeId('')
-    setTimeout(() => setMessage(null), 3000)
   }
 
   return (
@@ -47,17 +42,6 @@ const CheckInOut = ({ employees, onCheckIn, loading }) => {
         <h5 className="mb-0">Registro de Entrada/Salida</h5>
       </CCardHeader>
       <CCardBody>
-        {message && (
-          <CAlert
-            color={message.type}
-            className="mb-3"
-            dismissible
-            onClose={() => setMessage(null)}
-          >
-            {message.text}
-          </CAlert>
-        )}
-
         <CRow className="g-3">
           <CCol md={6}>
             <CFormSelect

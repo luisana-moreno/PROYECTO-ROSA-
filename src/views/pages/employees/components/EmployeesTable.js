@@ -41,9 +41,7 @@ const EmployeesTable = ({
             <CTableRow key={employee.ttr_documen || index}>
               <CTableDataCell>{indexOfFirstEmployee + index + 1}</CTableDataCell>
               <CTableDataCell>
-                {`${employee?.ttr_nombrel || ''} ${employee?.ttr_nomsegu || ''} ${
-                  employee?.ttr_apellid || ''
-                } ${employee?.ttr_apesegu || ''}`}
+                {`${employee?.ttr_nombrel || ''} ${employee?.ttr_apellid || ''}`}
               </CTableDataCell>
               <CTableDataCell>{employee?.cargo_nombre || ''}</CTableDataCell>
               <CTableDataCell>{formatDateToDDMMYYYY(employee?.ttr_feccont)}</CTableDataCell>

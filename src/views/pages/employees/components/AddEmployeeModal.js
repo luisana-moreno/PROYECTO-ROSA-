@@ -40,19 +40,11 @@ const AddEmployeeModal = ({
     }
 
     if (addEmployee.ttr_nombrel.length > 100) {
-      toast.error('El primer nombre no puede exceder los 100 caracteres.')
-      return false
-    }
-    if (addEmployee.ttr_nomsegu && addEmployee.ttr_nomsegu.length > 100) {
-      toast.error('El segundo nombre no puede exceder los 100 caracteres.')
+      toast.error('El nombre no puede exceder los 100 caracteres.')
       return false
     }
     if (addEmployee.ttr_apellid.length > 100) {
-      toast.error('El primer apellido no puede exceder los 100 caracteres.')
-      return false
-    }
-    if (addEmployee.ttr_apesegu && addEmployee.ttr_apesegu.length > 100) {
-      toast.error('El segundo apellido no puede exceder los 100 caracteres.')
+      toast.error('El apellido no puede exceder los 100 caracteres.')
       return false
     }
     if (addEmployee.ttr_documen.length > 8) {
@@ -105,50 +97,25 @@ const AddEmployeeModal = ({
           <CCol md={6}>
             <CFormInput
               className="modal-name custom-select"
-              placeholder="Primer Nombre"
-              aria-label="primer nombre"
+              placeholder="Nombre"
+              aria-label="Nombre"
               value={addEmployee.ttr_nombrel}
               onChange={(e) => setAddEmployee({ ...addEmployee, ttr_nombrel: e.target.value })}
               maxLength={100}
             />
-            <small className="text-muted">Ingrese el primer nombre.</small>
+            <small className="text-muted">Ingrese el nombre.</small>
           </CCol>
 
           <CCol md={6}>
             <CFormInput
               className="modal-name custom-select"
-              placeholder="Segundo Nombre"
-              aria-label="segundo nombre"
-              value={addEmployee.ttr_nomsegu}
-              onChange={(e) => setAddEmployee({ ...addEmployee, ttr_nomsegu: e.target.value })}
-              maxLength={100}
-            />
-            <small className="text-muted">Ingrese el segundo nombre.</small>
-          </CCol>
-        </CRow>
-        <CRow className="employees-las-name g-3 mt-2">
-          <CCol md={6}>
-            <CFormInput
-              className="modal-name custom-select"
-              placeholder="Primer apellido"
-              aria-label="Primer apellido"
+              placeholder="Apellido"
+              aria-label="Apellido"
               value={addEmployee.ttr_apellid}
               onChange={(e) => setAddEmployee({ ...addEmployee, ttr_apellid: e.target.value })}
               maxLength={100}
             />
-            <small className="text-muted">Ingrese el primer apellido.</small>
-          </CCol>
-
-          <CCol md={6}>
-            <CFormInput
-              className="modal-name custom-select"
-              placeholder="Segundo apellido"
-              aria-label="Segundo apellido"
-              value={addEmployee.ttr_apesegu}
-              onChange={(e) => setAddEmployee({ ...addEmployee, ttr_apesegu: e.target.value })}
-              maxLength={100}
-            />
-            <small className="text-muted">Ingrese el segundo apellido.</small>
+            <small className="text-muted">Ingrese el apellido.</small>
           </CCol>
         </CRow>
         <CRow className="g-3 mt-2">

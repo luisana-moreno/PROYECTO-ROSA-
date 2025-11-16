@@ -22,6 +22,8 @@ const AsistenciaModule = () => {
     setDetailVisible,
     filteredEmployees,
     loading,
+    attendanceHistory, // Recibir el historial de asistencia
+    todayDayName, // Recibir el nombre del día actual
   } = useAttendance()
 
   return (
@@ -50,6 +52,7 @@ const AsistenciaModule = () => {
             handleHoursWorkedChange={handleHoursWorkedChange}
             setSelectedEmployee={setSelectedEmployee}
             setDetailVisible={setDetailVisible}
+            todayDayName={todayDayName} // Pasar el nombre del día actual
           />
         </CCardBody>
       </CCard>
@@ -60,6 +63,7 @@ const AsistenciaModule = () => {
         onClose={() => setDetailVisible(false)}
         employee={selectedEmployee}
         days={days}
+        attendanceHistory={attendanceHistory} // Pasar el historial de asistencia
       />
     </CContainer>
   )

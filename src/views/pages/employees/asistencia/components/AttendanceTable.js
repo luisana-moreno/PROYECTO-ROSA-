@@ -19,6 +19,7 @@ const AttendanceTable = ({
   handleHoursWorkedChange,
   setSelectedEmployee,
   setDetailVisible,
+  todayDayName, // Nuevo prop
 }) => {
   const getStatusColor = (status) => {
     switch (status) {
@@ -60,31 +61,38 @@ const AttendanceTable = ({
                 <strong>{emp.name}</strong>
               </CTableDataCell>
               <CTableDataCell className="text-muted">{emp.position}</CTableDataCell>
-              {days.map((day) => (
-                <CTableDataCell key={`${emp.id}-${day}`} className="text-center p-2">
-                  <CFormSelect
-                    size="sm"
-                    value={emp.attendance[day]?.status || ''}
-                    onChange={(e) => handleAttendanceChange(emp.id, day, e.target.value)}
-                    style={{ fontSize: '0.85rem' }}
-                  >
-                    <option value="">—</option>
-                    <option value="Presente">Presente</option>
-                    <option value="Ausente">Ausente</option>
-                    <option value="Reposo">Reposo</option>
-                  </CFormSelect>
-                  {emp.attendance[day]?.status && (
-                    <div className="mt-1">
-                      <CBadge
-                        color={getStatusColor(emp.attendance[day].status)}
-                        shape="rounded-pill"
-                      >
-                        {emp.attendance[day].status}
-                      </CBadge>
-                    </div>
-                  )}
-                </CTableDataCell>
-              ))}
+              {days.map((day) => {
+                const today = new Date()
+                const currentDayName = days[today.getDay() === 0 ? 6 : today.getDay() - 1] // Ajusta para que el domingo sea el último día (índice 6)
+                const isPastDay = days.indexOf(day) < days.indexOf(currentDayName)
+
+                return (
+                  <CTableDataCell key={`${emp.id}-${day}`} className="text-center p-2">
+                    <CFormSelect
+                      size="sm"
+                      value={emp.attendance[day]?.status || ''}
+                      onChange={(e) => handleAttendanceChange(emp.id, day, e.target.value)}
+                      style={{ fontSize: '0.85rem' }}
+                      disabled={isPastDay} // Deshabilita si es un día pasado
+                    >
+                      <option value="">—</option>
+                      <option value="Presente">Presente</option>
+                      <option value="Ausente">Ausente</option>
+                      <option value="Reposo">Reposo</option>
+                    </CFormSelect>
+                    {emp.attendance[day]?.status && (
+                      <div className="mt-1">
+                        <CBadge
+                          color={getStatusColor(emp.attendance[day].status)}
+                          shape="rounded-pill"
+                        >
+                          {emp.attendance[day].status}
+                        </CBadge>
+                      </div>
+                    )}
+                  </CTableDataCell>
+                )
+              })}
               <CTableDataCell className="text-center">
                 <CFormInput
                   type="number"
