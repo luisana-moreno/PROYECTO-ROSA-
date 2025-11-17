@@ -10,6 +10,7 @@ import EditCattleModal from './components/EditCattleModal'
 import DeleteCattleModal from './components/DeleteCattleModal'
 import ViewCattleModal from './components/ViewCattleModal'
 import ExpBovModal from './components/ExpBovModal' // Importa el nuevo modal de expediente
+import CattleFilters from './components/CattleFilters' // Importa el nuevo componente de filtros
 
 const Cattle = () => {
   const {
@@ -38,6 +39,17 @@ const Cattle = () => {
     colores,
     etapas,
     estados,
+    searchTerm,
+    setSearchTerm,
+    filterRaza,
+    setFilterRaza,
+    filterColor,
+    setFilterColor,
+    filterEtapa,
+    setFilterEtapa,
+    filterEstado,
+    setFilterEstado,
+    filteredCattle,
   } = useCattle()
 
   return (
@@ -53,10 +65,26 @@ const Cattle = () => {
             Agregar Bovino
           </CButton>
         </h4>
+        <CattleFilters
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          filterRaza={filterRaza}
+          setFilterRaza={setFilterRaza}
+          filterColor={filterColor}
+          setFilterColor={setFilterColor}
+          filterEtapa={filterEtapa}
+          setFilterEtapa={setFilterEtapa}
+          filterEstado={filterEstado}
+          setFilterEstado={setFilterEstado}
+          razas={razas}
+          colores={colores}
+          etapas={etapas}
+          estados={estados}
+        />
       </CCardHeader>
       <CCardBody>
         <CattleTable
-          cattle={cattle}
+          cattle={filteredCattle}
           setCurrentCattle={setCurrentCattle}
           setEditVisible={setEditVisible}
           setDeleteVisible={setDeleteVisible}

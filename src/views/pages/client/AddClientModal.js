@@ -64,9 +64,15 @@ const PersonClientFields = ({ addClient, setAddClient }) => (
           placeholder="Numero de Documento"
           aria-label="Numero de Documento"
           value={addClient.Document_Number}
-          onChange={(e) => setAddClient({ ...addClient, Document_Number: e.target.value })}
+          onChange={(e) => {
+            const value = e.target.value
+            if (/^\d*$/.test(value) && value.length <= 10) {
+              setAddClient({ ...addClient, Document_Number: value })
+            }
+          }}
+          maxLength={10}
         />
-        <small className="text-muted">Ingrese el numero de documento.</small>
+        <small className="text-muted">Ingrese el numero de documento (máximo 10 dígitos).</small>
       </CCol>
     </CRow>
   </>
@@ -91,9 +97,15 @@ const CompanyClientFields = ({ addClient, setAddClient }) => (
           placeholder="Rif"
           aria-label="Rif"
           value={addClient.Rif}
-          onChange={(e) => setAddClient({ ...addClient, Rif: e.target.value })}
+          onChange={(e) => {
+            const value = e.target.value
+            if (/^\d*$/.test(value) && value.length <= 10) {
+              setAddClient({ ...addClient, Rif: value })
+            }
+          }}
+          maxLength={10}
         />
-        <small className="text-muted">Ingrese el rif.</small>
+        <small className="text-muted">Ingrese el rif (máximo 10 dígitos).</small>
       </CCol>
     </CRow>
   </>
@@ -108,9 +120,15 @@ const CommonClientFields = ({ addClient, setAddClient }) => (
           placeholder="Telefono"
           aria-label="Telefono"
           value={addClient.Phone}
-          onChange={(e) => setAddClient({ ...addClient, Phone: e.target.value })}
+          onChange={(e) => {
+            const value = e.target.value
+            if (/^\d*$/.test(value) && value.length <= 11) {
+              setAddClient({ ...addClient, Phone: value })
+            }
+          }}
+          maxLength={11}
         />
-        <small className="text-muted">Ingrese el numero de telefono.</small>
+        <small className="text-muted">Ingrese el numero de telefono (11 dígitos).</small>
       </CCol>
       <CCol md={6}>
         <CFormInput
@@ -175,6 +193,9 @@ const AddClientModal = ({ visible, setVisible, addClient, setAddClient, handleAd
       if (!addClient.Rif) {
         toast.error('El Rif es requerido.')
         return false
+      } else if (!/^\d{10}$/.test(addClient.Rif)) {
+        toast.error('El Rif debe tener 10 dígitos numéricos.')
+        return false
       }
     } else if (clientTypeSelected === 'Person') {
       if (!addClient.firts_name) {
@@ -187,6 +208,9 @@ const AddClientModal = ({ visible, setVisible, addClient, setAddClient, handleAd
       }
       if (!addClient.Document_Number) {
         toast.error('El número de documento es requerido.')
+        return false
+      } else if (!/^\d{10}$/.test(addClient.Document_Number)) {
+        toast.error('El número de documento debe tener 10 dígitos numéricos.')
         return false
       }
     }

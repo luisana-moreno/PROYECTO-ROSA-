@@ -8,6 +8,7 @@ import ClientTable from './ClientTable'
 import AddClientModal from './AddClientModal'
 import EditClientModal from './EditClientModal'
 import DeleteClientModal from './DeleteClientModal'
+import ClientFilters from './components/ClientFilters'
 
 const Client = () => {
   const {
@@ -27,6 +28,9 @@ const Client = () => {
     handleAddClient,
     handleEditClient,
     handleDeleteClient,
+    searchTerm,
+    setSearchTerm,
+    filteredClients,
   } = useClients()
 
   return (
@@ -42,11 +46,12 @@ const Client = () => {
             Agregar Cliente
           </CButton>
         </h4>
+        <ClientFilters searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       </CCardHeader>
 
       <CCardBody>
         <ClientTable
-          clients={clients}
+          clients={filteredClients}
           setCurrentClient={setCurrentClient}
           setEditVisibleClient={setEditVisibleClient}
           setDeleteVisibleClient={setDeleteVisibleClient}

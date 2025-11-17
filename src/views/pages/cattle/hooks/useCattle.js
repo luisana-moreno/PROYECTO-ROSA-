@@ -20,6 +20,11 @@ export const useCattle = () => {
   const [currentCattle, setCurrentCattle] = useState(null)
   const [deleteConfirmation, setDeleteConfirmation] = useState('')
   const [cattle, setCattle] = useState([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterRaza, setFilterRaza] = useState('')
+  const [filterColor, setFilterColor] = useState('')
+  const [filterEtapa, setFilterEtapa] = useState('')
+  const [filterEstado, setFilterEstado] = useState('')
   const [razas, setRazas] = useState([])
   const [colores, setColores] = useState([])
   const [etapas, setEtapas] = useState([])
@@ -58,6 +63,20 @@ export const useCattle = () => {
       toast.error('Error al cargar datos iniciales')
     }
   }
+
+  const filteredCattle = cattle.filter((bovino) => {
+    const matchesSearchTerm = searchTerm
+      ? String(bovino.ttrNumerobv)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        String(bovino.ttrNombrbov)?.toLowerCase().includes(searchTerm.toLowerCase())
+      : true
+
+    const matchesRaza = filterRaza ? bovino.ttrIdrazabo === parseInt(filterRaza) : true
+    const matchesColor = filterColor ? bovino.ttrIdcolorb === parseInt(filterColor) : true
+    const matchesEtapa = filterEtapa ? bovino.ttrIdetapav === parseInt(filterEtapa) : true
+    const matchesEstado = filterEstado ? bovino.ttrIdestadb === parseInt(filterEstado) : true
+
+    return matchesSearchTerm && matchesRaza && matchesColor && matchesEtapa && matchesEstado
+  })
 
   const handleAddCattle = async () => {
     try {
@@ -191,5 +210,16 @@ export const useCattle = () => {
     colores,
     etapas,
     estados,
+    searchTerm,
+    setSearchTerm,
+    filterRaza,
+    setFilterRaza,
+    filterColor,
+    setFilterColor,
+    filterEtapa,
+    setFilterEtapa,
+    filterEstado,
+    setFilterEstado,
+    filteredCattle,
   }
 }

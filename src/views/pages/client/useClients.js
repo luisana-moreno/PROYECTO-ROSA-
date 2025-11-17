@@ -9,6 +9,7 @@ export const useClients = () => {
   const [currentClient, setCurrentClient] = useState(null)
   const [deleteConfirmationClient, setDeleteConfirmationClient] = useState('')
   const [clients, setClients] = useState([])
+  const [searchTerm, setSearchTerm] = useState('')
   const [addClientForm, setAddClientForm] = useState({
     client_type: '', // 'Person' o 'Company'
     company_name: '',
@@ -38,6 +39,23 @@ export const useClients = () => {
     }
     fetchClients()
   }, [])
+
+  const filteredClients = clients.filter((client) => {
+    const matchesSearchTerm = searchTerm
+      ? (client.client_type === 'Person' &&
+          (client.ttr_nombrecl?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            client.ttr_apellido?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            client.ttr_documecl?.toLowerCase().includes(searchTerm.toLowerCase()))) ||
+        (client.client_type === 'Company' &&
+          (client.ttr_nomcompa?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            client.ttr_documecl?.toLowerCase().includes(searchTerm.toLowerCase()))) ||
+        client.ttr_telefono?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.ttr_direccio?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.ttr_correocl?.toLowerCase().includes(searchTerm.toLowerCase())
+      : true
+
+    return matchesSearchTerm
+  })
 
   const handleAddClient = async () => {
     try {
@@ -171,5 +189,8 @@ export const useClients = () => {
     handleAddClient,
     handleEditClient,
     handleDeleteClient,
+    searchTerm,
+    setSearchTerm,
+    filteredClients,
   }
 }

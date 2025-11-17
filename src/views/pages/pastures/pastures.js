@@ -8,6 +8,7 @@ import PasturesTable from './components/PasturesTable'
 import AddPastureModal from './components/AddPastureModal'
 import EditPastureModal from './components/EditPastureModal'
 import DeletePastureModal from './components/DeletePastureModal'
+import PastureFilters from './components/PastureFilters'
 
 const Pastures = () => {
   const {
@@ -30,6 +31,13 @@ const Pastures = () => {
     handleEditPasture,
     handleDeletePasture,
     toast,
+    searchTerm,
+    setSearchTerm,
+    filterEstadoPotrero,
+    setFilterEstadoPotrero,
+    filterTipoMantenimiento,
+    setFilterTipoMantenimiento,
+    filteredPastures,
   } = usePastures()
 
   return (
@@ -45,10 +53,20 @@ const Pastures = () => {
             Crear Potrero
           </CButton>
         </h4>
+        <PastureFilters
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          filterEstadoPotrero={filterEstadoPotrero}
+          setFilterEstadoPotrero={setFilterEstadoPotrero}
+          filterTipoMantenimiento={filterTipoMantenimiento}
+          setFilterTipoMantenimiento={setFilterTipoMantenimiento}
+          estadosPotrero={estadosPotrero}
+          tiposMantenimiento={tiposMantenimiento}
+        />
       </CCardHeader>
       <CCardBody>
         <PasturesTable
-          pastures={pastures}
+          pastures={filteredPastures}
           setCurrentPasture={setCurrentPasture}
           setEditVisible={setEditVisible}
           setDeleteVisible={setDeleteVisible}

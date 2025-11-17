@@ -10,6 +10,9 @@ export const usePastures = () => {
   const [currentPasture, setCurrentPasture] = useState(null)
   const [deleteConfirmation, setDeleteConfirmation] = useState('')
   const [pastures, setPastures] = useState([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterEstadoPotrero, setFilterEstadoPotrero] = useState('')
+  const [filterTipoMantenimiento, setFilterTipoMantenimiento] = useState('')
   const [estadosPotrero, setEstadosPotrero] = useState([])
   const [tiposMantenimiento, setTiposMantenimiento] = useState([])
   const [addPasture, setAddPasture] = useState({
@@ -74,6 +77,22 @@ export const usePastures = () => {
     }
     fetchInitialData()
   }, [])
+
+  const filteredPastures = pastures.filter((pasture) => {
+    const matchesSearchTerm = searchTerm
+      ? String(pasture.ttr_codpotre)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        String(pasture.ttr_descripc)?.toLowerCase().includes(searchTerm.toLowerCase())
+      : true
+
+    const matchesEstado = filterEstadoPotrero
+      ? pasture.ttr_idestpot === parseInt(filterEstadoPotrero)
+      : true
+    const matchesTipoMantenimiento = filterTipoMantenimiento
+      ? pasture.ttr_idtipman === parseInt(filterTipoMantenimiento)
+      : true
+
+    return matchesSearchTerm && matchesEstado && matchesTipoMantenimiento
+  })
 
   // Agregar potrero
   // Agregar potrero
@@ -212,5 +231,12 @@ export const usePastures = () => {
     handleEditPasture,
     handleDeletePasture,
     showToast,
+    searchTerm,
+    setSearchTerm,
+    filterEstadoPotrero,
+    setFilterEstadoPotrero,
+    filterTipoMantenimiento,
+    setFilterTipoMantenimiento,
+    filteredPastures,
   }
 }
