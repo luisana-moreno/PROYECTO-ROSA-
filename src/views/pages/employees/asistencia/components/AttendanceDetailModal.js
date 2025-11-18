@@ -36,9 +36,8 @@ const AttendanceDetailModal = ({
       case 'Ausente':
         return 'danger'
       case 'Reposo':
+      case 'Pendiente': // Considerar Pendiente como un estado que podría tener un color específico
         return 'warning'
-      case 'Pendiente':
-        return 'info'
       default:
         return 'secondary'
     }
@@ -46,16 +45,16 @@ const AttendanceDetailModal = ({
 
   // Calcular el resumen de la semana usando los nombres de los tipos de asistencia
   const presentDays = days.filter(
-    (day) => employee.attendance[day]?.tipoAsistenciaNombre === 'Presente',
+    (dayInfo) => employee.attendance[dayInfo.name]?.tipoAsistenciaNombre === 'Presente',
   ).length
   const absentDays = days.filter(
-    (day) => employee.attendance[day]?.tipoAsistenciaNombre === 'Ausente',
+    (dayInfo) => employee.attendance[dayInfo.name]?.tipoAsistenciaNombre === 'Ausente',
   ).length
   const restDays = days.filter(
-    (day) => employee.attendance[day]?.tipoAsistenciaNombre === 'Reposo',
+    (dayInfo) => employee.attendance[dayInfo.name]?.tipoAsistenciaNombre === 'Reposo',
   ).length
   const pendingDays = days.filter(
-    (day) => employee.attendance[day]?.tipoAsistenciaNombre === 'Pendiente',
+    (dayInfo) => employee.attendance[dayInfo.name]?.tipoAsistenciaNombre === 'Pendiente',
   ).length
 
   return (
@@ -96,17 +95,19 @@ const AttendanceDetailModal = ({
 
         <h6 className="text-muted mb-3">Estado por Día (Semana Actual)</h6>
         <div className="d-flex flex-wrap gap-2">
-          {days.map((day) => (
-            <div key={day} className="text-center">
+          {days.map((dayInfo) => (
+            <div key={dayInfo.name} className="text-center">
               <div className="small text-muted mb-1">
-                {day.charAt(0).toUpperCase() + day.slice(1)}
+                {dayInfo.name.charAt(0).toUpperCase() + dayInfo.name.slice(1)}
+                <br />
+                <small>{dayInfo.date}</small>
               </div>
               <CBadge
-                color={getStatusColor(employee.attendance[day]?.tipoAsistenciaNombre)}
+                color={getStatusColor(employee.attendance[dayInfo.name]?.tipoAsistenciaNombre)}
                 shape="rounded-pill"
                 className="py-2 px-3"
               >
-                {employee.attendance[day]?.tipoAsistenciaNombre || '—'}
+                {employee.attendance[dayInfo.name]?.tipoAsistenciaNombre || '—'}
               </CBadge>
             </div>
           ))}

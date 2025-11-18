@@ -39,6 +39,27 @@ export const getWeekRange = (date) => {
   return `${startFormatted.replace('.', '')} - ${endFormatted.replace('.', '')}`
 }
 
+export const getWeekDaysWithDates = (date) => {
+  const d = new Date(date)
+  const dayOfWeek = d.getDay() // 0 para domingo, 1 para lunes, ..., 6 para sábado
+
+  const startOfWeek = new Date(d)
+  startOfWeek.setDate(d.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1))
+  startOfWeek.setHours(0, 0, 0, 0)
+
+  const weekDays = []
+  for (let i = 0; i < 7; i++) {
+    const currentDay = new Date(startOfWeek)
+    currentDay.setDate(startOfWeek.getDate() + i)
+    const dayName = getDayName(currentDay)
+    const formattedDate = `${String(currentDay.getDate()).padStart(2, '0')}/${String(
+      currentDay.getMonth() + 1,
+    ).padStart(2, '0')}`
+    weekDays.push({ name: dayName, date: formattedDate })
+  }
+  return weekDays
+}
+
 export const getDayName = (dateString) => {
   const date = new Date(dateString)
   const options = { weekday: 'long' }

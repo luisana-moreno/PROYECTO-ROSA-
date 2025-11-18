@@ -3,11 +3,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { attendanceService } from 'src/api/attendanceService'
 import { employeeService } from 'src/api/employeeService'
-import { getWeekRange, getDayName, formatHoursToHHMMSS } from 'src/utils/dateFormatter'
+import {
+  getWeekRange,
+  getDayName,
+  formatHoursToHHMMSS,
+  getWeekDaysWithDates,
+} from 'src/utils/dateFormatter'
 import { toast } from 'react-toastify' // Importa toast de react-toastify
-
-// Días de la semana para la tabla, definidos fuera del hook para estabilidad
-const DAYS_OF_WEEK = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo']
 
 const useAttendance = () => {
   const [week, setWeek] = useState('')
@@ -15,13 +17,21 @@ const useAttendance = () => {
   const [selectedEmployee, _setSelectedEmployee] = useState(null) // Renombrado para uso interno
   const [detailVisible, setDetailVisible] = useState(false)
   const [attendanceHistory, setAttendanceHistory] = useState([]) // Nuevo estado para el historial
+  const [isEditingLocked, setIsEditingLocked] = useState(true) // Estado para controlar el bloqueo de edición
   const [filters, setFilters] = useState({
     name: '',
     position: '',
   })
   const [loading, setLoading] = useState(false)
   const [attendanceTypes, setAttendanceTypes] = useState([]) // Nuevo estado para tipos de asistencia
+  const [currentWeekDays, setCurrentWeekDays] = useState([]) // Nuevo estado para los días de la semana con fechas
   const isMounted = useRef(false) // Para controlar la ejecución única del useEffect
+  const lastFetchedWeek = useRef(null) // Para controlar el reinicio semanal
+
+  const toggleEditingLock = useCallback(() => {
+    setIsEditingLocked((prev) => !prev)
+    toast.info(`Edición ${isEditingLocked ? 'desbloqueada' : 'bloqueada'}.`)
+  }, [isEditingLocked])
 
   const fetchAttendanceData = useCallback(async () => {
     setLoading(true)
@@ -40,7 +50,18 @@ const useAttendance = () => {
 
       const today = new Date()
       const currentWeekRange = getWeekRange(today)
+      const weekDaysWithDates = getWeekDaysWithDates(today)
+      setCurrentWeekDays(weekDaysWithDates)
       setWeek(currentWeekRange)
+
+      // Lógica para reiniciar la asistencia semanal
+      const currentWeekIdentifier = weekDaysWithDates.map((d) => d.date).join('-')
+      if (lastFetchedWeek.current !== currentWeekIdentifier) {
+        console.log('Nueva semana detectada, reiniciando asistencia.')
+        lastFetchedWeek.current = currentWeekIdentifier
+        // No cargar asistencias antiguas si es una nueva semana
+        // La inicialización de attendanceByDay ya se encarga de esto
+      }
 
       if (employeesData) {
         const employeesWithAttendance = employeesData.map((emp) => {
@@ -53,16 +74,13 @@ const useAttendance = () => {
             position: emp.cargo_nombre || '',
           }
 
-          const employeeAttendances = attendancesData.filter(
-            (att) => att.ttr_idemplea === formattedEmp.id,
-          )
-
           const attendanceByDay = {}
           let totalHoursWorked = 0
           let currentAttendanceId = null
 
-          DAYS_OF_WEEK.forEach((day) => {
-            attendanceByDay[day] = {
+          weekDaysWithDates.forEach((dayInfo) => {
+            const dayName = dayInfo.name
+            attendanceByDay[dayName] = {
               status: 'Ausente', // Por defecto
               id: null,
               horaEntrada: null,
@@ -74,40 +92,57 @@ const useAttendance = () => {
             }
           })
 
-          employeeAttendances.forEach((att) => {
-            const attendanceDate = new Date(att.ttr_fechaasi)
-            const dayOfWeek = getDayName(attendanceDate)
-            const tipoAsistencia = typesData.find((type) => type.tma_idtipasi === att.ttr_idtipasi)
+          // Solo procesar asistencias si no es una nueva semana o si hay datos para la semana actual
+          if (lastFetchedWeek.current === currentWeekIdentifier) {
+            const employeeAttendances = attendancesData.filter(
+              (att) => att.ttr_idemplea === formattedEmp.id,
+            )
 
-            if (DAYS_OF_WEEK.includes(dayOfWeek)) {
-              const horaEntrada = att.ttr_horaentr
-              const horaSalida = att.ttr_horasali
-              const horaTrabajo = att.ttr_horatrab
+            employeeAttendances.forEach((att) => {
+              const attendanceDate = new Date(att.ttr_fechaasi)
+              const dayOfWeek = getDayName(attendanceDate)
+              const tipoAsistencia = typesData.find(
+                (type) => type.tma_idtipasi === att.ttr_idtipasi,
+              )
 
-              attendanceByDay[dayOfWeek] = {
-                status: tipoAsistencia ? tipoAsistencia.tma_nomtipa : 'Desconocido',
-                id: att.ttr_idasisen,
-                horaEntrada: horaEntrada,
-                horaSalida: horaSalida,
-                horaTrabajo: horaTrabajo,
-                idTipoAsistencia: att.ttr_idtipasi,
-                tipoAsistenciaNombre: tipoAsistencia ? tipoAsistencia.tma_nomtipa : 'Desconocido',
-              }
-
-              if (horaEntrada && horaSalida && horaTrabajo) {
-                const [h, m, s] = horaTrabajo.split(':').map(Number)
-                totalHoursWorked += h + m / 60 + s / 3600
-              }
+              // Asegurarse de que la asistencia sea de la semana actual
+              const attWeekIdentifier = getWeekDaysWithDates(attendanceDate)
+                .map((d) => d.date)
+                .join('-')
 
               if (
-                attendanceDate.toDateString() === today.toDateString() &&
-                horaEntrada &&
-                !horaSalida
+                weekDaysWithDates.some((d) => d.name === dayOfWeek) &&
+                attWeekIdentifier === currentWeekIdentifier
               ) {
-                currentAttendanceId = att.ttr_idasisen
+                const horaEntrada = att.ttr_horaentr
+                const horaSalida = att.ttr_horasali
+                const horaTrabajo = att.ttr_horatrab
+
+                attendanceByDay[dayOfWeek] = {
+                  status: tipoAsistencia ? tipoAsistencia.tma_nomtipa : 'Desconocido',
+                  id: att.ttr_idasisen,
+                  horaEntrada: horaEntrada,
+                  horaSalida: horaSalida,
+                  horaTrabajo: horaTrabajo,
+                  idTipoAsistencia: att.ttr_idtipasi,
+                  tipoAsistenciaNombre: tipoAsistencia ? tipoAsistencia.tma_nomtipa : 'Desconocido',
+                }
+
+                if (horaEntrada && horaSalida && horaTrabajo) {
+                  const [h, m, s] = horaTrabajo.split(':').map(Number)
+                  totalHoursWorked += h + m / 60 + s / 3600
+                }
+
+                if (
+                  attendanceDate.toDateString() === today.toDateString() &&
+                  horaEntrada &&
+                  !horaSalida
+                ) {
+                  currentAttendanceId = att.ttr_idasisen
+                }
               }
-            }
-          })
+            })
+          }
 
           return {
             ...formattedEmp,
@@ -127,7 +162,14 @@ const useAttendance = () => {
   }, [setEmployees, setWeek, setLoading, toast])
 
   useEffect(() => {
-    if (!isMounted.current) {
+    // Ejecutar fetchAttendanceData cada vez que la semana cambie (para reiniciar)
+    // o al montar el componente por primera vez.
+    const today = new Date()
+    const currentWeekIdentifier = getWeekDaysWithDates(today)
+      .map((d) => d.date)
+      .join('-')
+
+    if (!isMounted.current || lastFetchedWeek.current !== currentWeekIdentifier) {
       console.log('useEffect: fetchAttendanceData se está ejecutando.')
       fetchAttendanceData()
       isMounted.current = true
@@ -144,15 +186,20 @@ const useAttendance = () => {
         return
       }
 
+      // Obtener el día actual de la semana con la fecha formateada
+      const today = new Date()
+      const currentDayInfo = getWeekDaysWithDates(today).find(
+        (day) => day.name === getDayName(today),
+      )
+      const currentDayName = currentDayInfo ? currentDayInfo.name : getDayName(today)
+      const formattedTodayDate = today.toISOString().split('T')[0] // Fecha en YYYY-MM-DD para la API
+
       const currentTime = new Date().toLocaleTimeString('es-ES', {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
         hour12: false,
       })
-      const today = new Date().toISOString().split('T')[0]
-
-      const currentDayName = getDayName(new Date())
       let updatedEmployee = { ...employee }
 
       if (!updatedEmployee.attendance) {
@@ -175,7 +222,7 @@ const useAttendance = () => {
         const newAttendance = await attendanceService.recordCheckIn(
           Number(employeeId),
           currentTime,
-          today,
+          formattedTodayDate,
         )
         updatedEmployee.currentAttendanceId = newAttendance.ttr_idasisen
         updatedEmployee.attendance[currentDayName] = {
@@ -254,10 +301,18 @@ const useAttendance = () => {
       const today = new Date()
       today.setHours(0, 0, 0, 0) // Normalizar la fecha de hoy a medianoche
 
-      const tempDate = new Date()
-      const attendanceDate = new Date(
-        tempDate.setDate(tempDate.getDate() - tempDate.getDay() + DAYS_OF_WEEK.indexOf(day) + 1),
-      )
+      // Obtener el objeto del día de la semana actual con su fecha
+      const currentDayInfo = currentWeekDays.find((d) => d.name === day)
+      if (!currentDayInfo) {
+        toast.error('Día de la semana no encontrado.')
+        setLoading(false)
+        return
+      }
+
+      // Reconstruir la fecha completa para la asistencia
+      const [dayOfMonth, monthOfYear] = currentDayInfo.date.split('/').map(Number)
+      const currentYear = new Date().getFullYear()
+      const attendanceDate = new Date(currentYear, monthOfYear - 1, dayOfMonth)
       attendanceDate.setHours(0, 0, 0, 0) // Normalizar la fecha de asistencia a medianoche
 
       // Si la fecha de asistencia es anterior a hoy, no permitir el cambio
@@ -359,7 +414,8 @@ const useAttendance = () => {
         return
       }
       const today = new Date()
-      const dayOfWeek = getDayName(today)
+      const currentDayInfo = currentWeekDays.find((day) => day.name === getDayName(today))
+      const dayOfWeek = currentDayInfo ? currentDayInfo.name : getDayName(today)
       const currentAttendance = employee.attendance[dayOfWeek]
 
       if (currentAttendance && currentAttendance.id) {
@@ -437,7 +493,7 @@ const useAttendance = () => {
     selectedEmployee,
     detailVisible,
     filters,
-    days: DAYS_OF_WEEK,
+    days: currentWeekDays, // Ahora days es un array de objetos { name, date }
     handleAttendanceChange,
     handleHoursWorkedChange,
     handleCheckIn,
@@ -449,6 +505,12 @@ const useAttendance = () => {
     attendanceHistory,
     attendanceTypes, // Exportar los tipos de asistencia
     todayDayName: getDayName(new Date()), // Exportar el nombre del día actual
+    todayFormattedDate: `${String(new Date().getDate()).padStart(2, '0')}/${String(
+      new Date().getMonth() + 1,
+    ).padStart(2, '0')}`, // Exportar la fecha actual formateada
+    todayFullDate: new Date(), // Exportar la fecha actual completa como objeto Date
+    isEditingLocked, // Exportar el estado de bloqueo de edición
+    toggleEditingLock, // Exportar la función para alternar el bloqueo de edición
   }
 }
 
