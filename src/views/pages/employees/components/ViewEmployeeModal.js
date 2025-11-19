@@ -10,6 +10,7 @@ const ViewEmployeeModal = ({ viewVisible, setViewVisible, currentEmployee }) => 
       visible={viewVisible}
       onClose={() => setViewVisible(false)}
       className="modern-modal"
+      backdrop="static"
     >
       <CModalHeader className="modern-modal-header">
         <CModalTitle className="modern-modal-title">Detalles del Empleado</CModalTitle>

@@ -73,6 +73,7 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
       visible={expBovVisible}
       onClose={() => setExpBovVisible(false)}
       size="xl"
+      backdrop="static"
     >
       <CModalHeader className="modal-module">
         <CModalTitle className="typography-color-title">

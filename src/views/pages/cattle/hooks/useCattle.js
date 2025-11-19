@@ -115,7 +115,12 @@ export const useCattle = () => {
       }
     } catch (error) {
       console.error('Error al agregar bovino:', error)
-      toast.error(error.message || 'Error al agregar bovino')
+      // Manejo de errores de validación del backend
+      if (error.response && error.response.status === 409) {
+        toast.error(error.response.data.message) // Muestra el mensaje de error específico del backend
+      } else {
+        toast.error(error.message || 'Error al agregar bovino')
+      }
     }
   }
 
@@ -150,7 +155,12 @@ export const useCattle = () => {
       }
     } catch (error) {
       console.error('Error al editar bovino:', error)
-      toast.error(error.message || 'Error al editar bovino')
+      // Manejo de errores de validación del backend
+      if (error.response && error.response.status === 409) {
+        toast.error(error.response.data.message) // Muestra el mensaje de error específico del backend
+      } else {
+        toast.error(error.message || 'Error al editar bovino')
+      }
     }
   }
 

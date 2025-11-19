@@ -17,7 +17,7 @@ const DeleteVaccinationModal = ({
   onConfirmDelete,
 }) => {
   return (
-    <CModal alignment="center" visible={visible} onClose={onClose}>
+    <CModal alignment="center" visible={visible} onClose={onClose} backdrop="static">
       <CModalHeader className="modal-module">
         <CModalTitle className="typography-color">Confirmar Eliminación</CModalTitle>
       </CModalHeader>

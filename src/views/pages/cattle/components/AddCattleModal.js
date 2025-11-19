@@ -55,7 +55,13 @@ const AddCattleModal = ({
   }
 
   return (
-    <CModal alignment="center" scrollable visible={visible} onClose={() => setVisible(false)}>
+    <CModal
+      alignment="center"
+      scrollable
+      visible={visible}
+      onClose={() => setVisible(false)}
+      backdrop="static"
+    >
       <CModalHeader className="modal-module">
         <CModalTitle className="typography-color">Datos del Bovino</CModalTitle>
       </CModalHeader>

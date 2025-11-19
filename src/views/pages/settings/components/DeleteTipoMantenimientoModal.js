@@ -32,7 +32,7 @@ const DeleteTipoMantenimientoModal = ({
   }
 
   return (
-    <CModal visible={visible} onClose={() => setVisible(false)}>
+    <CModal visible={visible} onClose={() => setVisible(false)} backdrop="static">
       <CModalHeader>
         <CModalTitle>Eliminar Tipo de Mantenimiento</CModalTitle>
       </CModalHeader>

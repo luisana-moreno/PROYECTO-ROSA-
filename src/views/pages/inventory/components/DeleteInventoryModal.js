@@ -17,7 +17,7 @@ const DeleteInventoryModal = ({
   onDelete,
 }) => {
   return (
-    <CModal visible={visible} onClose={onClose}>
+    <CModal visible={visible} onClose={onClose} backdrop="static">
       <CModalHeader className="modal-module">
         <CModalTitle className="typography-color">Eliminar Registro</CModalTitle>
       </CModalHeader>

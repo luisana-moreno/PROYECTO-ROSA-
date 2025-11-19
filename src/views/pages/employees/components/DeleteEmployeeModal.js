@@ -21,6 +21,7 @@ const DeleteEmployeeModal = ({
       visible={deleteVisible}
       onClose={() => setDeleteVisible(false)}
       className="modern-modal"
+      backdrop="static"
     >
       <CModalHeader className="modern-modal-header">
         <CModalTitle className="modern-modal-title">Eliminar Empleado</CModalTitle>

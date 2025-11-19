@@ -58,7 +58,14 @@ const AttendanceDetailModal = ({
   ).length
 
   return (
-    <CModal size="lg" alignment="center" scrollable visible={visible} onClose={onClose}>
+    <CModal
+      size="lg"
+      alignment="center"
+      scrollable
+      visible={visible}
+      onClose={onClose}
+      backdrop="static"
+    >
       <CModalHeader closeButton>
         <CModalTitle>Detalle de Asistencia - {employee.name}</CModalTitle>
       </CModalHeader>

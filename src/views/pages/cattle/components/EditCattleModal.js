@@ -61,6 +61,7 @@ const EditCattleModal = ({
       scrollable
       visible={editVisible}
       onClose={() => setEditVisible(false)}
+      backdrop="static"
     >
       <CModalHeader className="modal-module">
         <CModalTitle className="text-white">Editar Bovino</CModalTitle>

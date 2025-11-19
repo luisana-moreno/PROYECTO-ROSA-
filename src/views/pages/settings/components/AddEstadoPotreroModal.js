@@ -23,7 +23,12 @@ const AddEstadoPotreroModal = ({ visible, setVisible, createEstadoPotrero }) => 
   }
 
   return (
-    <CModal alignment="center" visible={visible} onClose={() => setVisible(false)}>
+    <CModal
+      alignment="center"
+      visible={visible}
+      onClose={() => setVisible(false)}
+      backdrop="static"
+    >
       <CModalHeader>
         <CModalTitle>Agregar Estado de Potrero</CModalTitle>
       </CModalHeader>

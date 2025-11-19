@@ -26,7 +26,7 @@ const DeleteCattleModal = ({
   }
 
   return (
-    <CModal visible={deleteVisible} onClose={() => setDeleteVisible(false)}>
+    <CModal visible={deleteVisible} onClose={() => setDeleteVisible(false)} backdrop="static">
       <CModalHeader>
         <CModalTitle className="typography-color-title">Eliminar Bovino</CModalTitle>
       </CModalHeader>

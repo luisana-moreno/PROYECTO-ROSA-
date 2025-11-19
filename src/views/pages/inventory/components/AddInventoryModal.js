@@ -15,7 +15,7 @@ const AddInventoryModal = ({
   setNewCategoryName,
 }) => {
   return (
-    <CModal alignment="center" scrollable visible={visible} onClose={onClose}>
+    <CModal alignment="center" scrollable visible={visible} onClose={onClose} backdrop="static">
       <CModalHeader className="modal-module">
         <CModalTitle className="typography-color">Registro de Inventario</CModalTitle>
       </CModalHeader>

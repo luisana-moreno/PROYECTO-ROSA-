@@ -244,7 +244,13 @@ const AddClientModal = ({ visible, setVisible, addClient, setAddClient, handleAd
   }
 
   return (
-    <CModal alignment="center" scrollable visible={visible} onClose={() => setVisible(false)}>
+    <CModal
+      alignment="center"
+      scrollable
+      visible={visible}
+      onClose={() => setVisible(false)}
+      backdrop="static"
+    >
       <CModalHeader className="modal-module">
         <CModalTitle className="typography-color">Datos del cliente</CModalTitle>
       </CModalHeader>

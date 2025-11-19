@@ -97,7 +97,12 @@ export const useUsers = () => {
       }
     } catch (error) {
       console.error('Error al agregar usuario:', error) // Mantener console.error para depuración interna
-      toast.error(error.message || 'Error al agregar usuario.')
+      // Manejo de errores de validación del backend
+      if (error.response && error.response.status === 409) {
+        toast.error(error.response.data.message) // Muestra el mensaje de error específico del backend
+      } else {
+        toast.error(error.message || 'Error al agregar usuario.')
+      }
     }
   }
 
@@ -118,7 +123,12 @@ export const useUsers = () => {
       }
     } catch (error) {
       console.error('Error al actualizar usuario:', error) // Mantener console.error para depuración interna
-      toast.error(error.message || 'Error al actualizar usuario.')
+      // Manejo de errores de validación del backend
+      if (error.response && error.response.status === 409) {
+        toast.error(error.response.data.message) // Muestra el mensaje de error específico del backend
+      } else {
+        toast.error(error.message || 'Error al actualizar usuario.')
+      }
     }
   }
 

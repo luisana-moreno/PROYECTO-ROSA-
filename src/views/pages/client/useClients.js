@@ -103,7 +103,12 @@ export const useClients = () => {
         toast.success('Cliente agregado exitosamente!')
       }
     } catch (error) {
-      toast.error('Error al agregar cliente: ' + error.message)
+      // Manejo de errores de validación del backend
+      if (error.response && error.response.status === 409) {
+        toast.error(error.response.data.message) // Muestra el mensaje de error específico del backend
+      } else {
+        toast.error('Error al agregar cliente: ' + (error.message || 'Error desconocido.'))
+      }
     }
   }
 
@@ -149,7 +154,12 @@ export const useClients = () => {
         toast.success('Cliente actualizado exitosamente!')
       }
     } catch (error) {
-      toast.error('Error al actualizar cliente: ' + error.message)
+      // Manejo de errores de validación del backend
+      if (error.response && error.response.status === 409) {
+        toast.error(error.response.data.message) // Muestra el mensaje de error específico del backend
+      } else {
+        toast.error('Error al actualizar cliente: ' + (error.message || 'Error desconocido.'))
+      }
     }
   }
 
@@ -165,7 +175,7 @@ export const useClients = () => {
         setDeleteVisibleClient(false)
         toast.success('Cliente eliminado exitosamente!')
       } catch (error) {
-        toast.error('Error al eliminar cliente: ' + error.message)
+        toast.error('Error al eliminar cliente: ' + (error.message || 'Error desconocido.'))
       }
     } else {
       toast.error('Confirmación de eliminación fallida. Escriba "confirmar".')

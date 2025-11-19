@@ -8,6 +8,7 @@ const ViewCattleModal = ({ viewVisible, setViewVisible, currentCattle }) => {
       scrollable
       visible={viewVisible}
       onClose={() => setViewVisible(false)}
+      backdrop="static"
     >
       <CModalHeader>
         <CModalTitle>Detalles del Bovino</CModalTitle>

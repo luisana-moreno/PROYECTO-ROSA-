@@ -42,7 +42,7 @@ const VaccinationModal = ({
 
   return (
     <>
-      <CModal alignment="center" visible={visible} onClose={onClose}>
+      <CModal alignment="center" visible={visible} onClose={onClose} backdrop="static">
         <CModalHeader className="modal-module">
           <CModalTitle className="typograhy-color-title">
             {editMode ? 'Editar Evento de Vacunación' : 'Registrar Vacunación'}

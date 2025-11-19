@@ -23,7 +23,12 @@ const AddTipoMantenimientoModal = ({ visible, setVisible, createTipoMantenimient
   }
 
   return (
-    <CModal alignment="center" visible={visible} onClose={() => setVisible(false)}>
+    <CModal
+      alignment="center"
+      visible={visible}
+      onClose={() => setVisible(false)}
+      backdrop="static"
+    >
       <CModalHeader>
         <CModalTitle>Agregar Tipo de Mantenimiento</CModalTitle>
       </CModalHeader>

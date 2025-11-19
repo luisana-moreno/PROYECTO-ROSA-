@@ -85,6 +85,7 @@ const AddEmployeeModal = ({
       visible={visible}
       onClose={() => setVisible(false)}
       className="modern-modal"
+      backdrop="static"
     >
       <CModalHeader className="modern-modal-header">
         <CModalTitle className="modern-modal-title">Registro de Empleados</CModalTitle>

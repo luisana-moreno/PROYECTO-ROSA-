@@ -155,7 +155,12 @@ export const useEmployees = () => {
         toast.success('Registro agregado correctamente')
       }
     } catch (error) {
-      toast.error(error.message || 'Error al agregar empleado.')
+      // Manejo de errores de validación del backend
+      if (error.response && error.response.status === 409) {
+        toast.error(error.response.data.message) // Muestra el mensaje de error específico del backend
+      } else {
+        toast.error(error.message || 'Error al agregar empleado.')
+      }
     }
   }
 
@@ -196,7 +201,12 @@ export const useEmployees = () => {
         toast.info('Registro editado correctamente')
       }
     } catch (error) {
-      toast.error(error.message || 'Error al editar empleado.')
+      // Manejo de errores de validación del backend
+      if (error.response && error.response.status === 409) {
+        toast.error(error.response.data.message) // Muestra el mensaje de error específico del backend
+      } else {
+        toast.error(error.message || 'Error al editar empleado.')
+      }
     }
   }
 

@@ -17,7 +17,7 @@ const DeleteClientModal = ({
   handleDeleteClient,
 }) => {
   return (
-    <CModal visible={deleteVisible} onClose={() => setDeleteVisible(false)}>
+    <CModal visible={deleteVisible} onClose={() => setDeleteVisible(false)} backdrop="static">
       <CModalHeader className="modal-module">
         <CModalTitle className="typography-color">Eliminar cliente</CModalTitle>
       </CModalHeader>

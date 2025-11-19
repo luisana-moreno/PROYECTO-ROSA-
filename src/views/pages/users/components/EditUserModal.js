@@ -61,6 +61,7 @@ const EditUserModal = ({
       visible={editVisible}
       onClose={() => setEditVisible(false)}
       className="modern-modal"
+      backdrop="static"
     >
       <CModalHeader className="modern-modal-header">
         <CModalTitle className="modern-modal-title">Editar Usuario</CModalTitle>

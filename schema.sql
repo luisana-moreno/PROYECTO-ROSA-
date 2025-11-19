@@ -581,12 +581,28 @@ ALTER TABLE IF EXISTS public.ttrbovlotpotr
     ON DELETE NO ACTION;
 
 -- Insertar tipos de asistencia por defecto
-INSERT INTO public.tmatipasist (tma_idtipasi, tma_nomtipa) VALUES (1, 'Presente') ON CONFLICT (tma_idtipa) DO NOTHING;
-INSERT INTO public.tmatipasist (tma_idtipasi, tma_nomtipa) VALUES (2, 'Ausente') ON CONFLICT (tma_idtipa) DO NOTHING;
-INSERT INTO public.tmatipasist (tma_idtipasi, tma_nomtipa) VALUES (3, 'Reposo') ON CONFLICT (tma_idtipa) DO NOTHING;
-INSERT INTO public.tmatipasist (tma_idtipasi, tma_nomtipa) VALUES (4, 'Pendiente') ON CONFLICT (tma_idtipa) DO NOTHING;
+INSERT INTO public.tmatipasist (tma_idtipasi, tma_nomtipa) VALUES (1, 'Presente') ON CONFLICT (tma_idtipasi) DO NOTHING;
+INSERT INTO public.tmatipasist (tma_idtipasi, tma_nomtipa) VALUES (2, 'Ausente') ON CONFLICT (tma_idtipasi) DO NOTHING;
+INSERT INTO public.tmatipasist (tma_idtipasi, tma_nomtipa) VALUES (3, 'Reposo') ON CONFLICT (tma_idtipasi) DO NOTHING;
+INSERT INTO public.tmatipasist (tma_idtipasi, tma_nomtipa) VALUES (4, 'Pendiente') ON CONFLICT (tma_idtipasi) DO NOTHING;
 
 -- Ajustar la secuencia para que los IDs generados automáticamente no colisionen con los insertados manualmente
 SELECT setval('public.tmatipasist_tma_idtipasi_seq', (SELECT MAX(tma_idtipasi) FROM public.tmatipasist));
+
+-- Nuevas restricciones UNIQUE
+ALTER TABLE IF EXISTS public.ttrempleado
+    ADD CONSTRAINT ttrempleado_ttr_documen_key UNIQUE (ttr_documen);
+
+ALTER TABLE IF EXISTS public.ttrusuarioo
+    ADD CONSTRAINT ttrusuarioo_ttr_correoe_key UNIQUE (ttr_correoe);
+
+ALTER TABLE IF EXISTS public.ttrclienteee
+    ADD CONSTRAINT ttrclienteee_ttr_documecl_key UNIQUE (ttr_documecl);
+
+ALTER TABLE IF EXISTS public.ttrclienteee
+    ADD CONSTRAINT ttrclienteee_ttr_correocl_key UNIQUE (ttr_correocl);
+
+ALTER TABLE IF EXISTS public.ttrbovinoss
+    ADD CONSTRAINT ttrbovinoss_ttr_numerobv_key UNIQUE (ttr_numerobv);
 
 END;

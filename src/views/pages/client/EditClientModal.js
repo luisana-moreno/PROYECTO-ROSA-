@@ -247,6 +247,7 @@ const EditClientModal = ({
       scrollable
       visible={editVisible}
       onClose={() => setEditVisible(false)}
+      backdrop="static"
     >
       <CModalHeader className="modal-module">
         <CModalTitle className="text-white">Editar Datos del cliente</CModalTitle>

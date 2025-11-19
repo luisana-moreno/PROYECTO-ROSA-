@@ -32,7 +32,7 @@ const DeleteEstadoPotreroModal = ({
   }
 
   return (
-    <CModal visible={visible} onClose={() => setVisible(false)}>
+    <CModal visible={visible} onClose={() => setVisible(false)} backdrop="static">
       <CModalHeader>
         <CModalTitle>Eliminar Estado de Potrero</CModalTitle>
       </CModalHeader>
