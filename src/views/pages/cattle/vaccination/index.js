@@ -1,9 +1,12 @@
 import React from 'react'
-import { CAlert } from '@coreui/react'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import useVaccination from './hooks/useVaccination'
 import VaccinationCalendar from './components/VaccinationCalendar'
 import VaccinationModal from './components/VaccinationModal'
 import DeleteVaccinationModal from './components/DeleteVaccinationModal'
+import DayOptionsModal from './components/DayOptionsModal'
+import VaccinationDetailsModal from './components/VaccinationDetailsModal' // Importar el nuevo modal de detalles
 
 const Vaccination = () => {
   const {
@@ -14,12 +17,13 @@ const Vaccination = () => {
     vaccinationEvents,
     formData,
     setFormData,
-    toast,
     confirmDelete,
     deleteConfirmation,
     setDeleteConfirmation,
     employees,
-    cattle,
+    allCattle,
+    visibleCattleModal,
+    setVisibleCattleModal,
     handleDateClick,
     handleEventClick,
     handleSubmit,
@@ -27,33 +31,45 @@ const Vaccination = () => {
     handleConfirmDelete,
     cancelDelete,
     closeModal,
-    // Eliminado: setVisibleCattleModal, visibleCattleModal
+    handleSelectCattle,
+    tiposVacuna,
+    tratamientos,
+    handleAddVacuna,
+    handleAddTratamiento,
+    visibleDayOptionsModal,
+    setVisibleDayOptionsModal,
+    dayOptionsDate,
+    handleRegisterOptionClick,
+    handleViewDetailsOptionClick,
+    handleEditRecord, // Nueva función exportada
+    visibleVaccinationDetailsModal,
+    setVisibleVaccinationDetailsModal,
+    vaccinationDetails,
   } = useVaccination()
-
-  const { visibleCattleModal, setVisibleCattleModal } = useVaccination() // Desestructurar aquí para pasar como objeto
 
   return (
     <>
-      {toast.show && (
-        <div
-          style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            zIndex: 9999,
-            minWidth: 300,
-          }}
-        >
-          <CAlert color={toast.color} className="text-center m-0">
-            {toast.message}
-          </CAlert>
-        </div>
-      )}
+      <ToastContainer />
       <VaccinationCalendar
         vaccinationEvents={vaccinationEvents}
         handleDateClick={handleDateClick}
-        handleEventClick={handleEventClick}
+        // handleEventClick ya no es necesario aquí, el comportamiento de clic en evento se maneja desde DayOptionsModal
+      />
+
+      <DayOptionsModal
+        visible={visibleDayOptionsModal}
+        onClose={() => setVisibleDayOptionsModal(false)}
+        selectedDate={dayOptionsDate}
+        onRegister={handleRegisterOptionClick}
+        onViewDetails={handleViewDetailsOptionClick}
+      />
+
+      <VaccinationDetailsModal
+        visible={visibleVaccinationDetailsModal}
+        onClose={() => setVisibleVaccinationDetailsModal(false)}
+        records={vaccinationDetails}
+        selectedDate={dayOptionsDate}
+        onEditRecord={handleEditRecord} // Pasar la nueva función de edición
       />
 
       <VaccinationModal
@@ -64,10 +80,15 @@ const Vaccination = () => {
         formData={formData}
         setFormData={setFormData}
         employees={employees}
-        cattle={cattle}
+        allCattle={allCattle}
+        handleSelectCattle={handleSelectCattle}
         onSubmit={handleSubmit}
         onDelete={handleDelete}
         cattleModalProps={{ visibleCattleModal, setVisibleCattleModal }}
+        tiposVacuna={tiposVacuna}
+        tratamientos={tratamientos}
+        handleAddVacuna={handleAddVacuna}
+        handleAddTratamiento={handleAddTratamiento}
       />
 
       <DeleteVaccinationModal

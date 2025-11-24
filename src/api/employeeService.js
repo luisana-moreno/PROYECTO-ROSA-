@@ -13,17 +13,21 @@ export const employeeService = {
       throw new Error(errorData.message || 'Error al obtener empleados')
     }
     const data = await response.json()
-    // Función auxiliar para transformar las claves de mayúsculas a minúsculas
-    const formatEmployeeData = (employee) => {
-      const formattedEmployee = {}
-      for (const key in employee) {
-        if (Object.hasOwnProperty.call(employee, key)) {
-          formattedEmployee[key.toLowerCase()] = employee[key]
-        }
-      }
-      return formattedEmployee
-    }
-    return data.map(formatEmployeeData)
+    return data.map((employee) => ({
+      id: employee.ttr_idemplo,
+      ttrNombrel: employee.ttr_nombrel,
+      ttrApellid: employee.ttr_apellid,
+      cargoNombre: employee.cargoNombre,
+      // Incluir otras propiedades si son necesarias para otros componentes
+      ttrNomsegu: employee.ttr_nomsegu,
+      ttrApesegu: employee.ttr_apesegu,
+      ttrDocumen: employee.ttr_documen,
+      ttrFecnaci: employee.ttr_fecnaci,
+      ttrTelefon: employee.ttr_telefon,
+      ttrDirecci: employee.ttr_direcci,
+      ttrFeccont: employee.ttr_feccont,
+      ttrIdcargp: employee.ttr_idcargp,
+    }))
   },
 
   getEmployeeById: async (id) => {
@@ -38,8 +42,21 @@ export const employeeService = {
       throw new Error(errorData.message || 'Error al obtener empleado por ID')
     }
     const data = await response.json()
-    // No es necesario formatear aquí, ya que useEmployees lo maneja
-    return data
+    return {
+      id: data.ttr_idemplo,
+      ttrNombrel: data.ttr_nombrel,
+      ttrApellid: data.ttr_apellid,
+      cargoNombre: data.cargoNombre,
+      // Incluir otras propiedades si son necesarias para otros componentes
+      ttrNomsegu: data.ttr_nomsegu,
+      ttrApesegu: data.ttr_apesegu,
+      ttrDocumen: data.ttr_documen,
+      ttrFecnaci: data.ttr_fecnaci,
+      ttrTelefon: data.ttr_telefon,
+      ttrDirecci: data.ttr_direcci,
+      ttrFeccont: data.ttr_feccont,
+      ttrIdcargp: data.ttr_idcargp,
+    }
   },
 
   addEmployee: async (employeeData) => {

@@ -19,7 +19,6 @@ export const useEmployees = () => {
     ttr_direcci: '',
     ttr_feccont: '',
     ttr_idcargp: '', // Almacenará el ID del cargo
-    Contact_Person: '', // Mantener por ahora, pero no se enviará al backend
   })
   const [searchTerm, setSearchTerm] = useState('') // Nuevo estado para el término de búsqueda
   const [filterPosition, setFilterPosition] = useState('') // Nuevo estado para el filtro por cargo
@@ -133,13 +132,12 @@ export const useEmployees = () => {
       ttr_direcci: addEmployeeForm.ttr_direcci,
       ttr_feccont: addEmployeeForm.ttr_feccont,
       ttr_idcargp: addEmployeeForm.ttr_idcargp,
-      Contact_Person: addEmployeeForm.Contact_Person,
     }
     try {
       const newEmp = await employeeService.addEmployee(employeeToSend)
       if (newEmp) {
-        const cargoNombre = positions.find((p) => p.id === newEmp.ttr_idcargp)?.name || ''
-        setEmployees([...employees, { ...newEmp, cargo_nombre: cargoNombre }])
+        const cargonombre = positions.find((p) => p.id === newEmp.ttr_idcargp)?.name || ''
+        setEmployees([...employees, { ...newEmp, cargonombre: cargonombre }])
         setAddEmployeeForm({
           ttr_nombrel: '',
           ttr_apellid: '',
@@ -149,7 +147,6 @@ export const useEmployees = () => {
           ttr_direcci: '',
           ttr_feccont: '',
           ttr_idcargp: '',
-          Contact_Person: '',
         })
         setVisible(false)
         toast.success('Registro agregado correctamente')
@@ -181,7 +178,6 @@ export const useEmployees = () => {
       ttr_direcci: currentEmployee.ttr_direcci,
       ttr_feccont: currentEmployee.ttr_feccont,
       ttr_idcargp: currentEmployee.ttr_idcargp,
-      Contact_Person: currentEmployee.Contact_Person,
     }
     try {
       const updated = await employeeService.updateEmployee(
@@ -189,11 +185,11 @@ export const useEmployees = () => {
         employeeToSend,
       )
       if (updated) {
-        const cargoNombre = positions.find((p) => p.id === updated.ttr_idcargp)?.name || ''
+        const cargonombre = positions.find((p) => p.id === updated.ttr_idcargp)?.name || ''
         setEmployees(
           employees.map((emp) =>
             emp.ttr_idemplo === updated.ttr_idemplo
-              ? { ...updated, cargo_nombre: cargoNombre }
+              ? { ...updated, cargonombre: cargonombre }
               : emp,
           ),
         )

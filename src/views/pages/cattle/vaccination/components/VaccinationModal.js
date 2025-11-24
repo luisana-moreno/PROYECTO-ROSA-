@@ -8,10 +8,14 @@ import {
   CModalTitle,
   CForm,
   CFormInput,
-  CFormSelect,
-  CBadge, // Importar CBadge
+  CBadge,
 } from '@coreui/react'
-import { CustomTableModal } from 'src/components' // Importar CustomTableModal
+import { CustomTableModal } from 'src/components'
+import EmployeeSearchSelect from './EmployeeSearchSelect'
+import VaccineSearchSelect from './VaccineSearchSelect'
+import TreatmentSearchSelect from './TreatmentSearchSelect'
+import { format } from 'date-fns' // Importar format
+import { es } from 'date-fns/locale' // Importar el locale español
 
 const VaccinationModal = ({
   visible,
@@ -21,24 +25,31 @@ const VaccinationModal = ({
   formData,
   setFormData,
   employees,
-  allCattle, // Cambiado a allCattle
-  handleSelectCattle, // Nuevo prop
+  allCattle,
+  handleSelectCattle,
   onSubmit,
   onDelete,
-  cattleModalProps, // Nuevo prop para visibleCattleModal y setVisibleCattleModal
+  cattleModalProps,
+  tiposVacuna,
+  tratamientos,
+  handleAddVacuna,
+  handleAddTratamiento,
 }) => {
   const { visibleCattleModal, setVisibleCattleModal } = cattleModalProps
-  console.log('visibleCattleModal en VaccinationModal:', visibleCattleModal)
+
   const cattleColumns = [
     { key: 'id', label: 'ID' },
-    { key: 'cattleNumber', label: 'Número de Bovino' },
+    { key: 'ttrNumerobv', label: 'Número de Bovino' },
     { key: 'razaNombre', label: 'Raza' },
   ]
 
-  // Obtener los objetos de bovinos seleccionados para mostrar en el modal
   const selectedCattleObjects = formData.cattleIds
     .map((id) => allCattle.find((b) => b.id === id))
     .filter(Boolean)
+
+  const formattedSelectedDate = selectedDate
+    ? format(selectedDate, 'dd MMMM yyyy', { locale: es })
+    : 'N/A'
 
   return (
     <>
@@ -50,13 +61,18 @@ const VaccinationModal = ({
         </CModalHeader>
         <CModalBody>
           <p>
-            <strong>Fecha:</strong> {selectedDate}
+            <strong>Fecha:</strong> {formattedSelectedDate}
           </p>
           <CForm>
             <div className="mb-3">
               <CButton
                 className="button-no-hover-green text-white"
-                onClick={() => setVisibleCattleModal(true)}
+                onClick={() => {
+                  console.log(
+                    'Botón "Seleccionar Bovinos" clickeado. Estableciendo visibleCattleModal a true.',
+                  )
+                  setVisibleCattleModal(true)
+                }}
               >
                 Seleccionar Bovinos
               </CButton>
@@ -72,19 +88,15 @@ const VaccinationModal = ({
                 )}
               </div>
             </div>
+            <h6 className="typography-color-title mb-2">Seleccionar Empleado</h6>
+            <EmployeeSearchSelect
+              employees={employees}
+              selectedEmployeeId={formData.employeeId}
+              onSelectEmployee={(id) => setFormData({ ...formData, employeeId: id })}
+              placeholder="Buscar y seleccionar empleado..."
+            />
+            <div className="mb-3"></div>
 
-            <CFormSelect
-              className="modal-name mb-3 custom-select"
-              value={formData.employeeId}
-              onChange={(e) => setFormData({ ...formData, employeeId: e.target.value })}
-            >
-              <option value="">Seleccione el empleado</option>
-              {employees.map((emp) => (
-                <option key={emp.ttrIdemplo} value={emp.ttrIdemplo}>
-                  {emp.ttrNombrel} {emp.ttrApellid} ({emp.cargoNombre})
-                </option>
-              ))}
-            </CFormSelect>
             <CFormInput
               className="modal-name mb-3 custom-select"
               placeholder="Diagnóstico"
@@ -93,29 +105,34 @@ const VaccinationModal = ({
               value={formData.diagnosis}
               onChange={(e) => setFormData({ ...formData, diagnosis: e.target.value })}
             />
-            <CFormInput
-              className="modal-name mb-3 custom-select"
-              placeholder="Tratamiento"
-              type="text"
-              name="treatment"
-              value={formData.treatment}
-              onChange={(e) => setFormData({ ...formData, treatment: e.target.value })}
-            />
-            <CFormInput
-              className="modal-name mb-3 custom-select"
-              type="text"
-              placeholder="Vacuna"
-              name="vaccine"
-              value={formData.vaccine}
-              onChange={(e) => setFormData({ ...formData, vaccine: e.target.value })}
-            />
+
+            <div className="mb-3">
+              <TreatmentSearchSelect
+                treatments={tratamientos}
+                selectedTreatmentName={formData.treatment}
+                onSelectTreatment={(name) => setFormData({ ...formData, treatment: name })}
+                onAddTreatment={handleAddTratamiento}
+                placeholder="Buscar y seleccionar tratamiento..."
+              />
+            </div>
+
+            <div className="mb-3">
+              <VaccineSearchSelect
+                vaccines={tiposVacuna}
+                selectedVaccineName={formData.vaccine}
+                onSelectVaccine={(name) => setFormData({ ...formData, vaccine: name })}
+                onAddVaccine={handleAddVacuna}
+                placeholder="Buscar y seleccionar vacuna..."
+              />
+            </div>
+
             <CFormInput
               className="modal-name mb-3"
               type="date"
               placeholder="Fecha de Vacunación"
-              name="dateVaccination"
-              value={formData.dateVaccination}
-              onChange={(e) => setFormData({ ...formData, dateVaccination: e.target.value })}
+              name="date_vaccination"
+              value={formData.date_vaccination}
+              onChange={(e) => setFormData({ ...formData, date_vaccination: e.target.value })}
             />
           </CForm>
         </CModalBody>

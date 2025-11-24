@@ -40,10 +40,7 @@ const ViewEmployeeModal = ({ viewVisible, setViewVisible, currentEmployee }) => 
               {formatDateToDDMMYYYY(currentEmployee.ttr_feccont)}
             </p>
             <p>
-              <strong>Cargo:</strong> {currentEmployee.cargo_nombre}
-            </p>
-            <p>
-              <strong>Persona de Contacto:</strong> {currentEmployee.Contact_Person}
+              <strong>Cargo:</strong> {currentEmployee.cargonombre}
             </p>
           </>
         ) : (

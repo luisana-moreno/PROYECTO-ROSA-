@@ -32,8 +32,7 @@ const EditEmployeeModal = ({
       !currentEmployee.ttr_telefon ||
       !currentEmployee.ttr_direcci ||
       !currentEmployee.ttr_feccont ||
-      !currentEmployee.ttr_idcargp ||
-      !currentEmployee.Contact_Person
+      !currentEmployee.ttr_idcargp
     ) {
       toast.error('Todos los campos obligatorios deben ser llenados.')
       return false
@@ -223,20 +222,6 @@ const EditEmployeeModal = ({
               ))}
             </CFormSelect>
             <small className="text-muted">Ingrese el cargo.</small>
-          </CCol>
-        </CRow>
-        <CRow className="g-3 mt-2">
-          <CCol md={6}>
-            <CFormInput
-              className="modal-name custom-select"
-              placeholder="Persona de Contacto"
-              aria-label="Persona de Contacto"
-              value={currentEmployee?.Contact_Person || ''}
-              onChange={(e) =>
-                setCurrentEmployee({ ...currentEmployee, Contact_Person: e.target.value })
-              }
-            />
-            <small className="text-muted">Ingrese la persona de contacto.</small>
           </CCol>
         </CRow>
       </CModalBody>

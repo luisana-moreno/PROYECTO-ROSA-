@@ -23,6 +23,7 @@ const EmployeesTable = ({
   currentPage,
   paginate,
 }) => {
+  console.log(employees)
   return (
     <>
       <CTable hover responsive className="shadow-sm">
@@ -38,12 +39,12 @@ const EmployeesTable = ({
         </CTableHead>
         <CTableBody>
           {employees.map((employee, index) => (
-            <CTableRow key={employee.ttr_documen || index}>
+            <CTableRow key={employee.ttr_idemplo || index}>
               <CTableDataCell>{indexOfFirstEmployee + index + 1}</CTableDataCell>
               <CTableDataCell>
                 {`${employee?.ttr_nombrel || ''} ${employee?.ttr_apellid || ''}`}
               </CTableDataCell>
-              <CTableDataCell>{employee?.cargo_nombre || ''}</CTableDataCell>
+              <CTableDataCell>{employee?.cargonombre || ''}</CTableDataCell>
               <CTableDataCell>{formatDateToDDMMYYYY(employee?.ttr_feccont)}</CTableDataCell>
               <CTableDataCell>{employee?.ttr_telefon || ''}</CTableDataCell>
               <CTableDataCell>

@@ -1,3 +1,5 @@
+import { regmedicosService } from './regmedicosService'
+
 const API_URL = import.meta.env.VITE_API_URL
 
 export const vaccinationService = {
@@ -14,26 +16,29 @@ export const vaccinationService = {
       throw new Error(errorData.message || 'Error al obtener tipos de vacuna')
     }
     const data = await response.json()
-    return data.map((tipo) => ({
-      id: tipo.TMA_IDTIPVA,
-      nombre: tipo.TMA_NOMBREL,
-    }))
+    return data
+      .map((tipo) => ({
+        id: tipo.tma_idtipva, // Corregido a minúsculas
+        nombre: tipo.tma_nomtipv, // Corregido a minúsculas
+      }))
+      .filter((tipo) => tipo.nombre) // Filtrar elementos sin nombre
   },
 
-  createTipoVacuna: async (tipoVacunaData) => {
+  createTipoVacuna: async (nombre) => {
+    // Cambiado para recibir 'nombre' directamente
     const response = await fetch(`${API_URL}/regmedicos/tiposvacuna`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ nombre: tipoVacunaData.nombre }),
+      body: JSON.stringify({ nombre }), // Usar 'nombre' directamente
     })
     if (!response.ok) {
       const errorData = await response.json()
       throw new Error(errorData.message || 'Error al crear tipo de vacuna')
     }
     const data = await response.json()
-    return { id: data.TMA_IDTIPVA, nombre: data.TMA_NOMBREL }
+    return { id: data.tma_idtipva, nombre: data.tma_nomtipv } // Corregido a minúsculas
   },
 
   updateTipoVacuna: async (id, tipoVacunaData) => {
@@ -49,7 +54,7 @@ export const vaccinationService = {
       throw new Error(errorData.message || 'Error al actualizar tipo de vacuna')
     }
     const data = await response.json()
-    return { id: data.TMA_IDTIPVA, nombre: data.TMA_NOMBREL }
+    return { id: data.tma_idtipva, nombre: data.tma_nomtipv } // Corregido a minúsculas
   },
 
   deleteTipoVacuna: async (id) => {
@@ -64,6 +69,44 @@ export const vaccinationService = {
       throw new Error(errorData.message || 'Error al eliminar tipo de vacuna')
     }
     return true
+  },
+
+  // Servicios para Tratamientos (TMATRATAMEN)
+  getAllTratamientos: async () => {
+    const response = await fetch(`${API_URL}/regmedicos/tratamientos`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al obtener tratamientos')
+    }
+    const data = await response.json()
+    return data
+      .map((tratamiento) => ({
+        id: tratamiento.tma_idtrata,
+        nombre: tratamiento.tma_nomtrat,
+      }))
+      .filter((tratamiento) => tratamiento.nombre)
+  },
+
+  createTratamiento: async (nombre) => {
+    const response = await fetch(`${API_URL}/regmedicos/tratamientos`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ nombre }),
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al crear tratamiento')
+    }
+    const data = await response.json()
+    console.log('Respuesta de la API al crear tratamiento:', data)
+    return { id: data.tma_idtrata, nombre: data.tma_nomtrat }
   },
 
   // Servicios para Registros Médicos (Vacunación) (TTRREGMEDIC)
@@ -81,12 +124,16 @@ export const vaccinationService = {
     const data = await response.json()
     return data.map((registro) => ({
       id: registro.TTR_IDREGMED,
-      idBovino: registro.TTR_IDBOVIN,
-      idTipoVacuna: registro.TTR_IDTIPVA,
-      fechaVacunacion: registro.TTR_FECVACU,
-      proximaVacunacion: registro.TTR_PROVACU,
-      observaciones: registro.TTR_OBSERVA,
-      nombreTipoVacuna: registro.TMA_NOMBREL, // Asumiendo que el backend une esta información
+      idBovino: registro.TTR_IDBOVREF,
+      idTipoVacuna: registro.TTR_IDVACUNA,
+      fechaVacunacion: registro.TTR_FECHAREG,
+      observaciones: registro.TTR_DIAGNOST,
+      nombreTipoVacuna: registro.vacuna_nombre,
+      nombreEmpleado: `${registro.empleado_nombre} ${registro.empleado_apellido}`,
+      diagnostico: registro.TTR_DIAGNOST,
+      tratamiento: registro.tratamiento_nombre,
+      idEmpleado: registro.TTR_IDEMPMED,
+      idTratamiento: registro.TTR_IDTRATAM,
     }))
   },
 
@@ -105,11 +152,13 @@ export const vaccinationService = {
     const data = await response.json()
     return {
       id: data.TTR_IDREGMED,
-      idBovino: data.TTR_IDBOVIN,
-      idTipoVacuna: data.TTR_IDTIPVA,
-      fechaVacunacion: data.TTR_FECVACU,
-      proximaVacunacion: data.TTR_PROVACU,
-      observaciones: data.TTR_OBSERVA,
+      idBovino: data.TTR_IDBOVREF,
+      idEmpleado: data.TTR_IDEMPMED,
+      idMovRef: data.TTR_IDMOVREF,
+      diagnostico: data.TTR_DIAGNOST,
+      idTratamiento: data.TTR_IDTRATAM,
+      idVacuna: data.TTR_IDVACUNA,
+      fechaRegistro: data.TTR_FECHAREG,
     }
   },
 
@@ -128,11 +177,13 @@ export const vaccinationService = {
     const data = await response.json()
     return {
       id: data.TTR_IDREGMED,
-      idBovino: data.TTR_IDBOVIN,
-      idTipoVacuna: data.TTR_IDTIPVA,
-      fechaVacunacion: data.TTR_FECVACU,
-      proximaVacunacion: data.TTR_PROVACU,
-      observaciones: data.TTR_OBSERVA,
+      idBovino: data.TTR_IDBOVREF,
+      idEmpleado: data.TTR_IDEMPMED,
+      idMovRef: data.TTR_IDMOVREF,
+      diagnostico: data.TTR_DIAGNOST,
+      idTratamiento: data.TTR_IDTRATAM,
+      idVacuna: data.TTR_IDVACUNA,
+      fechaRegistro: data.TTR_FECHAREG,
     }
   },
 

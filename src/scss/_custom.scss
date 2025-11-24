@@ -1,45 +1,8 @@
-@use 'sass:color';
+/* _custom.scss */
 
-// Here you can add other styles
-$primary: rgb(45, 129, 30);
-
-$theme-colors: (
-  'primary': $primary,
-);
-
-// Estilos para la paginación
-.custom-pagination {
-  .page-item {
-    .page-link {
-      color: $primary !important; // Color del texto para elementos inactivos
-      &:hover {
-        color: color.adjust(
-          $primary,
-          $lightness: -10%
-        ) !important; // Color del texto al pasar el ratón
-      }
-    }
-
-    .typography-color-title {
-      color: $primary;
-    }
-
-    .button-no-hover-green {
-      background-color: $primary !important;
-      border-color: $primary !important;
-      &:hover {
-        background-color: color.adjust($primary, $lightness: -10%) !important;
-        border-color: color.adjust($primary, $lightness: -10%) !important;
-      }
-    }
-    &.active .page-link {
-      background-color: $primary !important;
-      border-color: $primary !important;
-      color: white !important; // Color del texto para el elemento activo
-      &:hover {
-        background-color: color.adjust($primary, $lightness: -10%) !important;
-        border-color: color.adjust($primary, $lightness: -10%) !important;
-      }
-    }
-  }
+// Estilos para el elemento seleccionado en listas de CoreUI (CListGroupItem)
+.list-group-item.active {
+  background-color: #fff !important; /* Fondo blanco */
+  border-color: #28a745 !important; /* Borde verde */
+  color: #000 !important; /* Letras negras */
 }
