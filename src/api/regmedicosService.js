@@ -16,8 +16,8 @@ export const regmedicosService = {
     }
     const data = await response.json()
     return data.map((tratamiento) => ({
-      id: tratamiento.TMA_IDTRATA,
-      nombre: tratamiento.TMA_NOMTRAT,
+      id: tratamiento.tma_idtrata,
+      nombre: tratamiento.tma_nomtrat,
     }))
   },
 
@@ -96,8 +96,8 @@ export const regmedicosService = {
     }
     const data = await response.json()
     return data.map((tipo) => ({
-      id: tipo.TMA_IDTIPVA,
-      nombre: tipo.TMA_NOMTIPV,
+      id: tipo.tma_idtipva,
+      nombre: tipo.tma_nomtipv,
     }))
   },
 
@@ -176,10 +176,9 @@ export const regmedicosService = {
       throw new Error(errorData.message || 'Error al obtener registros médicos')
     }
     const data = await response.json()
-    console.log(data)
     return data.map((registro) => ({
       id: registro.ttr_idregmed,
-      idBovino: registro.ttr_idbovref,
+      bovinos: registro.bovinos, // Ahora es un array de objetos {id, numero}
       idTipoVacuna: registro.ttr_idvacuna,
       fechaVacunacion: registro.ttr_fechareg,
       observaciones: registro.ttr_diagnost,
@@ -207,13 +206,13 @@ export const regmedicosService = {
     const data = await response.json()
     return {
       id: data.ttr_idregmed,
-      idBovino: data.ttr_idbovref,
-      idEmpleado: data.ttr_idempmed,
-      idMovRef: data.ttr_idmovref,
-      diagnostico: data.ttr_diagnost,
-      idTratamiento: data.ttr_idtratam,
-      idVacuna: data.ttr_idvacuna,
-      fechaRegistro: data.ttr_fechareg,
+      bovinos: data.bovinos, // Ahora es un array de IDs
+      idEmpleado: data.idEmpleadoMed, // Asegúrate de que el backend devuelve esto
+      idMovRef: data.idMovRef, // Asegúrate de que el backend devuelve esto
+      diagnostico: data.diagnostico,
+      idTratamiento: data.idTratamiento,
+      idVacuna: data.idVacuna,
+      fechaRegistro: data.fechaRegistro,
     }
   },
 
@@ -232,13 +231,13 @@ export const regmedicosService = {
     const data = await response.json()
     return {
       id: data.ttr_idregmed,
-      idBovino: data.ttr_idbovref,
-      idEmpleado: data.ttr_idempmed,
-      idMovRef: data.ttr_idmovref,
-      diagnostico: data.ttr_diagnost,
-      idTratamiento: data.ttr_idtratam,
-      idVacuna: data.ttr_idvacuna,
-      fechaRegistro: data.ttr_fechareg,
+      bovinos: data.bovinos, // Ahora es un array de IDs
+      idEmpleado: data.idEmpleadoMed, // Asegúrate de que el backend devuelve esto
+      idMovRef: data.idMovRef, // Asegúrate de que el backend devuelve esto
+      diagnostico: data.diagnostico,
+      idTratamiento: data.idTratamiento,
+      idVacuna: data.idVacuna,
+      fechaRegistro: data.fechaRegistro,
     }
   },
 
@@ -270,8 +269,7 @@ export const regmedicosService = {
     const data = await response.json()
     return data.map((registro) => ({
       id: registro.ttr_idregmed,
-      idBovino: registro.bovino_id,
-      numeroBovino: registro.bovino_numero,
+      bovinos: registro.bovinos, // Ahora es un array de objetos {id, numero}
       diagnostico: registro.ttr_diagnost,
       tipoVacuna: registro.vacuna_nombre,
       tratamiento: registro.tratamiento_nombre,

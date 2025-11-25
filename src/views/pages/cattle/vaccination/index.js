@@ -41,10 +41,14 @@ const Vaccination = () => {
     dayOptionsDate,
     handleRegisterOptionClick,
     handleViewDetailsOptionClick,
-    handleEditRecord, // Nueva función exportada
+    handleEditRecord,
     visibleVaccinationDetailsModal,
     setVisibleVaccinationDetailsModal,
     vaccinationDetails,
+    handleViewCattleDetails, // Nueva prop para el modal de detalles
+    visibleReadOnlyCattleModal,
+    setVisibleReadOnlyCattleModal,
+    readOnlyCattleDetails,
   } = useVaccination()
 
   return (
@@ -69,7 +73,7 @@ const Vaccination = () => {
         onClose={() => setVisibleVaccinationDetailsModal(false)}
         records={vaccinationDetails}
         selectedDate={dayOptionsDate}
-        onEditRecord={handleEditRecord} // Pasar la nueva función de edición
+        onShowAssociatedBovinos={handleViewCattleDetails} // Pasar la función para ver bovinos
       />
 
       <VaccinationModal
@@ -89,6 +93,9 @@ const Vaccination = () => {
         tratamientos={tratamientos}
         handleAddVacuna={handleAddVacuna}
         handleAddTratamiento={handleAddTratamiento}
+        visibleReadOnlyCattleModal={visibleReadOnlyCattleModal}
+        setVisibleReadOnlyCattleModal={setVisibleReadOnlyCattleModal}
+        readOnlyCattleDetails={readOnlyCattleDetails}
       />
 
       <DeleteVaccinationModal

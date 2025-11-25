@@ -34,6 +34,9 @@ const VaccinationModal = ({
   tratamientos,
   handleAddVacuna,
   handleAddTratamiento,
+  visibleReadOnlyCattleModal,
+  setVisibleReadOnlyCattleModal,
+  readOnlyCattleDetails,
 }) => {
   const { visibleCattleModal, setVisibleCattleModal } = cattleModalProps
 
@@ -159,11 +162,20 @@ const VaccinationModal = ({
           columns={cattleColumns}
           onSelect={handleSelectCattle}
           selectedItems={selectedCattleObjects}
-          setSelectedItems={(selected) =>
-            setFormData((prev) => ({ ...prev, cattleIds: selected.map((item) => item.id) }))
-          }
           title="Seleccionar Bovinos"
           searchPlaceholder="Buscar bovinos..."
+        />
+      )}
+
+      {visibleReadOnlyCattleModal && (
+        <CustomTableModal
+          visible={visibleReadOnlyCattleModal}
+          onClose={() => setVisibleReadOnlyCattleModal(false)}
+          data={readOnlyCattleDetails}
+          columns={cattleColumns}
+          title="Bovinos Asociados"
+          searchPlaceholder="Buscar bovinos..."
+          readOnly={true}
         />
       )}
     </>

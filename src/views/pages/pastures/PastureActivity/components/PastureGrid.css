@@ -1,0 +1,39 @@
+.pasture-grid-container {
+  padding: 1rem;
+}
+
+.pasture-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.pasture-card {
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s ease;
+  min-height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pasture-card:hover {
+  border-color: #0066cc;
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.2);
+}
+
+.pasture-card.selected {
+  border-color: #28a745;
+  background-color: #f0f8f5;
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+}
+
+.pasture-card h6 {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.pasture-card .small {
+  color: #666;
+  font-size: 0.75rem;
+}

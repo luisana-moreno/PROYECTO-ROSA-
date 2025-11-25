@@ -16,15 +16,14 @@ import {
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import CIcon from '@coreui/icons-react'
-import { cilPencil } from '@coreui/icons'
-
-const VaccinationDetailsModal = ({ visible, onClose, records, selectedDate, onEditRecord }) => {
+const VaccinationDetailsModal = ({
+  visible,
+  onClose,
+  records,
+  selectedDate,
+  onShowAssociatedBovinos,
+}) => {
   if (!visible) return null
-
-  const handleEditClick = (record) => {
-    onEditRecord(record)
-    onClose() // Cierra el modal de detalles después de iniciar la edición
-  }
 
   return (
     <CModal alignment="center" scrollable visible={visible} onClose={onClose} size="lg">
@@ -38,32 +37,30 @@ const VaccinationDetailsModal = ({ visible, onClose, records, selectedDate, onEd
           <CTable hover responsive>
             <CTableHead>
               <CTableRow>
-                <CTableHeaderCell>Número de Bovino</CTableHeaderCell>
+                <CTableHeaderCell>ID Registro Médico</CTableHeaderCell>
                 <CTableHeaderCell>Diagnóstico</CTableHeaderCell>
                 <CTableHeaderCell>Tipo de Vacuna</CTableHeaderCell>
                 <CTableHeaderCell>Tratamiento</CTableHeaderCell>
-                <CTableHeaderCell>Nombre del Responsable</CTableHeaderCell> {/* Nuevo campo */}
-                <CTableHeaderCell>Acciones</CTableHeaderCell>
-                {/* Nueva columna para acciones */}
+                <CTableHeaderCell>Nombre del Responsable</CTableHeaderCell>
+                <CTableHeaderCell>Bovinos</CTableHeaderCell>
               </CTableRow>
             </CTableHead>
             <CTableBody>
               {records.map((record) => (
                 <CTableRow key={record.id}>
-                  <CTableDataCell>{record.numeroBovino}</CTableDataCell>
+                  <CTableDataCell>{record.id}</CTableDataCell>
                   <CTableDataCell>{record.diagnostico || ''}</CTableDataCell>
                   <CTableDataCell>{record.tipoVacuna}</CTableDataCell>
                   <CTableDataCell>{record.tratamiento}</CTableDataCell>
-                  <CTableDataCell>{record.nombreEmpleado || 'N/A'}</CTableDataCell>{' '}
-                  {/* Mostrar nombre del responsable */}
+                  <CTableDataCell>{record.nombreEmpleado || 'N/A'}</CTableDataCell>
                   <CTableDataCell>
                     <CButton
                       color="info"
                       size="sm"
-                      className="text-white"
-                      onClick={() => handleEditClick(record)}
+                      className="text-white ms-2"
+                      onClick={() => onShowAssociatedBovinos(record.bovinos)}
                     >
-                      <CIcon icon={cilPencil} className="me-1" /> Editar
+                      Ver Bovinos
                     </CButton>
                   </CTableDataCell>
                 </CTableRow>
@@ -88,7 +85,7 @@ VaccinationDetailsModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   records: PropTypes.array,
   selectedDate: PropTypes.instanceOf(Date),
-  onEditRecord: PropTypes.func.isRequired, // Nueva prop
+  onShowAssociatedBovinos: PropTypes.func.isRequired,
 }
 
 export default VaccinationDetailsModal

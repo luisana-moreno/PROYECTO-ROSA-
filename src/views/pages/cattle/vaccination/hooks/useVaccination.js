@@ -38,6 +38,9 @@ const useVaccination = () => {
   const [visibleVaccinationDetailsModal, setVisibleVaccinationDetailsModal] = useState(false)
   const [vaccinationDetails, setVaccinationDetails] = useState([])
 
+  const [visibleReadOnlyCattleModal, setVisibleReadOnlyCattleModal] = useState(false)
+  const [readOnlyCattleDetails, setReadOnlyCattleDetails] = useState([])
+
   const closeModal = useCallback(() => {
     setVisibleVaccination(false)
     setFormData({
@@ -58,9 +61,9 @@ const useVaccination = () => {
 
   const fetchVaccinationEvents = useCallback(async () => {
     try {
-      const allRegistros = await regmedicosService.getAllRegistrosMedicos()
+      const allRegistros = await vaccinationService.getAllRegistrosMedicos() // Usar vaccinationService (que ahora re-exporta regmedicosService)
       const events = allRegistros
-        .filter((registro) => registro.id !== undefined && registro.id !== null) // Filtra registros con ID indefinido o nulo
+        .filter((registro) => registro.id !== undefined && registro.id !== null)
         .map((registro) => {
           const employee = employees.find((emp) => emp.id === registro.idEmpleado)
           const employeeName = employee ? `${employee.nombre} ${employee.apellido}` : 'N/A'
@@ -68,11 +71,19 @@ const useVaccination = () => {
           return {
             id: registro.id.toString(),
             title: `Vacuna: ${registro.nombreTipoVacuna || ''} - ${registro.diagnostico || ''}`,
-            date: registro.fechaVacunacion?.split('T')[0] || '', // Asegurarse de que el formato sea 'YYYY-MM-DD'
+            date: registro.fechaVacunacion?.split('T')[0] || '',
             extendedProps: {
-              cattleIds: [registro.idBovino],
+              // Asegurarse de que bovinos sea un array de objetos completos si es necesario
+              cattleIds: registro.bovinos ? registro.bovinos.map((b) => b.id) : [],
+              bovinosCompletos: registro.bovinos // Almacenar los objetos bovinos completos
+                ? registro.bovinos.map((bovinoData) => ({
+                    ...bovinoData,
+                    ttrNumerobv: bovinoData.ttrNumerobv || 'N/A', // Asegurar que exista la propiedad
+                    razaNombre: bovinoData.razaNombre || 'N/A', // Asegurar que exista la propiedad
+                  }))
+                : [],
               employeeId: registro.idEmpleado,
-              employeeName: registro.nombreEmpleado, // Añadir el nombre del empleado
+              employeeName: registro.nombreEmpleado,
               diagnosis: registro.diagnostico,
               treatment: registro.tratamiento,
               vaccine: registro.nombreTipoVacuna,
@@ -85,7 +96,7 @@ const useVaccination = () => {
       console.error('Error al obtener los eventos de vacunación:', err)
       toast.error('Error al cargar eventos de vacunación.')
     }
-  }, [])
+  }, [employees]) // Añadir employees a las dependencias
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -97,22 +108,24 @@ const useVaccination = () => {
         setAllCattle(cattleData || [])
 
         const tiposVacunaData = await vaccinationService.getAllTiposVacuna()
+        console.log('Datos de Tipos de Vacuna:', tiposVacunaData) // Añadido para depuración
         setTiposVacuna(tiposVacunaData || [])
 
         const tratamientosData = await vaccinationService.getAllTratamientos()
+        console.log('Datos de Tratamientos:', tratamientosData) // Añadido para depuración
         setTratamientos(tratamientosData || [])
-
-        fetchVaccinationEvents() // Cargar los eventos de vacunación
       } catch (err) {
         console.error('Error al obtener datos iniciales:', err)
         toast.error('Error al cargar datos iniciales.')
+      } finally {
+        fetchVaccinationEvents() // Se asegura que los eventos se carguen después de que `employees` esté disponible
       }
     }
     fetchInitialData()
-  }, [fetchVaccinationEvents])
+  }, []) // Dependencias vacías para que se ejecute solo una vez al montar el componente
 
   const handleDateClick = (info) => {
-    setDayOptionsDate(info.date) // date ya es un objeto Date
+    setDayOptionsDate(info.date)
     setVisibleDayOptionsModal(true)
   }
 
@@ -136,8 +149,21 @@ const useVaccination = () => {
     setVisibleDayOptionsModal(false)
     try {
       const formattedDate = dayOptionsDate.toISOString().split('T')[0]
-      const records = await regmedicosService.getRegistrosMedicosByDate(formattedDate)
-      setVaccinationDetails(records)
+      const records = await vaccinationService.getRegistrosMedicosByDate(formattedDate) // Usar vaccinationService
+      const enrichedRecords = records.map((record) => ({
+        ...record,
+        bovinos: record.bovinos
+          ? record.bovinos.map((bovinoData) => {
+              const fullCattleData = allCattle.find((c) => c.id === bovinoData.id)
+              return {
+                ...bovinoData,
+                ttrNumerobv: fullCattleData?.ttrNumerobv || bovinoData.ttrNumerobv || 'N/A',
+                razaNombre: fullCattleData?.razaNombre || bovinoData.razaNombre || 'N/A',
+              }
+            })
+          : [],
+      }))
+      setVaccinationDetails(enrichedRecords)
       setVisibleVaccinationDetailsModal(true)
     } catch (error) {
       console.error('Error al obtener detalles de vacunación:', error)
@@ -145,11 +171,29 @@ const useVaccination = () => {
     }
   }, [dayOptionsDate])
 
+  const handleViewCattleDetails = useCallback(
+    (bovinos) => {
+      console.log('Bovinos recibidos en handleViewCattleDetails:', bovinos)
+      // Asegurarse de que los bovinos tengan la información completa antes de pasarlos al modal
+      const enrichedBovinos = bovinos.map((bovinoData) => {
+        const fullCattleData = allCattle.find((c) => c.id === bovinoData.id)
+        return {
+          ...bovinoData,
+          ttrNumerobv: fullCattleData?.ttrNumerobv || bovinoData.ttrNumerobv || 'N/A',
+          razaNombre: fullCattleData?.razaNombre || bovinoData.razaNombre || 'N/A',
+        }
+      })
+      setReadOnlyCattleDetails(enrichedBovinos)
+      setVisibleReadOnlyCattleModal(true)
+    },
+    [allCattle],
+  )
+
   const handleEventClick = (info) => {
     setEditMode(true)
     setSelectedEventId(info.event.id)
     setFormData({
-      cattleIds: info.event.extendedProps.cattleIds || [],
+      cattleIds: info.event.extendedProps.cattleIds || [], // Ya es un array de IDs
       employeeId: info.event.extendedProps.employeeId,
       diagnosis: info.event.extendedProps.diagnosis,
       treatment: info.event.extendedProps.treatment,
@@ -161,6 +205,7 @@ const useVaccination = () => {
   }
 
   const handleSelectCattle = (selected) => {
+    console.log('Bovinos seleccionados del CustomTableModal:', selected)
     setFormData((prev) => ({
       ...prev,
       cattleIds: selected.map((item) => item.id),
@@ -213,7 +258,7 @@ const useVaccination = () => {
       }
 
       const registroMedicoData = {
-        idBovinoRef: formData.cattleIds[0],
+        cattleIds: formData.cattleIds, // Enviar array de IDs de bovinos
         idEmpleadoMed: formData.employeeId,
         idMovRef: null,
         diagnostico: formData.diagnosis,
@@ -230,7 +275,7 @@ const useVaccination = () => {
         result = await vaccinationService.createRegistroMedico(registroMedicoData)
         toast.success('Evento registrado correctamente')
       }
-      fetchVaccinationEvents() // Actualizar eventos después de una operación
+      fetchVaccinationEvents()
       closeModal()
     } catch (error) {
       console.error('Error al guardar el registro médico:', error)
@@ -258,7 +303,7 @@ const useVaccination = () => {
         toast.error('Evento eliminado correctamente')
         setConfirmDelete(false)
         closeModal()
-        fetchVaccinationEvents() // Actualizar eventos después de una eliminación
+        fetchVaccinationEvents()
       } catch (error) {
         console.error('Error al eliminar el registro médico:', error)
         toast.error(error.message || 'Error al eliminar el registro médico.')
@@ -346,9 +391,13 @@ const useVaccination = () => {
     dayOptionsDate,
     handleRegisterOptionClick,
     handleViewDetailsOptionClick,
-    visibleVaccinationDetailsModal, // Nuevo estado
-    setVisibleVaccinationDetailsModal, // Nuevo setter
-    vaccinationDetails, // Nuevos detalles de vacunación
+    visibleVaccinationDetailsModal,
+    setVisibleVaccinationDetailsModal,
+    vaccinationDetails,
+    handleViewCattleDetails, // Ahora se exporta
+    visibleReadOnlyCattleModal,
+    setVisibleReadOnlyCattleModal,
+    readOnlyCattleDetails,
   }
 }
 

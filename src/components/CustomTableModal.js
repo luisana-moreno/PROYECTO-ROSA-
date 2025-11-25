@@ -24,9 +24,9 @@ const CustomTableModal = ({
   columns = [], // Valor predeterminado
   onSelect,
   selectedItems: initialSelectedItems,
-  setSelectedItems,
   title,
   searchPlaceholder,
+  readOnly = false, // Nueva prop
 }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [internalSelectedItems, setInternalSelectedItems] = useState(initialSelectedItems || [])
@@ -74,7 +74,7 @@ const CustomTableModal = ({
         <CTable hover responsive>
           <CTableHead>
             <CTableRow>
-              <CTableHeaderCell></CTableHeaderCell>
+              {!readOnly && <CTableHeaderCell></CTableHeaderCell>}
               {/* Checkbox column */}
               {columns.map((col) => (
                 <CTableHeaderCell key={col.key}>{col.label}</CTableHeaderCell>
@@ -84,12 +84,14 @@ const CustomTableModal = ({
           <CTableBody>
             {filteredData.map((item) => (
               <CTableRow key={item.id}>
-                <CTableDataCell>
-                  <CFormCheck
-                    checked={internalSelectedItems.some((selected) => selected.id === item.id)}
-                    onChange={() => handleCheckboxChange(item)}
-                  />
-                </CTableDataCell>
+                {!readOnly && (
+                  <CTableDataCell>
+                    <CFormCheck
+                      checked={internalSelectedItems.some((selected) => selected.id === item.id)}
+                      onChange={() => handleCheckboxChange(item)}
+                    />
+                  </CTableDataCell>
+                )}
                 {columns.map((col) => (
                   <CTableDataCell key={col.key}>{item[col.key]}</CTableDataCell>
                 ))}
@@ -100,11 +102,13 @@ const CustomTableModal = ({
       </CModalBody>
       <CModalFooter>
         <CButton color="secondary" onClick={onClose}>
-          Cancelar
+          Cerrar
         </CButton>
-        <CButton className="button-no-hover-green text-white" onClick={handleSave}>
-          Seleccionar
-        </CButton>
+        {!readOnly && (
+          <CButton className="button-no-hover-green text-white" onClick={handleSave}>
+            Seleccionar
+          </CButton>
+        )}
       </CModalFooter>
     </CModal>
   )
@@ -122,9 +126,9 @@ CustomTableModal.propTypes = {
   ).isRequired,
   onSelect: PropTypes.func.isRequired,
   selectedItems: PropTypes.arrayOf(PropTypes.object),
-  setSelectedItems: PropTypes.func,
   title: PropTypes.string,
   searchPlaceholder: PropTypes.string,
+  readOnly: PropTypes.bool, // Nueva prop
 }
 
 export default CustomTableModal
