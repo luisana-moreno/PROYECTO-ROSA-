@@ -27,7 +27,7 @@ const EmployeeFilters = ({
           <option value="">Todos los cargos</option>
           {positions.map((position) => (
             <option key={position.id} value={position.id}>
-              {position.name}
+              {position.nombre}
             </option>
           ))}
         </CFormSelect>

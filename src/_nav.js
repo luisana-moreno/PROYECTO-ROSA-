@@ -108,6 +108,13 @@ const _nav = [
       },
       {
         component: CNavItem,
+        name: 'Registro de Lotes',
+        to: '/lots',
+        icon: <CIcon icon={cilAnimal} customClassName="nav-icon" />,
+        roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
+      },
+      {
+        component: CNavItem,
         name: 'Produccion de Leche',
         to: '/milkProduction',
         icon: <CIcon icon={cilGraph} customClassName="nav-icon" />,
@@ -115,7 +122,6 @@ const _nav = [
       },
     ],
   },
-
   {
     component: CNavGroup,
     name: 'Gestion de Potreros',
@@ -132,7 +138,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Actividad de Potreros',
-        to: '/pastures/PastureActivity',
+        to: '/pastures/activity',
         icon: <CIcon icon={cilRain} customClassName="nav-icon" />,
         roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
       },

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   CButton,
   CCol,
@@ -22,6 +22,53 @@ const AddEmployeeModal = ({
   positions,
 }) => {
   const today = new Date().toISOString().split('T')[0]
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+
+  // Resetear hasUnsavedChanges cuando el modal se cierra o se abre
+  useEffect(() => {
+    if (!visible) {
+      setHasUnsavedChanges(false)
+    }
+  }, [visible])
+
+  // Manejar el evento antes de descargar la página (para advertir sobre cambios no guardados)
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      if (hasUnsavedChanges) {
+        event.preventDefault()
+        event.returnValue = '' // Mensaje estándar para la mayoría de los navegadores
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [hasUnsavedChanges])
+
+  const handleChange = (e) => {
+    setAddEmployee({ ...addEmployee, [e.target.name]: e.target.value })
+    setHasUnsavedChanges(true)
+  }
+
+  const handleDocumentChange = (e) => {
+    setAddEmployee({ ...addEmployee, ttr_documen: e.target.value.replace(/\D/g, '') })
+    setHasUnsavedChanges(true)
+  }
+
+  const handlePhoneChange = (e) => {
+    setAddEmployee({ ...addEmployee, ttr_telefon: e.target.value.replace(/\D/g, '') })
+    setHasUnsavedChanges(true)
+  }
+
+  const handlePositionChange = (e) => {
+    setAddEmployee({
+      ...addEmployee,
+      ttr_idcargp: e.target.value === '' ? '' : parseInt(e.target.value, 10),
+    })
+    setHasUnsavedChanges(true)
+  }
 
   const validateForm = () => {
     if (
@@ -74,6 +121,20 @@ const AddEmployeeModal = ({
   const handleAddEmployeeWithValidation = () => {
     if (validateForm()) {
       handleAddEmployee()
+      setHasUnsavedChanges(false) // Resetear después de guardar
+    }
+  }
+
+  const handleCloseModal = () => {
+    if (hasUnsavedChanges) {
+      const confirmClose = window.confirm(
+        'Tienes cambios sin guardar. ¿Estás seguro de que quieres cerrar sin guardar?',
+      )
+      if (confirmClose) {
+        setVisible(false)
+      }
+    } else {
+      setVisible(false)
     }
   }
 
@@ -82,7 +143,7 @@ const AddEmployeeModal = ({
       alignment="center"
       scrollable
       visible={visible}
-      onClose={() => setVisible(false)}
+      onClose={handleCloseModal}
       className="modern-modal"
       backdrop="static"
     >
@@ -99,8 +160,9 @@ const AddEmployeeModal = ({
               className="modal-name custom-select"
               placeholder="Nombre"
               aria-label="Nombre"
+              name="ttr_nombrel"
               value={addEmployee.ttr_nombrel}
-              onChange={(e) => setAddEmployee({ ...addEmployee, ttr_nombrel: e.target.value })}
+              onChange={handleChange}
               maxLength={100}
             />
             <small className="text-muted">Ingrese el nombre.</small>
@@ -111,8 +173,9 @@ const AddEmployeeModal = ({
               className="modal-name custom-select"
               placeholder="Apellido"
               aria-label="Apellido"
+              name="ttr_apellid"
               value={addEmployee.ttr_apellid}
-              onChange={(e) => setAddEmployee({ ...addEmployee, ttr_apellid: e.target.value })}
+              onChange={handleChange}
               maxLength={100}
             />
             <small className="text-muted">Ingrese el apellido.</small>
@@ -124,10 +187,9 @@ const AddEmployeeModal = ({
               className="modal-name custom-select"
               placeholder="Numero de documento"
               aria-label="Numero de documento"
+              name="ttr_documen"
               value={addEmployee.ttr_documen}
-              onChange={(e) =>
-                setAddEmployee({ ...addEmployee, ttr_documen: e.target.value.replace(/\D/g, '') })
-              }
+              onChange={handleDocumentChange}
               maxLength={8}
             />
             <small className="text-muted">Ingrese el numero de documento.</small>
@@ -138,8 +200,9 @@ const AddEmployeeModal = ({
               type="date"
               aria-label="Fecha de nacimiento"
               placeholder="Fecha de nacimiento"
+              name="ttr_fecnaci"
               value={addEmployee.ttr_fecnaci}
-              onChange={(e) => setAddEmployee({ ...addEmployee, ttr_fecnaci: e.target.value })}
+              onChange={handleChange}
               max={today}
             />
             <small className="text-muted">Ingrese la fecha de nacimiento.</small>
@@ -151,10 +214,9 @@ const AddEmployeeModal = ({
               className="modal-name custom-select"
               placeholder="Telefono"
               aria-label="Telefono"
+              name="ttr_telefon"
               value={addEmployee.ttr_telefon}
-              onChange={(e) =>
-                setAddEmployee({ ...addEmployee, ttr_telefon: e.target.value.replace(/\D/g, '') })
-              }
+              onChange={handlePhoneChange}
               maxLength={11}
             />
             <small className="text-muted">Ingrese el numero de Telefono.</small>
@@ -165,8 +227,9 @@ const AddEmployeeModal = ({
               className="modal-name custom-select"
               placeholder="Direccion"
               aria-label="Direccion"
+              name="ttr_direcci"
               value={addEmployee.ttr_direcci}
-              onChange={(e) => setAddEmployee({ ...addEmployee, ttr_direcci: e.target.value })}
+              onChange={handleChange}
               maxLength={255}
             />
             <small className="text-muted">Ingrese la Direccion.</small>
@@ -178,8 +241,9 @@ const AddEmployeeModal = ({
               type="date"
               placeholder="Fecha de Contrato"
               aria-label="Fecha de Contrato"
+              name="ttr_feccont"
               value={addEmployee.ttr_feccont}
-              onChange={(e) => setAddEmployee({ ...addEmployee, ttr_feccont: e.target.value })}
+              onChange={handleChange}
               max={today}
             />
             <small className="text-muted">Ingrese la fecha de Contrato.</small>
@@ -189,20 +253,16 @@ const AddEmployeeModal = ({
             <CFormSelect
               className="modal-name custom-select"
               aria-label="Cargo"
+              name="ttr_idcargp"
               value={addEmployee.ttr_idcargp}
-              onChange={(e) =>
-                setAddEmployee({
-                  ...addEmployee,
-                  ttr_idcargp: e.target.value === '' ? '' : parseInt(e.target.value, 10),
-                })
-              }
+              onChange={handlePositionChange}
             >
               <option key="default-position-add" value="">
                 Seleccione el cargo
               </option>
               {positions.map((pos) => (
                 <option key={pos.id} value={pos.id}>
-                  {pos.name}
+                  {pos.nombre}
                 </option>
               ))}
             </CFormSelect>

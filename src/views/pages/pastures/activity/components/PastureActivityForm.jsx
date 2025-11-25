@@ -1,7 +1,7 @@
-"use client"
-import { CForm, CFormLabel, CFormSelect, CFormInput, CButton, CRow, CCol } from "@coreui/react"
-import CIcon from "@coreui/icons-react"
-import { cilCheckAlt, cilX } from "@coreui/icons"
+'use client'
+import { CForm, CFormLabel, CFormSelect, CFormInput, CButton, CRow, CCol } from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilCheckAlt, cilX } from '@coreui/icons'
 
 const PastureActivityForm = ({
   selectedPasture,
@@ -23,7 +23,7 @@ const PastureActivityForm = ({
         <CFormLabel>Potrero Seleccionado</CFormLabel>
         <CFormInput
           type="text"
-          value={selectedPasture ? selectedPasture.codigo : "Seleccione un potrero"}
+          value={selectedPasture ? selectedPasture.codigo : 'Seleccione un potrero'}
           disabled
           readOnly
         />
@@ -33,8 +33,10 @@ const PastureActivityForm = ({
         <CFormLabel htmlFor="selectLot">Lote</CFormLabel>
         <CFormSelect
           id="selectLot"
-          value={selectedLot ? selectedLot.id : ""}
-          onChange={(e) => setSelectedLot(lots.find((l) => l.id === Number.parseInt(e.target.value)))}
+          value={selectedLot ? selectedLot.id : ''}
+          onChange={(e) =>
+            setSelectedLot(lots.find((l) => l.id === Number.parseInt(e.target.value)))
+          }
           disabled={!selectedPasture || loading}
         >
           <option value="">Seleccione un lote</option>
@@ -62,11 +64,11 @@ const PastureActivityForm = ({
         <div
           className="mb-2"
           style={{
-            maxHeight: "150px",
-            overflowY: "auto",
-            border: "1px solid #ddd",
-            padding: "0.5rem",
-            borderRadius: "4px",
+            maxHeight: '150px',
+            overflowY: 'auto',
+            border: '1px solid #ddd',
+            padding: '0.5rem',
+            borderRadius: '4px',
           }}
         >
           {bovines.length > 0 ? (
@@ -103,10 +105,16 @@ const PastureActivityForm = ({
           <CButton
             className="button-no-hover-green text-white"
             onClick={onAssign}
-            disabled={!selectedPasture || !selectedLot || !startDate || selectedBovines.length === 0 || loading}
+            disabled={
+              !selectedPasture ||
+              !selectedLot ||
+              !startDate ||
+              selectedBovines.length === 0 ||
+              loading
+            }
           >
             <CIcon icon={cilCheckAlt} className="me-2" />
-            {loading ? "Asignando..." : "Asignar"}
+            {loading ? 'Asignando...' : 'Asignar'}
           </CButton>
         </CCol>
         <CCol xs="auto">

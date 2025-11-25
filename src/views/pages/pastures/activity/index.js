@@ -1,18 +1,27 @@
-'use client'
-import React, { useState, useEffect } from 'react'
-import { CCard, CCardHeader, CCardBody, CContainer, CRow, CCol, CButton } from '@coreui/react'
-import usePastureActivity from './hooks/usePastureActivity'
-import AssignLotToPastureForm from './components/AssignLotToPastureForm'
-import PastureActivityOverview from './components/PastureActivityOverview'
-import LotPastureHistoryModal from './components/LotPastureHistoryModal'
-import BovinesInLotPastureModal from './components/BovinesInLotPastureModal'
+import { useState } from 'react'
+import CIcon from '@coreui/icons-react'
+import { cilHistory } from '@coreui/icons'
+import {
+  CCard,
+  CCardBody,
+  CCardHeader,
+  CButton,
+  CNav,
+  CNavItem,
+  CNavLink,
+  CTabContent,
+  CTabPane,
+} from '@coreui/react'
+import { usePastureActivity } from './hooks/usePastureActivity'
+import PastureGrid from './components/PastureGrid'
+import PastureActivityForm from './components/PastureActivityForm'
+import PastureHistoryModal from './components/PastureHistoryModal'
 
-const PastureActivityModule = () => {
+const PastureActivity = () => {
   const {
     pastures,
     lots,
     bovines,
-    pastureStates,
     selectedPasture,
     setSelectedPasture,
     selectedLot,
@@ -21,113 +30,98 @@ const PastureActivityModule = () => {
     setStartDate,
     selectedBovines,
     setSelectedBovines,
-    bovineModalVisible,
-    setBovineModalVisible,
     loading,
-    lotPastureHistory,
-    fetchLotPastureHistory,
-    bovinesInLotPasture,
-    fetchBovinesInLotPastureByDate,
+    pastureHistory,
+    fetchPastureHistory,
     handleAssignLotToPasture,
-    handleUpdatePastureStatus,
+    handleMarkExit,
+    pastureStatus,
   } = usePastureActivity()
 
+  const [activeTab, setActiveTab] = useState('activity')
   const [historyModalVisible, setHistoryModalVisible] = useState(false)
-  const [selectedPastureForHistory, setSelectedPastureForHistory] = useState(null)
-
-  const [bovinesDetailModalVisible, setBovinesDetailModalVisible] = useState(false)
-  const [selectedLotForBovines, setSelectedLotForBovines] = useState(null)
-  const [selectedDateForBovines, setSelectedDateForBovines] = useState(null)
-
-  const handleViewHistory = (pasture) => {
-    setSelectedPastureForHistory(pasture)
-    fetchLotPastureHistory(pasture.id)
-    setHistoryModalVisible(true)
-  }
-
-  const handleViewBovinesInLot = (pastureId, lotId, date) => {
-    setSelectedPasture(pastureId) // Set the selected pasture for context
-    setSelectedLotForBovines(lotId)
-    setSelectedDateForBovines(date)
-    fetchBovinesInLotPastureByDate(pastureId, lotId, date)
-    setBovinesDetailModalVisible(true)
-  }
 
   return (
-    <CContainer fluid>
-      <CRow className="mb-4">
-        <CCol>
-          <h3 className="mb-1">Actividad de Potreros</h3>
-          <p className="text-muted mb-0">Gestión de asignación de lotes y bovinos a potreros.</p>
-        </CCol>
-      </CRow>
+    <CCard>
+      <CCardHeader className="d-flex justify-content-between align-items-center">
+        <h4 className="mb-0">Registro de Actividad de Potreros</h4>
+        <CButton
+          color="info"
+          variant="outline"
+          onClick={() => {
+            if (selectedPasture) {
+              fetchPastureHistory(selectedPasture.id)
+              setHistoryModalVisible(true)
+            }
+          }}
+          disabled={!selectedPasture}
+        >
+          <CIcon icon={cilHistory} className="me-2" />
+          Ver Historial
+        </CButton>
+      </CCardHeader>
+      <CCardBody>
+        <CNav variant="tabs" className="mb-3">
+          <CNavItem>
+            <CNavLink active={activeTab === 'activity'} onClick={() => setActiveTab('activity')}>
+              Registro de Actividad
+            </CNavLink>
+          </CNavItem>
+          <CNavItem>
+            <CNavLink active={activeTab === 'states'} onClick={() => setActiveTab('states')}>
+              Estados del Potrero
+            </CNavLink>
+          </CNavItem>
+        </CNav>
 
-      <CRow>
-        <CCol xs={12} lg={6}>
-          <CCard className="mb-4">
-            <CCardHeader>
-              <h5>Asignar Lote a Potrero</h5>
-            </CCardHeader>
-            <CCardBody>
-              <AssignLotToPastureForm
-                pastures={pastures}
-                lots={lots}
-                bovines={bovines}
-                selectedPasture={selectedPasture}
-                setSelectedPasture={setSelectedPasture}
-                selectedLot={selectedLot}
-                setSelectedLot={setSelectedLot}
-                startDate={startDate}
-                setStartDate={setStartDate}
-                selectedBovines={selectedBovines}
-                setSelectedBovines={setSelectedBovines}
-                bovineModalVisible={bovineModalVisible}
-                setBovineModalVisible={setBovineModalVisible}
-                handleAssignLotToPasture={handleAssignLotToPasture}
-                loading={loading}
-              />
-            </CCardBody>
-          </CCard>
-        </CCol>
+        <CTabContent className="mb-3">
+          <CTabPane visible={activeTab === 'activity'}>
+            <PastureGrid
+              pastures={pastures}
+              selectedPasture={selectedPasture}
+              onSelectPasture={setSelectedPasture}
+              pastureStatus={pastureStatus}
+            />
+            <PastureActivityForm
+              selectedPasture={selectedPasture}
+              selectedLot={selectedLot}
+              setSelectedLot={setSelectedLot}
+              startDate={startDate}
+              setStartDate={setStartDate}
+              selectedBovines={selectedBovines}
+              setSelectedBovines={setSelectedBovines}
+              lots={lots}
+              bovines={bovines}
+              onAssign={handleAssignLotToPasture}
+              onMarkExit={handleMarkExit}
+              loading={loading}
+            />
+          </CTabPane>
 
-        <CCol xs={12} lg={6}>
-          <CCard className="mb-4">
-            <CCardHeader>
-              <h5>Potreros Activos</h5>
-            </CCardHeader>
-            <CCardBody>
-              <PastureActivityOverview
-                pastures={pastures}
-                pastureStates={pastureStates}
-                handleUpdatePastureStatus={handleUpdatePastureStatus}
-                handleViewHistory={handleViewHistory}
-                loading={loading}
-              />
-            </CCardBody>
-          </CCard>
-        </CCol>
-      </CRow>
+          <CTabPane visible={activeTab === 'states'}>
+            <div className="alert alert-info">
+              Los potreros seleccionados mostrarán su estado actual. Puede cambiar el estado usando
+              la interfaz visual.
+            </div>
+            <PastureGrid
+              pastures={pastures}
+              selectedPasture={selectedPasture}
+              onSelectPasture={setSelectedPasture}
+              pastureStatus={pastureStatus}
+            />
+          </CTabPane>
+        </CTabContent>
+      </CCardBody>
 
-      <LotPastureHistoryModal
+      <PastureHistoryModal
         visible={historyModalVisible}
         onClose={() => setHistoryModalVisible(false)}
-        pasture={selectedPastureForHistory}
-        history={lotPastureHistory}
-        loading={loading}
-        onViewBovinesInLot={handleViewBovinesInLot}
-      />
-
-      <BovinesInLotPastureModal
-        visible={bovinesDetailModalVisible}
-        onClose={() => setBovinesDetailModalVisible(false)}
-        pastureId={selectedPasture}
-        lotId={selectedLotForBovines}
-        date={selectedDateForBovines}
-        bovines={bovinesInLotPasture}
+        history={pastureHistory}
+        pasture={selectedPasture}
         loading={loading}
       />
-    </CContainer>
+    </CCard>
   )
 }
 
-export default PastureActivityModule
+export default PastureActivity

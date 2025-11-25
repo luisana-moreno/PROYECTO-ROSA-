@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   CButton,
   CCol,
@@ -20,50 +20,108 @@ const EditEmployeeModal = ({
   setCurrentEmployee,
   handleEditEmployee,
   positions,
+  originalEmployee, // Propiedad para almacenar el estado original del empleado
 }) => {
   const today = new Date().toISOString().split('T')[0]
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+
+  // Resetear hasUnsavedChanges cuando el modal se cierra o se abre
+  useEffect(() => {
+    if (!editVisible) {
+      setHasUnsavedChanges(false)
+    } else {
+      // Comparar el currentEmployee con el originalEmployee para ver si hay cambios al abrir el modal
+      const isChanged = JSON.stringify(currentEmployee) !== JSON.stringify(originalEmployee)
+      setHasUnsavedChanges(isChanged)
+    }
+  }, [editVisible, currentEmployee, originalEmployee])
+
+  // Manejar el evento antes de descargar la página (para advertir sobre cambios no guardados)
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      if (hasUnsavedChanges) {
+        event.preventDefault()
+        event.returnValue = '' // Mensaje estándar para la mayoría de los navegadores
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [hasUnsavedChanges])
+
+  const handleChange = (e) => {
+    setCurrentEmployee({ ...currentEmployee, [e.target.name]: e.target.value })
+    setHasUnsavedChanges(true)
+  }
+
+  const handleDocumentChange = (e) => {
+    setCurrentEmployee({
+      ...currentEmployee,
+      ttrDocumen: e.target.value.replace(/\D/g, ''),
+    })
+    setHasUnsavedChanges(true)
+  }
+
+  const handlePhoneChange = (e) => {
+    setCurrentEmployee({
+      ...currentEmployee,
+      ttrTelefon: e.target.value.replace(/\D/g, ''),
+    })
+    setHasUnsavedChanges(true)
+  }
+
+  const handlePositionChange = (e) => {
+    setCurrentEmployee({
+      ...currentEmployee,
+      ttrIdcargp: e.target.value === '' ? '' : parseInt(e.target.value, 10),
+    })
+    setHasUnsavedChanges(true)
+  }
 
   const validateForm = () => {
     if (
-      !currentEmployee.ttr_nombrel ||
-      !currentEmployee.ttr_apellid ||
-      !currentEmployee.ttr_documen ||
-      !currentEmployee.ttr_fecnaci ||
-      !currentEmployee.ttr_telefon ||
-      !currentEmployee.ttr_direcci ||
-      !currentEmployee.ttr_feccont ||
-      !currentEmployee.ttr_idcargp
+      !currentEmployee.ttrNombrel ||
+      !currentEmployee.ttrApellid ||
+      !currentEmployee.ttrDocumen ||
+      !currentEmployee.ttrFecnaci ||
+      !currentEmployee.ttrTelefon ||
+      !currentEmployee.ttrDirecci ||
+      !currentEmployee.ttrFeccont ||
+      !currentEmployee.ttrIdcargp
     ) {
       toast.error('Todos los campos obligatorios deben ser llenados.')
       return false
     }
 
-    if (currentEmployee.ttr_nombrel.length > 100) {
+    if (currentEmployee.ttrNombrel.length > 100) {
       toast.error('El nombre no puede exceder los 100 caracteres.')
       return false
     }
-    if (currentEmployee.ttr_apellid.length > 100) {
+    if (currentEmployee.ttrApellid.length > 100) {
       toast.error('El apellido no puede exceder los 100 caracteres.')
       return false
     }
-    if (currentEmployee.ttr_documen.length > 8) {
+    if (currentEmployee.ttrDocumen.length > 8) {
       toast.error('El número de documento no puede exceder los 8 caracteres.')
       return false
     }
-    if (currentEmployee.ttr_telefon.length > 11) {
+    if (currentEmployee.ttrTelefon.length > 11) {
       toast.error('El teléfono no puede exceder los 11 caracteres.')
       return false
     }
-    if (currentEmployee.ttr_direcci.length > 255) {
+    if (currentEmployee.ttrDirecci.length > 255) {
       toast.error('La dirección no puede exceder los 255 caracteres.')
       return false
     }
 
-    if (new Date(currentEmployee.ttr_fecnaci) > new Date(today)) {
+    if (new Date(currentEmployee.ttrFecnaci) > new Date(today)) {
       toast.error('La fecha de nacimiento no puede ser una fecha futura.')
       return false
     }
-    if (new Date(currentEmployee.ttr_feccont) > new Date(today)) {
+    if (new Date(currentEmployee.ttrFeccont) > new Date(today)) {
       toast.error('La fecha de contrato no puede ser una fecha futura.')
       return false
     }
@@ -74,6 +132,20 @@ const EditEmployeeModal = ({
   const handleEditEmployeeWithValidation = () => {
     if (validateForm()) {
       handleEditEmployee()
+      setHasUnsavedChanges(false) // Resetear después de guardar
+    }
+  }
+
+  const handleCloseModal = () => {
+    if (hasUnsavedChanges) {
+      const confirmClose = window.confirm(
+        'Tienes cambios sin guardar. ¿Estás seguro de que quieres cerrar sin guardar?',
+      )
+      if (confirmClose) {
+        setEditVisible(false)
+      }
+    } else {
+      setEditVisible(false)
     }
   }
 
@@ -82,7 +154,7 @@ const EditEmployeeModal = ({
       alignment="center"
       scrollable
       visible={editVisible}
-      onClose={() => setEditVisible(false)}
+      onClose={handleCloseModal}
       className="modern-modal"
       backdrop="static"
     >
@@ -99,10 +171,9 @@ const EditEmployeeModal = ({
               className="modal-name custom-select"
               placeholder="Nombre"
               aria-label="Nombre"
-              value={currentEmployee?.ttr_nombrel || ''}
-              onChange={(e) =>
-                setCurrentEmployee({ ...currentEmployee, ttr_nombrel: e.target.value })
-              }
+              name="ttrNombrel"
+              value={currentEmployee?.ttrNombrel || ''}
+              onChange={handleChange}
               maxLength={100}
             />
             <small className="text-muted">Ingrese el nombre.</small>
@@ -113,10 +184,9 @@ const EditEmployeeModal = ({
               className="modal-name custom-select"
               placeholder="Apellido"
               aria-label="Apellido"
-              value={currentEmployee?.ttr_apellid || ''}
-              onChange={(e) =>
-                setCurrentEmployee({ ...currentEmployee, ttr_apellid: e.target.value })
-              }
+              name="ttrApellid"
+              value={currentEmployee?.ttrApellid || ''}
+              onChange={handleChange}
               maxLength={100}
             />
             <small className="text-muted">Ingrese el apellido.</small>
@@ -128,13 +198,9 @@ const EditEmployeeModal = ({
               className="modal-name custom-select"
               placeholder="Numero de documento"
               aria-label="Numero de documento"
-              value={currentEmployee?.ttr_documen || ''}
-              onChange={(e) =>
-                setCurrentEmployee({
-                  ...currentEmployee,
-                  ttr_documen: e.target.value.replace(/\D/g, ''),
-                })
-              }
+              name="ttrDocumen"
+              value={currentEmployee?.ttrDocumen || ''}
+              onChange={handleDocumentChange}
               maxLength={8}
             />
             <small className="text-muted">Ingrese el numero de documento.</small>
@@ -145,10 +211,9 @@ const EditEmployeeModal = ({
               type="date"
               placeholder="fecha de nacimiento"
               aria-label="fecha de nacimiento"
-              value={currentEmployee?.ttr_fecnaci || ''}
-              onChange={(e) =>
-                setCurrentEmployee({ ...currentEmployee, ttr_fecnaci: e.target.value })
-              }
+              name="ttrFecnaci"
+              value={currentEmployee?.ttrFecnaci || ''}
+              onChange={handleChange}
               max={today}
             />
             <small className="text-muted">Ingrese la fecha de nacimiento.</small>
@@ -160,13 +225,9 @@ const EditEmployeeModal = ({
               className="modal-name custom-select"
               placeholder="Telefono"
               aria-label="Telefono"
-              value={currentEmployee?.ttr_telefon || ''}
-              onChange={(e) =>
-                setCurrentEmployee({
-                  ...currentEmployee,
-                  ttr_telefon: e.target.value.replace(/\D/g, ''),
-                })
-              }
+              name="ttrTelefon"
+              value={currentEmployee?.ttrTelefon || ''}
+              onChange={handlePhoneChange}
               maxLength={11}
             />
             <small className="text-muted">Ingrese el numero de telefono.</small>
@@ -177,10 +238,9 @@ const EditEmployeeModal = ({
               className="modal-name custom-select"
               placeholder="Direccion"
               aria-label="Direccion"
-              value={currentEmployee?.ttr_direcci || ''}
-              onChange={(e) =>
-                setCurrentEmployee({ ...currentEmployee, ttr_direcci: e.target.value })
-              }
+              name="ttrDirecci"
+              value={currentEmployee?.ttrDirecci || ''}
+              onChange={handleChange}
               maxLength={255}
             />
             <small className="text-muted">Ingrese la direccion.</small>
@@ -192,10 +252,9 @@ const EditEmployeeModal = ({
               type="date"
               placeholder="Fecha de Contrato"
               aria-label="Fecha de Contrato"
-              value={currentEmployee?.ttr_feccont || ''}
-              onChange={(e) =>
-                setCurrentEmployee({ ...currentEmployee, ttr_feccont: e.target.value })
-              }
+              name="ttrFeccont"
+              value={currentEmployee?.ttrFeccont || ''}
+              onChange={handleChange}
               max={today}
             />
             <small className="text-muted">Ingrese la fecha de contrato.</small>
@@ -204,20 +263,16 @@ const EditEmployeeModal = ({
             <CFormSelect
               className="modal-name custom-select"
               aria-label="cargo"
-              value={currentEmployee?.ttr_idcargp || ''}
-              onChange={(e) =>
-                setCurrentEmployee({
-                  ...currentEmployee,
-                  ttr_idcargp: e.target.value === '' ? '' : parseInt(e.target.value, 10),
-                })
-              }
+              name="ttrIdcargp"
+              value={currentEmployee?.ttrIdcargp || ''}
+              onChange={handlePositionChange}
             >
               <option key="default-position-edit" value="">
                 Seleccione el cargo
               </option>
               {positions.map((pos) => (
                 <option key={pos.id} value={pos.id}>
-                  {pos.name}
+                  {pos.nombre}
                 </option>
               ))}
             </CFormSelect>

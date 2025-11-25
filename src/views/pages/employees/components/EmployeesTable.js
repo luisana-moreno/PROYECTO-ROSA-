@@ -42,11 +42,11 @@ const EmployeesTable = ({
             <CTableRow key={employee.ttr_idemplo || index}>
               <CTableDataCell>{indexOfFirstEmployee + index + 1}</CTableDataCell>
               <CTableDataCell>
-                {`${employee?.ttr_nombrel || ''} ${employee?.ttr_apellid || ''}`}
+                {`${employee?.ttrNombrel || ''} ${employee?.ttrApellid || ''}`}
               </CTableDataCell>
-              <CTableDataCell>{employee?.cargonombre || ''}</CTableDataCell>
-              <CTableDataCell>{formatDateToDDMMYYYY(employee?.ttr_feccont)}</CTableDataCell>
-              <CTableDataCell>{employee?.ttr_telefon || ''}</CTableDataCell>
+              <CTableDataCell>{employee?.cargoNombre || ''}</CTableDataCell>
+              <CTableDataCell>{formatDateToDDMMYYYY(employee?.ttrFeccont)}</CTableDataCell>
+              <CTableDataCell>{employee?.ttrTelefon || ''}</CTableDataCell>
               <CTableDataCell>
                 <div className="d-flex">
                   <CButton

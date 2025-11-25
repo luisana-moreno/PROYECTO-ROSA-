@@ -1,4 +1,4 @@
-"use client"
+'use client'
 import {
   CModal,
   CModalHeader,
@@ -11,7 +11,7 @@ import {
   CTableDataCell,
   CTableHeaderCell,
   CTableRow,
-} from "@coreui/react"
+} from '@coreui/react'
 
 const PastureHistoryModal = ({ visible, onClose, history, pasture, loading }) => {
   return (
@@ -37,7 +37,7 @@ const PastureHistoryModal = ({ visible, onClose, history, pasture, loading }) =>
                 <CTableRow key={idx}>
                   <CTableDataCell>{item.lote}</CTableDataCell>
                   <CTableDataCell>{item.fechaInicio}</CTableDataCell>
-                  <CTableDataCell>{item.fechaFin || "Activo"}</CTableDataCell>
+                  <CTableDataCell>{item.fechaFin || 'Activo'}</CTableDataCell>
                   <CTableDataCell>{item.bovinos}</CTableDataCell>
                 </CTableRow>
               ))}

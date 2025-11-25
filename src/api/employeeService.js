@@ -17,7 +17,7 @@ export const employeeService = {
       id: employee.ttr_idemplo,
       ttrNombrel: employee.ttr_nombrel,
       ttrApellid: employee.ttr_apellid,
-      cargoNombre: employee.cargoNombre,
+      cargoNombre: employee.cargonombre,
       // Incluir otras propiedades si son necesarias para otros componentes
       ttrNomsegu: employee.ttr_nomsegu,
       ttrApesegu: employee.ttr_apesegu,

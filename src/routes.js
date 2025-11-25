@@ -11,6 +11,7 @@ const Inventory = React.lazy(() => import('./views/pages/inventory/index'))
 const Login = React.lazy(() => import('./views/pages/login/Login'))
 const Pastures = React.lazy(() => import('./views/pages/pastures/pastures'))
 const PastureActivityModule = React.lazy(() => import('./views/pages/pastures/activity')) // Nuevo módulo
+const LotRegistration = React.lazy(() => import('./views/pages/lots'))
 const MilkProduction = React.lazy(() => import('./views/pages/cattle/milkProduction'))
 const Asisten = React.lazy(() => import('./views/pages/employees/asisten'))
 const Expbov = React.lazy(() => import('./views/pages/cattle/expbov'))
@@ -74,6 +75,13 @@ const routes = [
     exact: true,
     name: 'PastureActivityModule',
     element: PastureActivityModule,
+    roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
+  },
+  {
+    path: '/lots',
+    exact: true,
+    name: 'LotRegistration',
+    element: LotRegistration,
     roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
   },
   {

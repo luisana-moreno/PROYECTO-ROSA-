@@ -1,17 +1,20 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { CCard, CCardBody, CCardHeader } from "@coreui/react"
-import { useLots } from "./hooks/useLots"
-import LotForm from "./components/LotForm"
-import LotsTable from "./components/LotsTable"
-import LotDetailsModal from "./components/LotDetailsModal"
-import LotFilters from "./components/LotFilters"
+import { useState } from 'react'
+import { CCard, CCardBody, CCardHeader } from '@coreui/react'
+import { useLots } from './hooks/useLots'
+import LotForm from './components/LotForm'
+import LotsTable from './components/LotsTable'
+import LotDetailsModal from './components/LotDetailsModal'
+import LotFilters from './components/LotFilters'
 
 const LotRegistration = () => {
   const {
     lots,
+    allBovines,
+    allPastures,
     bovinesInLot,
+    activeBovinesInLot,
     movementHistory,
     loading,
     formData,
@@ -23,20 +26,23 @@ const LotRegistration = () => {
     handleAddLot,
     handleEditLot,
     handleDeleteLot,
-    fetchBovinesInLot,
-    fetchMovementHistory,
+    fetchBovinesInLot, // Ahora es para historial
+    fetchActiveBovinesInLot,
+    addBovinesToLot,
+    removeBovineFromLot,
+    updateBovineLotAssignment,
   } = useLots()
 
   const [detailsModalVisible, setDetailsModalVisible] = useState(false)
   const [selectedLotForDetails, setSelectedLotForDetails] = useState(null)
 
   const handleEditClick = (lot) => {
-    setFormData({ nombre: lot.nombre, descripcion: lot.descripcion })
+    setFormData({ nombre: lot.nombre }) // Lote solo tiene nombre
     setEditingLot(lot)
   }
 
   const handleCancelEdit = () => {
-    setFormData({ nombre: "", descripcion: "" })
+    setFormData({ nombre: '' })
     setEditingLot(null)
   }
 
@@ -64,7 +70,6 @@ const LotRegistration = () => {
           setFormData={setFormData}
           onSubmit={handleSubmit}
           isEditing={!!editingLot}
-          editingLot={editingLot}
           onCancel={handleCancelEdit}
           loading={loading}
         />
@@ -84,11 +89,16 @@ const LotRegistration = () => {
         visible={detailsModalVisible}
         onClose={() => setDetailsModalVisible(false)}
         lot={selectedLotForDetails}
+        allBovines={allBovines}
+        allPastures={allPastures}
         bovinesInLot={bovinesInLot}
-        movementHistory={movementHistory}
+        activeBovinesInLot={activeBovinesInLot}
         loading={loading}
-        onFetchBovines={fetchBovinesInLot}
-        onFetchHistory={fetchMovementHistory}
+        fetchBovinesInLot={fetchBovinesInLot} // Para historial
+        fetchActiveBovinesInLot={fetchActiveBovinesInLot}
+        addBovinesToLot={addBovinesToLot}
+        removeBovineFromLot={removeBovineFromLot}
+        updateBovineLotAssignment={updateBovineLotAssignment}
       />
     </CCard>
   )

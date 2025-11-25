@@ -42,6 +42,7 @@ const Employees = () => {
     filterPosition, // Nuevo estado de filtro por cargo
     setFilterPosition, // Nuevo setter de filtro por cargo
     filteredEmployees, // Empleados filtrados
+    originalEmployee, // Obtener el originalEmployee del hook
   } = useEmployees()
 
   return (
@@ -93,6 +94,7 @@ const Employees = () => {
         setCurrentEmployee={setCurrentEmployee}
         handleEditEmployee={handleEditEmployee}
         positions={positions}
+        originalEmployee={originalEmployee}
       />
       <DeleteEmployeeModal
         deleteVisible={deleteVisible}

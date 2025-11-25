@@ -1,4 +1,4 @@
-"use client"
+'use client'
 import {
   CTable,
   CTableHead,
@@ -8,9 +8,9 @@ import {
   CTableRow,
   CButton,
   CBadge,
-} from "@coreui/react"
-import CIcon from "@coreui/icons-react"
-import { cilPencil, cilTrash, cilInfo } from "@coreui/icons"
+} from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilPencil, cilTrash, cilInfo } from '@coreui/icons'
 
 const LotsTable = ({ lots, onEdit, onDelete, onViewDetails, loading }) => {
   return (
@@ -31,7 +31,7 @@ const LotsTable = ({ lots, onEdit, onDelete, onViewDetails, loading }) => {
             <CTableRow key={lot.id}>
               <CTableDataCell>{idx + 1}</CTableDataCell>
               <CTableDataCell>{lot.nombre}</CTableDataCell>
-              <CTableDataCell>{lot.descripcion || "-"}</CTableDataCell>
+              <CTableDataCell>{lot.descripcion || '-'}</CTableDataCell>
               <CTableDataCell>
                 <CBadge color="info">{lot.bovinos}</CBadge>
               </CTableDataCell>
@@ -59,7 +59,13 @@ const LotsTable = ({ lots, onEdit, onDelete, onViewDetails, loading }) => {
                 >
                   <CIcon icon={cilPencil} />
                 </CButton>
-                <CButton color="danger" variant="outline" size="sm" onClick={() => onDelete(lot.id)} disabled={loading}>
+                <CButton
+                  color="danger"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onDelete(lot.id)}
+                  disabled={loading}
+                >
                   <CIcon icon={cilTrash} />
                 </CButton>
               </CTableDataCell>

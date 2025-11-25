@@ -1,7 +1,7 @@
-"use client"
-import { CFormInput, CRow, CCol } from "@coreui/react"
-import CIcon from "@coreui/icons-react"
-import { cilSearch } from "@coreui/icons"
+'use client'
+import { CFormInput, CRow, CCol } from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilSearch } from '@coreui/icons'
 
 const LotFilters = ({ searchTerm, setSearchTerm }) => {
   return (
