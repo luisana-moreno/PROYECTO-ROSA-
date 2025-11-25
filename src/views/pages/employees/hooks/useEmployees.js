@@ -12,14 +12,14 @@ export const useEmployees = () => {
   const [deleteConfirmation, setDeleteConfirmation] = useState('')
   const [employees, setEmployees] = useState([])
   const [addEmployeeForm, setAddEmployeeForm] = useState({
-    ttr_nombrel: '',
-    ttr_apellid: '',
-    ttr_documen: '',
-    ttr_fecnaci: '',
-    ttr_telefon: '',
-    ttr_direcci: '',
-    ttr_feccont: '',
-    ttrIdcargp: '', // Almacenará el ID del cargo (camelCase para consistencia)
+    ttrNombrel: '',
+    ttrApellid: '',
+    ttrDocumen: '',
+    ttrFecnaci: '',
+    ttrTelefon: '',
+    ttrDirecci: '',
+    ttrFeccont: '',
+    ttrIdcargp: '', // Almacenará el ID del cargo
   })
   const [searchTerm, setSearchTerm] = useState('') // Nuevo estado para el término de búsqueda
   const [filterPosition, setFilterPosition] = useState('') // Nuevo estado para el filtro por cargo
@@ -35,48 +35,64 @@ export const useEmployees = () => {
 
   // Función de validación
   const validateEmployeeForm = (form) => {
-    if (!form.ttrNombrel) {
-      toast.warning('El campo "Primer Nombre" es requerido.')
+    if (!form.ttrNombrel || form.ttrNombrel.trim() === '') {
+      toast.error('El campo "Nombre" es requerido.')
       return false
     }
-    if (!form.ttrApellid) {
-      toast.warning('El campo "Primer Apellido" es requerido.')
+    if (!form.ttrApellid || form.ttrApellid.trim() === '') {
+      toast.error('El campo "Apellido" es requerido.')
       return false
     }
-    if (!form.ttrDocumen) {
-      toast.warning('El campo "Cédula de Identidad" es requerido.')
+    if (!form.ttrDocumen || form.ttrDocumen.trim() === '') {
+      toast.error('El campo "Número de documento" es requerido.')
       return false
     }
     if (!/^\d+$/.test(form.ttrDocumen)) {
-      toast.warning('El campo "Cédula de Identidad" solo debe contener números.')
+      toast.error('El campo "Número de documento" solo debe contener números.')
+      return false
+    }
+    if (form.ttrDocumen.length > 8) {
+      toast.error('El número de documento no puede exceder los 8 caracteres.')
       return false
     }
     if (!form.ttrFecnaci) {
-      toast.warning('El campo "Fecha de Nacimiento" es requerido.')
+      toast.error('El campo "Fecha de nacimiento" es requerido.')
       return false
     }
-    if (!form.ttrTelefon) {
-      toast.warning('El campo "Número de Teléfono" es requerido.')
+    if (new Date(form.ttrFecnaci) > new Date()) {
+      toast.error('La fecha de nacimiento no puede ser una fecha futura.')
+      return false
+    }
+    if (!form.ttrTelefon || form.ttrTelefon.trim() === '') {
+      toast.error('El campo "Teléfono" es requerido.')
       return false
     }
     if (!/^\d+$/.test(form.ttrTelefon)) {
-      toast.warning('El campo "Número de Teléfono" solo debe contener números.')
+      toast.error('El campo "Teléfono" solo debe contener números.')
       return false
     }
     if (form.ttrTelefon.length !== 11) {
-      toast.warning('El campo "Número de Teléfono" debe tener exactamente 11 dígitos.')
+      toast.error('El teléfono debe tener exactamente 11 dígitos.')
       return false
     }
-    if (!form.ttrDirecci) {
-      toast.warning('El campo "Dirección" es requerido.')
+    if (!form.ttrDirecci || form.ttrDirecci.trim() === '') {
+      toast.error('El campo "Dirección" es requerido.')
+      return false
+    }
+    if (form.ttrDirecci.length > 255) {
+      toast.error('La dirección no puede exceder los 255 caracteres.')
       return false
     }
     if (!form.ttrFeccont) {
-      toast.warning('El campo "Fecha de Contratación" es requerido.')
+      toast.error('El campo "Fecha de contrato" es requerido.')
+      return false
+    }
+    if (new Date(form.ttrFeccont) > new Date()) {
+      toast.error('La fecha de contrato no puede ser una fecha futura.')
       return false
     }
     if (!form.ttrIdcargp) {
-      toast.warning('El campo "Cargo" es requerido.')
+      toast.error('El campo "Cargo" es requerido.')
       return false
     }
     return true
@@ -104,27 +120,22 @@ export const useEmployees = () => {
         if (employeesData) {
           setEmployees(
             employeesData.map((emp) => ({
-              ...emp,
-              ttrIdcargp: emp.ttrIdcargp ? parseInt(emp.ttrIdcargp, 10) : '',
+              id: emp.id,
+              ttrNombrel: emp.ttrNombrel,
+              ttrApellid: emp.ttrApellid,
+              cargoNombre: emp.cargoNombre,
+              ttrNomsegu: emp.ttrNomsegu,
+              ttrApesegu: emp.ttrApesegu,
+              ttrDocumen: emp.ttrDocumen,
               ttrFecnaci: emp.ttrFecnaci
                 ? new Date(emp.ttrFecnaci).toISOString().split('T')[0]
                 : '',
+              ttrTelefon: emp.ttrTelefon,
+              ttrDirecci: emp.ttrDirecci,
               ttrFeccont: emp.ttrFeccont
                 ? new Date(emp.ttrFeccont).toISOString().split('T')[0]
                 : '',
-            })),
-          )
-          console.log(
-            'Empleados después del mapeo en useEmployees:',
-            employeesData.map((emp) => ({
-              ...emp,
-              ttr_idcargp: emp.ttr_idcargp ? parseInt(emp.ttr_idcargp, 10) : '',
-              ttr_fecnaci: emp.ttr_fecnaci
-                ? new Date(emp.ttr_fecnaci).toISOString().split('T')[0]
-                : '',
-              ttr_feccont: emp.ttr_feccont
-                ? new Date(emp.ttr_feccont).toISOString().split('T')[0]
-                : '',
+              ttrIdcargp: emp.ttrIdcargp ? parseInt(emp.ttrIdcargp, 10) : '',
             })),
           )
         }
@@ -144,40 +155,39 @@ export const useEmployees = () => {
       return
     }
     const employeeToSend = {
-      ttr_nombrel: addEmployeeForm.ttr_nombrel, // Estos aún deben ser snake_case para el backend
-      ttr_apellid: addEmployeeForm.ttr_apellid,
-      ttr_documen: addEmployeeForm.ttr_documen,
-      ttr_fecnaci: addEmployeeForm.ttr_fecnaci,
-      ttr_telefon: addEmployeeForm.ttr_telefon,
-      ttr_direcci: addEmployeeForm.ttr_direcci,
-      ttr_feccont: addEmployeeForm.ttr_feccont,
-      ttr_idcargp: addEmployeeForm.ttrIdcargp, // Corregido: usar ttrIdcargp para el formulario
+      ttr_nombrel: addEmployeeForm.ttrNombrel,
+      ttr_apellid: addEmployeeForm.ttrApellid,
+      ttr_documen: addEmployeeForm.ttrDocumen,
+      ttr_fecnaci: addEmployeeForm.ttrFecnaci,
+      ttr_telefon: addEmployeeForm.ttrTelefon,
+      ttr_direcci: addEmployeeForm.ttrDirecci,
+      ttr_feccont: addEmployeeForm.ttrFeccont,
+      ttr_idcargp: addEmployeeForm.ttrIdcargp,
     }
     try {
       const newEmp = await employeeService.addEmployee(employeeToSend)
       if (newEmp) {
-        const cargoNombre = positions.find((p) => p.id === newEmp.ttrIdcargp)?.nombre || '' // Corregido: usar ttrIdcargp y cargoNombre
+        const cargoNombre = positions.find((p) => p.id === newEmp.ttrIdcargp)?.nombre || ''
         setEmployees([...employees, { ...newEmp, cargoNombre: cargoNombre }])
         setAddEmployeeForm({
-          ttr_nombrel: '',
-          ttr_apellid: '',
-          ttr_documen: '',
-          ttr_fecnaci: '',
-          ttr_telefon: '',
-          ttr_direcci: '',
-          ttr_feccont: '',
-          ttrIdcargp: '', // Corregido: usar ttrIdcargp
+          ttrNombrel: '',
+          ttrApellid: '',
+          ttrDocumen: '',
+          ttrFecnaci: '',
+          ttrTelefon: '',
+          ttrDirecci: '',
+          ttrFeccont: '',
+          ttrIdcargp: '',
         })
         setVisible(false)
         toast.success('Registro agregado correctamente')
       }
     } catch (error) {
-      // Manejo de errores de validación del backend
-      if (error.response && error.response.status === 409) {
-        toast.error(error.response.data.message) // Muestra el mensaje de error específico del backend
-      } else {
-        toast.error(error.message || 'Error al agregar empleado.')
-      }
+      const errorMessage =
+        error.response && error.response.data && error.response.data.message
+          ? error.response.data.message
+          : error.message || 'Error al agregar empleado.'
+      toast.error(errorMessage)
     }
   }
 
@@ -191,39 +201,33 @@ export const useEmployees = () => {
       return
     }
     const employeeToSend = {
-      ttr_nombrel: currentEmployee.ttrNombrel, // Estos deben ser camelCase porque son los del currentEmployee
+      ttr_nombrel: currentEmployee.ttrNombrel,
       ttr_apellid: currentEmployee.ttrApellid,
       ttr_documen: currentEmployee.ttrDocumen,
       ttr_fecnaci: currentEmployee.ttrFecnaci,
       ttr_telefon: currentEmployee.ttrTelefon,
       ttr_direcci: currentEmployee.ttrDirecci,
       ttr_feccont: currentEmployee.ttrFeccont,
-      ttr_idcargp: currentEmployee.ttrIdcargp, // Corregido: usar ttrIdcargp
+      ttr_idcargp: currentEmployee.ttrIdcargp,
     }
     try {
-      const updated = await employeeService.updateEmployee(
-        currentEmployee.id, // Corregido: usar currentEmployee.id
-        employeeToSend,
-      )
+      const updated = await employeeService.updateEmployee(currentEmployee.id, employeeToSend)
       if (updated) {
-        const cargoNombre = positions.find((p) => p.id === updated.ttrIdcargp)?.nombre || '' // Corregido: usar ttrIdcargp y cargoNombre
+        const cargoNombre = positions.find((p) => p.id === updated.ttrIdcargp)?.nombre || ''
         setEmployees(
           employees.map((emp) =>
-            emp.id === updated.id // Corregido: usar emp.id y updated.id
-              ? { ...updated, cargoNombre: cargoNombre }
-              : emp,
+            emp.id === updated.id ? { ...updated, cargoNombre: cargoNombre } : emp,
           ),
         )
         setEditVisible(false)
         toast.info('Registro editado correctamente')
       }
     } catch (error) {
-      // Manejo de errores de validación del backend
-      if (error.response && error.response.status === 409) {
-        toast.error(error.response.data.message) // Muestra el mensaje de error específico del backend
-      } else {
-        toast.error(error.message || 'Error al editar empleado.')
-      }
+      const errorMessage =
+        error.response && error.response.data && error.response.data.message
+          ? error.response.data.message
+          : error.message || 'Error al editar empleado.'
+      toast.error(errorMessage)
     }
   }
 
@@ -260,7 +264,7 @@ export const useEmployees = () => {
         employeeDocument.includes(lowerCaseSearchTerm)
       : true
     const matchesPosition = filterPosition
-      ? employee.ttrIdcargp === parseInt(filterPosition, 10) // Corregido: usar ttrIdcargp
+      ? employee.ttrIdcargp === parseInt(filterPosition, 10)
       : true
     return matchesSearchTerm && matchesPosition
   })

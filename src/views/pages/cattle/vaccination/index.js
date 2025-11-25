@@ -1,6 +1,4 @@
 import React from 'react'
-import { ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
 import useVaccination from './hooks/useVaccination'
 import VaccinationCalendar from './components/VaccinationCalendar'
 import VaccinationModal from './components/VaccinationModal'
@@ -53,7 +51,6 @@ const Vaccination = () => {
 
   return (
     <>
-      <ToastContainer />
       <VaccinationCalendar
         vaccinationEvents={vaccinationEvents}
         handleDateClick={handleDateClick}

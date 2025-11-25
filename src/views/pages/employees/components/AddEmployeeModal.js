@@ -24,118 +24,31 @@ const AddEmployeeModal = ({
   const today = new Date().toISOString().split('T')[0]
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
-  // Resetear hasUnsavedChanges cuando el modal se cierra o se abre
-  useEffect(() => {
-    if (!visible) {
-      setHasUnsavedChanges(false)
-    }
-  }, [visible])
-
-  // Manejar el evento antes de descargar la página (para advertir sobre cambios no guardados)
-  useEffect(() => {
-    const handleBeforeUnload = (event) => {
-      if (hasUnsavedChanges) {
-        event.preventDefault()
-        event.returnValue = '' // Mensaje estándar para la mayoría de los navegadores
-      }
-    }
-
-    window.addEventListener('beforeunload', handleBeforeUnload)
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-    }
-  }, [hasUnsavedChanges])
-
   const handleChange = (e) => {
     setAddEmployee({ ...addEmployee, [e.target.name]: e.target.value })
-    setHasUnsavedChanges(true)
   }
 
   const handleDocumentChange = (e) => {
-    setAddEmployee({ ...addEmployee, ttr_documen: e.target.value.replace(/\D/g, '') })
-    setHasUnsavedChanges(true)
+    setAddEmployee({ ...addEmployee, ttrDocumen: e.target.value.replace(/\D/g, '') })
   }
 
   const handlePhoneChange = (e) => {
-    setAddEmployee({ ...addEmployee, ttr_telefon: e.target.value.replace(/\D/g, '') })
-    setHasUnsavedChanges(true)
+    setAddEmployee({ ...addEmployee, ttrTelefon: e.target.value.replace(/\D/g, '') })
   }
 
   const handlePositionChange = (e) => {
     setAddEmployee({
       ...addEmployee,
-      ttr_idcargp: e.target.value === '' ? '' : parseInt(e.target.value, 10),
+      ttrIdcargp: e.target.value === '' ? '' : parseInt(e.target.value, 10),
     })
-    setHasUnsavedChanges(true)
-  }
-
-  const validateForm = () => {
-    if (
-      !addEmployee.ttr_nombrel ||
-      !addEmployee.ttr_apellid ||
-      !addEmployee.ttr_documen ||
-      !addEmployee.ttr_fecnaci ||
-      !addEmployee.ttr_telefon ||
-      !addEmployee.ttr_direcci ||
-      !addEmployee.ttr_feccont ||
-      !addEmployee.ttr_idcargp
-    ) {
-      toast.error('Todos los campos obligatorios deben ser llenados.')
-      return false
-    }
-
-    if (addEmployee.ttr_nombrel.length > 100) {
-      toast.error('El nombre no puede exceder los 100 caracteres.')
-      return false
-    }
-    if (addEmployee.ttr_apellid.length > 100) {
-      toast.error('El apellido no puede exceder los 100 caracteres.')
-      return false
-    }
-    if (addEmployee.ttr_documen.length > 8) {
-      toast.error('El número de documento no puede exceder los 8 caracteres.')
-      return false
-    }
-    if (addEmployee.ttr_telefon.length > 11) {
-      toast.error('El teléfono no puede exceder los 11 caracteres.')
-      return false
-    }
-    if (addEmployee.ttr_direcci.length > 255) {
-      toast.error('La dirección no puede exceder los 255 caracteres.')
-      return false
-    }
-
-    if (new Date(addEmployee.ttr_fecnaci) > new Date(today)) {
-      toast.error('La fecha de nacimiento no puede ser una fecha futura.')
-      return false
-    }
-    if (new Date(addEmployee.ttr_feccont) > new Date(today)) {
-      toast.error('La fecha de contrato no puede ser una fecha futura.')
-      return false
-    }
-
-    return true
   }
 
   const handleAddEmployeeWithValidation = () => {
-    if (validateForm()) {
-      handleAddEmployee()
-      setHasUnsavedChanges(false) // Resetear después de guardar
-    }
+    handleAddEmployee()
   }
 
   const handleCloseModal = () => {
-    if (hasUnsavedChanges) {
-      const confirmClose = window.confirm(
-        'Tienes cambios sin guardar. ¿Estás seguro de que quieres cerrar sin guardar?',
-      )
-      if (confirmClose) {
-        setVisible(false)
-      }
-    } else {
-      setVisible(false)
-    }
+    setVisible(false)
   }
 
   return (
@@ -160,8 +73,8 @@ const AddEmployeeModal = ({
               className="modal-name custom-select"
               placeholder="Nombre"
               aria-label="Nombre"
-              name="ttr_nombrel"
-              value={addEmployee.ttr_nombrel}
+              name="ttrNombrel"
+              value={addEmployee.ttrNombrel}
               onChange={handleChange}
               maxLength={100}
             />
@@ -173,8 +86,8 @@ const AddEmployeeModal = ({
               className="modal-name custom-select"
               placeholder="Apellido"
               aria-label="Apellido"
-              name="ttr_apellid"
-              value={addEmployee.ttr_apellid}
+              name="ttrApellid"
+              value={addEmployee.ttrApellid}
               onChange={handleChange}
               maxLength={100}
             />
@@ -187,8 +100,8 @@ const AddEmployeeModal = ({
               className="modal-name custom-select"
               placeholder="Numero de documento"
               aria-label="Numero de documento"
-              name="ttr_documen"
-              value={addEmployee.ttr_documen}
+              name="ttrDocumen"
+              value={addEmployee.ttrDocumen}
               onChange={handleDocumentChange}
               maxLength={8}
             />
@@ -200,8 +113,8 @@ const AddEmployeeModal = ({
               type="date"
               aria-label="Fecha de nacimiento"
               placeholder="Fecha de nacimiento"
-              name="ttr_fecnaci"
-              value={addEmployee.ttr_fecnaci}
+              name="ttrFecnaci"
+              value={addEmployee.ttrFecnaci}
               onChange={handleChange}
               max={today}
             />
@@ -214,8 +127,8 @@ const AddEmployeeModal = ({
               className="modal-name custom-select"
               placeholder="Telefono"
               aria-label="Telefono"
-              name="ttr_telefon"
-              value={addEmployee.ttr_telefon}
+              name="ttrTelefon"
+              value={addEmployee.ttrTelefon}
               onChange={handlePhoneChange}
               maxLength={11}
             />
@@ -227,8 +140,8 @@ const AddEmployeeModal = ({
               className="modal-name custom-select"
               placeholder="Direccion"
               aria-label="Direccion"
-              name="ttr_direcci"
-              value={addEmployee.ttr_direcci}
+              name="ttrDirecci"
+              value={addEmployee.ttrDirecci}
               onChange={handleChange}
               maxLength={255}
             />
@@ -241,8 +154,8 @@ const AddEmployeeModal = ({
               type="date"
               placeholder="Fecha de Contrato"
               aria-label="Fecha de Contrato"
-              name="ttr_feccont"
-              value={addEmployee.ttr_feccont}
+              name="ttrFeccont"
+              value={addEmployee.ttrFeccont}
               onChange={handleChange}
               max={today}
             />
@@ -253,8 +166,8 @@ const AddEmployeeModal = ({
             <CFormSelect
               className="modal-name custom-select"
               aria-label="Cargo"
-              name="ttr_idcargp"
-              value={addEmployee.ttr_idcargp}
+              name="ttrIdcargp"
+              value={addEmployee.ttrIdcargp}
               onChange={handlePositionChange}
             >
               <option key="default-position-add" value="">
