@@ -55,6 +55,23 @@ const useVaccination = () => {
     setEditMode(false)
   }, [])
 
+  const handleEditRecord = useCallback((record) => {
+    // Cerrar el modal de detalles primero
+    setVisibleVaccinationDetailsModal(false)
+    setEditMode(true)
+    setSelectedEventId(record.id) // El ID del registro médico
+    setFormData({
+      cattleIds: record.bovinos ? record.bovinos.map((b) => b.id) : [],
+      employeeId: record.idEmpleado,
+      diagnosis: record.diagnostico,
+      treatment: record.tratamiento,
+      vaccine: record.tipoVacuna,
+      date_vaccination: record.fechaRegistro?.split('T')[0], // Asegurarse de que el formato de fecha sea correcto
+    })
+    setSelectedDate(new Date(record.fechaRegistro)) // Usar la fecha del registro
+    setVisibleVaccination(true)
+  }, [])
+
   const cancelDelete = useCallback(() => {
     setConfirmDelete(false)
   }, [])
@@ -291,7 +308,8 @@ const useVaccination = () => {
     tratamientos,
   ])
 
-  const handleDelete = useCallback(() => {
+  const handleDelete = useCallback((record) => {
+    setSelectedEventId(record.id) // Establecer el ID del evento seleccionado
     setConfirmDelete(true)
     setDeleteConfirmation('')
   }, [])
@@ -300,9 +318,10 @@ const useVaccination = () => {
     if (deleteConfirmation === 'confirmar' && selectedEventId !== null) {
       try {
         await vaccinationService.deleteRegistroMedico(selectedEventId)
-        toast.error('Evento eliminado correctamente')
+        toast.success('Evento eliminado correctamente') // Cambiado a toast.success
         setConfirmDelete(false)
-        closeModal()
+        setVisibleVaccinationDetailsModal(false) // Cerrar el modal de detalles
+        closeModal() // Cerrar el modal principal si estaba abierto
         fetchVaccinationEvents()
       } catch (error) {
         console.error('Error al eliminar el registro médico:', error)
@@ -391,6 +410,7 @@ const useVaccination = () => {
     dayOptionsDate,
     handleRegisterOptionClick,
     handleViewDetailsOptionClick,
+    handleEditRecord, // Exportar la nueva función
     visibleVaccinationDetailsModal,
     setVisibleVaccinationDetailsModal,
     vaccinationDetails,

@@ -22,6 +22,8 @@ const VaccinationDetailsModal = ({
   records,
   selectedDate,
   onShowAssociatedBovinos,
+  onEditRecord,
+  onDeleteRecord,
 }) => {
   if (!visible) return null
 
@@ -43,6 +45,7 @@ const VaccinationDetailsModal = ({
                 <CTableHeaderCell>Tratamiento</CTableHeaderCell>
                 <CTableHeaderCell>Nombre del Responsable</CTableHeaderCell>
                 <CTableHeaderCell>Bovinos</CTableHeaderCell>
+                <CTableHeaderCell>Acciones</CTableHeaderCell>
               </CTableRow>
             </CTableHead>
             <CTableBody>
@@ -61,6 +64,24 @@ const VaccinationDetailsModal = ({
                       onClick={() => onShowAssociatedBovinos(record.bovinos)}
                     >
                       Ver Bovinos
+                    </CButton>
+                  </CTableDataCell>
+                  <CTableDataCell>
+                    <CButton
+                      color="warning"
+                      size="sm"
+                      className="text-white me-2"
+                      onClick={() => onEditRecord(record)}
+                    >
+                      Editar
+                    </CButton>
+                    <CButton
+                      color="danger"
+                      size="sm"
+                      className="text-white"
+                      onClick={() => onDeleteRecord(record)}
+                    >
+                      Eliminar
                     </CButton>
                   </CTableDataCell>
                 </CTableRow>
@@ -86,6 +107,8 @@ VaccinationDetailsModal.propTypes = {
   records: PropTypes.array,
   selectedDate: PropTypes.instanceOf(Date),
   onShowAssociatedBovinos: PropTypes.func.isRequired,
+  onEditRecord: PropTypes.func.isRequired,
+  onDeleteRecord: PropTypes.func.isRequired,
 }
 
 export default VaccinationDetailsModal

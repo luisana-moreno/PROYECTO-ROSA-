@@ -74,6 +74,8 @@ const Vaccination = () => {
         records={vaccinationDetails}
         selectedDate={dayOptionsDate}
         onShowAssociatedBovinos={handleViewCattleDetails} // Pasar la función para ver bovinos
+        onEditRecord={handleEditRecord}
+        onDeleteRecord={handleDelete}
       />
 
       <VaccinationModal
