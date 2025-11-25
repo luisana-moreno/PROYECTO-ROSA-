@@ -113,41 +113,46 @@ export const useEmployees = () => {
     }
   }, [editVisible, currentEmployee])
 
-  useEffect(() => {
-    const fetchEmployeesAndPositions = async () => {
-      try {
-        const employeesData = await employeeService.getAllEmployees()
-        if (employeesData) {
-          setEmployees(
-            employeesData.map((emp) => ({
-              id: emp.id,
-              ttrNombrel: emp.ttrNombrel,
-              ttrApellid: emp.ttrApellid,
-              cargoNombre: emp.cargoNombre,
-              ttrNomsegu: emp.ttrNomsegu,
-              ttrApesegu: emp.ttrApesegu,
-              ttrDocumen: emp.ttrDocumen,
-              ttrFecnaci: emp.ttrFecnaci
-                ? new Date(emp.ttrFecnaci).toISOString().split('T')[0]
-                : '',
-              ttrTelefon: emp.ttrTelefon,
-              ttrDirecci: emp.ttrDirecci,
-              ttrFeccont: emp.ttrFeccont
-                ? new Date(emp.ttrFeccont).toISOString().split('T')[0]
-                : '',
-              ttrIdcargp: emp.ttrIdcargp ? parseInt(emp.ttrIdcargp, 10) : '',
-            })),
-          )
-        }
-        const positionsData = await employeeService.getAllPositions()
-        if (positionsData) {
-          setPositions(positionsData.map((pos) => ({ id: pos.id, nombre: pos.nombre }))) // Corregido: usar 'nombre' en lugar de 'name'
-        }
-      } catch (error) {
-        toast.error(error.message || 'Error al cargar datos iniciales.')
+  const fetchEmployees = async () => {
+    try {
+      const employeesData = await employeeService.getAllEmployees()
+      if (employeesData) {
+        setEmployees(
+          employeesData.map((emp) => ({
+            id: emp.id,
+            ttrNombrel: emp.ttrNombrel,
+            ttrApellid: emp.ttrApellid,
+            cargoNombre: emp.cargoNombre,
+            ttrNomsegu: emp.ttrNomsegu,
+            ttrApesegu: emp.ttrApesegu,
+            ttrDocumen: emp.ttrDocumen,
+            ttrFecnaci: emp.ttrFecnaci ? new Date(emp.ttrFecnaci).toISOString().split('T')[0] : '',
+            ttrTelefon: emp.ttrTelefon,
+            ttrDirecci: emp.ttrDirecci,
+            ttrFeccont: emp.ttrFeccont ? new Date(emp.ttrFeccont).toISOString().split('T')[0] : '',
+            ttrIdcargp: emp.ttrIdcargp ? parseInt(emp.ttrIdcargp, 10) : '',
+          })),
+        )
       }
+    } catch (error) {
+      toast.error(error.message || 'Error al cargar empleados.')
     }
-    fetchEmployeesAndPositions()
+  }
+
+  const fetchPositions = async () => {
+    try {
+      const positionsData = await employeeService.getAllPositions()
+      if (positionsData) {
+        setPositions(positionsData.map((pos) => ({ id: pos.id, nombre: pos.nombre })))
+      }
+    } catch (error) {
+      toast.error(error.message || 'Error al cargar cargos.')
+    }
+  }
+
+  useEffect(() => {
+    fetchEmployees()
+    fetchPositions()
   }, [])
 
   const handleAddEmployee = async () => {
@@ -167,8 +172,7 @@ export const useEmployees = () => {
     try {
       const newEmp = await employeeService.addEmployee(employeeToSend)
       if (newEmp) {
-        const cargoNombre = positions.find((p) => p.id === newEmp.ttrIdcargp)?.nombre || ''
-        setEmployees([...employees, { ...newEmp, cargoNombre: cargoNombre }])
+        await fetchEmployees() // Refrescar la tabla de empleados
         setAddEmployeeForm({
           ttrNombrel: '',
           ttrApellid: '',
@@ -214,11 +218,7 @@ export const useEmployees = () => {
       const updated = await employeeService.updateEmployee(currentEmployee.id, employeeToSend)
       if (updated) {
         const cargoNombre = positions.find((p) => p.id === updated.ttrIdcargp)?.nombre || ''
-        setEmployees(
-          employees.map((emp) =>
-            emp.id === updated.id ? { ...updated, cargoNombre: cargoNombre } : emp,
-          ),
-        )
+        await fetchEmployees() // Refrescar la tabla de empleados
         setEditVisible(false)
         toast.info('Registro editado correctamente')
       }
@@ -239,15 +239,15 @@ export const useEmployees = () => {
     }
     if (deleteConfirmation === 'confirmar') {
       try {
-        await employeeService.deleteEmployee(currentEmployee.id) // Corregido: usar currentEmployee.id
-        setEmployees(employees.filter((emp) => emp.id !== currentEmployee.id)) // Corregido: usar emp.id y currentEmployee.id
+        await employeeService.deleteEmployee(currentEmployee.id)
+        await fetchEmployees() // Refrescar la tabla de empleados
         setDeleteVisible(false)
-        toast.error('Empleado eliminado exitosamente') // Usar toast.error
+        toast.error('Empleado eliminado exitosamente')
       } catch (error) {
-        toast.error(error.message || 'Error al eliminar empleado.') // Usar toast.error
+        toast.error(error.message || 'Error al eliminar empleado.')
       }
     } else {
-      toast.warning('Debe escribir "confirmar" para eliminar') // Usar toast.warning
+      toast.warning('Debe escribir "confirmar" para eliminar')
     }
   }
 
@@ -299,6 +299,8 @@ export const useEmployees = () => {
     setSearchTerm,
     setFilterPosition,
     filteredEmployees,
-    originalEmployee, // Exportar el estado original
+    originalEmployee,
+    fetchEmployees, // Exportar fetchEmployees para recargar en otros componentes si es necesario
+    fetchPositions, // Exportar fetchPositions para recargar en otros componentes si es necesario
   }
 }
