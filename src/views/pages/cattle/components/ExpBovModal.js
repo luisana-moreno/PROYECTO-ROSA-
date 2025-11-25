@@ -79,9 +79,8 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
     }
     try {
       toast.info('Generando PDF, por favor espere...')
-      const response = await pdfService.exportCattleExpedientPdf(currentCattle.ttrIdbovino)
-      const blob = new Blob([response.data], { type: 'application/pdf' })
-      const url = window.URL.createObjectURL(blob)
+      const responseBlob = await pdfService.exportCattleExpedientPdf(currentCattle.ttrIdbovino)
+      const url = window.URL.createObjectURL(responseBlob) // Usa responseBlob directamente
       const link = document.createElement('a')
       link.href = url
       link.setAttribute('download', `expediente-bovino-${currentCattle.ttrNumerobv}.pdf`)
