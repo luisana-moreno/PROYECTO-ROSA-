@@ -277,4 +277,27 @@ export const regmedicosService = {
       nombreEmpleado: `${registro.empleado_nombre} ${registro.empleado_apellido}`,
     }))
   },
+
+  getRegistrosMedicosByBovinoId: async (idBovino) => {
+    const response = await fetch(`${API_URL}/regmedicos/bovino/${idBovino}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al obtener registros médicos por ID de bovino')
+    }
+    const data = await response.json()
+    // Asegurarse de que los nombres de las propiedades coincidan con los que el PDF espera
+    return data.map((registro) => ({
+      ttrFechareg: registro.ttrFechareg, // Fecha Registro
+      ttrDiagnost: registro.ttrDiagnost, // Diagnóstico
+      tmaNomtrat: registro.tmaNomtrat, // Tratamiento (nombre)
+      tmaNomtipv: registro.tmaNomtipv, // Vacuna (nombre)
+      employeeName: registro.employeeName, // Empleado nombre
+      employeeLastName: registro.employeeLastName, // Empleado apellido
+    }))
+  },
 }

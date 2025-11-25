@@ -39,6 +39,7 @@ const AttendanceTable = ({
     }
   }
 
+  console.log('Employees in AttendanceTable:', employees)
   return (
     <div className="table-responsive">
       <CTable hover responsive>
@@ -68,9 +69,11 @@ const AttendanceTable = ({
           {employees.map((emp) => (
             <CTableRow key={emp.id} className="align-middle">
               <CTableDataCell>
-                <strong>{emp.name}</strong>
+                <strong>{`${emp.ttrNombrel || ''} ${emp.ttrNomsegu || ''} ${
+                  emp.ttrApellid || ''
+                } ${emp.ttrApesegu || ''}`}</strong>
               </CTableDataCell>
-              <CTableDataCell className="text-muted">{emp.position}</CTableDataCell>
+              <CTableDataCell className="text-muted">{emp.cargoNombre}</CTableDataCell>
               {days.map((dayInfo) => {
                 // Reconstruir la fecha completa para el día de la semana actual
                 const [dayOfMonth, monthOfYear] = dayInfo.date.split('/').map(Number)

@@ -43,6 +43,9 @@ const AttendanceDetailModal = ({
     }
   }
 
+  console.log('Employee in AttendanceDetailModal:', employee)
+  console.log('Attendance History in AttendanceDetailModal:', attendanceHistory)
+  console.log('Days in AttendanceDetailModal:', days)
   // Calcular el resumen de la semana usando los nombres de los tipos de asistencia
   const presentDays = days.filter(
     (dayInfo) => employee.attendance[dayInfo.name]?.tipoAsistenciaNombre === 'Presente',
@@ -67,17 +70,21 @@ const AttendanceDetailModal = ({
       backdrop="static"
     >
       <CModalHeader closeButton>
-        <CModalTitle>Detalle de Asistencia - {employee.name}</CModalTitle>
+        <CModalTitle>
+          Detalle de Asistencia -{' '}
+          {`${employee.ttrNombrel || ''} ${employee.ttrNomsegu || ''} ${employee.ttrApellid || ''} ${employee.ttrApesegu || ''}`}
+        </CModalTitle>
       </CModalHeader>
       <CModalBody>
         <CRow className="mb-4">
           <CCol md={6}>
             <h6 className="text-muted mb-2">Información del Empleado</h6>
             <p className="mb-1">
-              <strong>Nombre:</strong> {employee.name}
+              <strong>Nombre:</strong>{' '}
+              {`${employee.ttrNombrel || ''} ${employee.ttrNomsegu || ''} ${employee.ttrApellid || ''} ${employee.ttrApesegu || ''}`}
             </p>
             <p className="mb-1">
-              <strong>Cargo:</strong> {employee.position}
+              <strong>Cargo:</strong> {employee.cargoNombre}
             </p>
             <p>
               <strong>Horas Trabajadas:</strong> {employee.hoursWorked || 0} hrs

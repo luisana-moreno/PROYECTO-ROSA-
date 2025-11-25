@@ -53,7 +53,7 @@ const CheckInOut = ({ employees, onCheckIn, loading }) => {
               <option value="">-- Elige un empleado --</option>
               {employees.map((emp) => (
                 <option key={emp.id} value={emp.id}>
-                  {emp.name} ({emp.position})
+                  {emp.ttrNombrel} {emp.ttrApellid} ({emp.cargoNombre})
                 </option>
               ))}
             </CFormSelect>

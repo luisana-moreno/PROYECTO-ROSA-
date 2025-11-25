@@ -65,15 +65,16 @@ const useAttendance = () => {
 
       if (employeesData) {
         const employeesWithAttendance = employeesData.map((emp) => {
+          console.log('Original employee from API:', emp) // Log para depuración
           const formattedEmp = {
-            ...emp,
-            id: emp.ttr_idemplo,
+            ...emp, // Asegurarse de que el resto de las propiedades originales se mantengan
+            id: emp.id,
             name: `${emp.ttr_nombrel || ''} ${emp.ttr_nomsegu || ''} ${
               emp.ttr_apellid || ''
             } ${emp.ttr_apesegu || ''}`,
-            position: emp.cargo_nombre || '',
+            position: emp.cargonombre || '',
           }
-
+          console.log('Formatted employee after mapping:', formattedEmp) // Log para depuración
           const attendanceByDay = {}
           let totalHoursWorked = 0
           let currentAttendanceId = null

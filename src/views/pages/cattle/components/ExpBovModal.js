@@ -25,6 +25,8 @@ import {
 import CIcon from '@coreui/icons-react'
 import { cilMedicalCross, cilList, cilInfo } from '@coreui/icons' // Eliminado cilDrop, se usará cilList para Producción de Leche
 import PropTypes from 'prop-types'
+import { toast } from 'react-toastify'
+import { exportCattleExpedientPdf } from '../../../../api/cattleService' // Asegúrate de que esta ruta sea correcta
 import { helpFetch } from 'src/helpper/helpFetch'
 import { formatDateToDDMMYYYY } from 'src/utils/dateFormatter'
 
@@ -60,6 +62,31 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
         .catch((error) => console.error('Error al cargar historial de lotes/potreros:', error))
     }
   }, [expBovVisible, currentCattle])
+
+  const handleExportPdf = async () => {
+    if (!currentCattle || !currentCattle.ttr_idbovino) {
+      toast.error('No se ha seleccionado ningún bovino para exportar.')
+      return
+    }
+    try {
+      toast.info('Generando PDF, por favor espere...')
+      const response = await exportCattleExpedientPdf(currentCattle.ttr_idbovino)
+      const blob = new Blob([response.data], { type: 'application/pdf' })
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', `expediente-bovino-${currentCattle.ttr_numerobv}.pdf`)
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+      toast.success('PDF generado y descargado exitosamente.')
+      setExpBovVisible(false)
+    } catch (error) {
+      console.error('Error al exportar PDF:', error)
+      toast.error('Error al generar el PDF del expediente.')
+    }
+  }
 
   // Usar la función de utilidad formatDateToDDMMYYYY
   const formatDate = (dateString) => {
@@ -256,6 +283,13 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
           onClick={() => setExpBovVisible(false)}
         >
           Cerrar
+        </CButton>
+        <CButton
+          color="primary"
+          className="button-no-hover-green text-white"
+          onClick={handleExportPdf}
+        >
+          Exportar a PDF
         </CButton>
       </CModalFooter>
     </CModal>

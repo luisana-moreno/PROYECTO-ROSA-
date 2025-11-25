@@ -34,6 +34,7 @@ export const cattleService = {
     return mapKeysToCamelCase(data).map((item) => ({
       ...item,
       id: item.idbovino || item.ttrIdbovino || item.id, // Usar idbovino o ttrIdbovino como id si existe
+      ttrIdbovino: item.idbovino || item.ttrIdbovino || item.id, // Asegurar que ttrIdbovino siempre esté presente
     }))
   },
 
@@ -361,3 +362,6 @@ export const cattleService = {
     return response // Retorna la respuesta completa para manejar el blob en el frontend
   },
 }
+
+// Exportar la función directamente para facilitar la importación si es necesario
+export const exportCattleExpedientPdf = cattleService.exportCattleExpedientPdf

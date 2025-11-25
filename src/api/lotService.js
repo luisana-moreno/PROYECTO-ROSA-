@@ -310,4 +310,27 @@ export const lotService = {
       throw error
     }
   },
+
+  getLotPastureHistoryByBovinoId: async (idBovino) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/lotepotreros/bovino/${idBovino}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(
+          errorData.message || 'Error al obtener historial de lotes/potreros por ID de bovino',
+        )
+      }
+      const data = await response.json()
+      return mapKeysToCamelCase(data)
+    } catch (error) {
+      console.error('Error en getLotPastureHistoryByBovinoId (LotService):', error)
+      toast.error(error.message || 'Error al obtener historial de lotes/potreros.')
+      throw error
+    }
+  },
 }
