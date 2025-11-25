@@ -41,6 +41,10 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
           setMedicalRecords(records)
           setMilkProduction(production)
           setLotPastureHistory(history)
+
+          console.log('Registros médicos cargados:', records)
+          console.log('Producción de leche cargada:', production)
+          console.log('Historial de lotes y potreros cargado:', history)
         } catch (error) {
           console.error('Error al cargar detalles del bovino para el expediente:', error)
           toast.error('Error al cargar detalles del bovino.')

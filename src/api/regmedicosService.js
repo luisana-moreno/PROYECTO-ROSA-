@@ -290,6 +290,7 @@ export const regmedicosService = {
       throw new Error(errorData.message || 'Error al obtener registros médicos por ID de bovino')
     }
     const data = await response.json()
+    console.log('Registros médicos recibidos del API:', data) // Log para depuración
     // Asegurarse de que los nombres de las propiedades coincidan con los que el PDF espera
     return data.map((registro) => ({
       ttrFechareg: registro.ttrFechareg, // Fecha Registro

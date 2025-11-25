@@ -126,6 +126,12 @@ const Cattle = () => {
         setViewVisible={setViewVisible}
         currentCattle={currentCattle}
       />
+      {console.log(
+        'Cattle.js: Rendering ExpBovModal with expBovVisible:',
+        expBovVisible,
+        'and currentCattle:',
+        currentCattle,
+      )}
       <ExpBovModal // Nuevo modal de expediente
         expBovVisible={expBovVisible}
         setExpBovVisible={setExpBovVisible}

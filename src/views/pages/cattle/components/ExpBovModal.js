@@ -26,7 +26,7 @@ import CIcon from '@coreui/icons-react'
 import { cilMedicalCross, cilList, cilInfo } from '@coreui/icons' // Eliminado cilDrop, se usará cilList para Producción de Leche
 import PropTypes from 'prop-types'
 import { toast } from 'react-toastify'
-import { exportCattleExpedientPdf } from '../../../../api/cattleService' // Asegúrate de que esta ruta sea correcta
+import { pdfService } from '../../../../api/pdfService' // Importa el nuevo servicio de PDF
 import { helpFetch } from 'src/helpper/helpFetch'
 import { formatDateToDDMMYYYY } from 'src/utils/dateFormatter'
 
@@ -39,43 +39,52 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
   const [pastureHistory, setPastureHistory] = useState([])
 
   useEffect(() => {
-    if (expBovVisible && currentCattle) {
-      // Cargar registros médicos
-      get(`regmedicos/bovino/${currentCattle.ttr_idbovino}`)
-        .then((data) => {
-          setMedicalRecords(data || [])
-        })
-        .catch((error) => console.error('Error al cargar registros médicos:', error))
+    const loadCattleDetails = async () => {
+      if (expBovVisible && currentCattle && currentCattle.ttrIdbovino) {
+        try {
+          const [records, production, history] = await Promise.all([
+            get(`regmedicos/bovino/${currentCattle.ttrIdbovino}`),
+            get(`prodleche/bovino/${currentCattle.ttrIdbovino}`),
+            get(`lotepotreros/bovino/${currentCattle.ttrIdbovino}`),
+          ])
+          setMedicalRecords(records || [])
+          setMilkProduction(production || [])
+          setPastureHistory(history || [])
 
-      // Cargar producción de leche
-      get(`prodleche/bovino/${currentCattle.ttr_idbovino}`)
-        .then((data) => {
-          setMilkProduction(data || [])
-        })
-        .catch((error) => console.error('Error al cargar producción de leche:', error))
-
-      // Cargar historial de lotes/potreros
-      get(`lotepotreros/bovino/${currentCattle.ttr_idbovino}`)
-        .then((data) => {
-          setPastureHistory(data || [])
-        })
-        .catch((error) => console.error('Error al cargar historial de lotes/potreros:', error))
+          console.log('ExpBovModal (components): currentCattle:', currentCattle)
+          console.log('ExpBovModal (components): Registros médicos cargados:', records)
+          console.log('ExpBovModal (components): Producción de leche cargada:', production)
+          console.log('ExpBovModal (components): Historial de lotes y potreros cargado:', history)
+        } catch (error) {
+          console.error('Error al cargar detalles del bovino para el expediente:', error)
+          toast.error('Error al cargar detalles del bovino.')
+          setMedicalRecords([])
+          setMilkProduction([])
+          setPastureHistory([])
+        }
+      } else if (!expBovVisible) {
+        // Limpiar datos cuando el modal se cierra
+        setMedicalRecords([])
+        setMilkProduction([])
+        setPastureHistory([])
+      }
     }
+    loadCattleDetails()
   }, [expBovVisible, currentCattle])
 
   const handleExportPdf = async () => {
-    if (!currentCattle || !currentCattle.ttr_idbovino) {
+    if (!currentCattle || !currentCattle.ttrIdbovino) {
       toast.error('No se ha seleccionado ningún bovino para exportar.')
       return
     }
     try {
       toast.info('Generando PDF, por favor espere...')
-      const response = await exportCattleExpedientPdf(currentCattle.ttr_idbovino)
+      const response = await pdfService.exportCattleExpedientPdf(currentCattle.ttrIdbovino)
       const blob = new Blob([response.data], { type: 'application/pdf' })
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      link.setAttribute('download', `expediente-bovino-${currentCattle.ttr_numerobv}.pdf`)
+      link.setAttribute('download', `expediente-bovino-${currentCattle.ttrNumerobv}.pdf`)
       document.body.appendChild(link)
       link.click()
       link.remove()

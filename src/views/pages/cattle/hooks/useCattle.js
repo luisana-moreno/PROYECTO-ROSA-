@@ -187,6 +187,7 @@ export const useCattle = () => {
   }
 
   const handleViewExpBov = (cattle) => {
+    console.log('useCattle: handleViewExpBov llamado con:', cattle)
     setCurrentCattle({
       ...cattle,
       ttrFecnacim: formatDateToDDMMYYYY(cattle.ttrFecnacim),

@@ -18,6 +18,7 @@ const CattleTable = ({
   setViewVisible,
   handleViewExpBov, // Nueva prop
 }) => {
+  console.log('CattleTable cattle prop:', cattle)
   return (
     <CTable hover responsive>
       <CTableHead>

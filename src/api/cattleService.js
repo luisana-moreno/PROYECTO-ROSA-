@@ -348,20 +348,5 @@ export const cattleService = {
   },
 
   // Servicio para exportar expediente de bovino a PDF
-  exportCattleExpedientPdf: async (cattleId) => {
-    const response = await fetch(`${API_URL}/jobs/cattle-expedient/${cattleId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al exportar expediente de bovino a PDF')
-    }
-    return response // Retorna la respuesta completa para manejar el blob en el frontend
-  },
+  // Esta función se ha movido a pdfService.js
 }
-
-// Exportar la función directamente para facilitar la importación si es necesario
-export const exportCattleExpedientPdf = cattleService.exportCattleExpedientPdf
