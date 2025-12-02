@@ -12,16 +12,15 @@ import {
 import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash, cilInfo } from '@coreui/icons'
 
-const LotsTable = ({ lots, onEdit, onDelete, onViewDetails, loading }) => {
+const LotsTable = ({ lots, onEdit, onDelete, onViewDetails, onViewBovines, loading }) => {
   return (
     <CTable bordered hover responsive>
       <CTableHead>
         <CTableRow>
           <CTableHeaderCell>#</CTableHeaderCell>
           <CTableHeaderCell>Nombre</CTableHeaderCell>
-          <CTableHeaderCell>Descripción</CTableHeaderCell>
           <CTableHeaderCell>Bovinos</CTableHeaderCell>
-          <CTableHeaderCell>Estado</CTableHeaderCell>
+
           <CTableHeaderCell>Acciones</CTableHeaderCell>
         </CTableRow>
       </CTableHead>
@@ -31,9 +30,16 @@ const LotsTable = ({ lots, onEdit, onDelete, onViewDetails, loading }) => {
             <CTableRow key={lot.id}>
               <CTableDataCell>{idx + 1}</CTableDataCell>
               <CTableDataCell>{lot.nombre}</CTableDataCell>
-              <CTableDataCell>{lot.descripcion || '-'}</CTableDataCell>
               <CTableDataCell>
-                <CBadge color="info">{lot.bovinos}</CBadge>
+                <CButton
+                  color="info"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onViewBovines(lot)}
+                  disabled={loading}
+                >
+                  Ver Bovinos ({lot.bovinos})
+                </CButton>
               </CTableDataCell>
               <CTableDataCell>
                 <CBadge color="success">{lot.estado}</CBadge>
@@ -47,7 +53,7 @@ const LotsTable = ({ lots, onEdit, onDelete, onViewDetails, loading }) => {
                   onClick={() => onViewDetails(lot)}
                   disabled={loading}
                 >
-                  <CIcon icon={cilInfo} />
+                  Detalles
                 </CButton>
                 <CButton
                   color="warning"
@@ -57,7 +63,7 @@ const LotsTable = ({ lots, onEdit, onDelete, onViewDetails, loading }) => {
                   onClick={() => onEdit(lot)}
                   disabled={loading}
                 >
-                  <CIcon icon={cilPencil} />
+                  Editar
                 </CButton>
                 <CButton
                   color="danger"
@@ -66,7 +72,7 @@ const LotsTable = ({ lots, onEdit, onDelete, onViewDetails, loading }) => {
                   onClick={() => onDelete(lot.id)}
                   disabled={loading}
                 >
-                  <CIcon icon={cilTrash} />
+                  Eliminar
                 </CButton>
               </CTableDataCell>
             </CTableRow>

@@ -281,7 +281,8 @@ export const lotService = {
       // Asegurarse de que los datos de bovinos tengan una propiedad 'id' para CustomTableModal
       return mapKeysToCamelCase(data).map((item) => ({
         ...item,
-        id: item.ttrIdbovino, // Usar directamente ttrIdbovino después del mapeo a camelCase
+        id: item.idbovino || item.ttrIdbovino || item.id, // Usar idbovino o ttrIdbovino como id si existe
+        ttrIdbovino: item.idbovino || item.ttrIdbovino || item.id, // Asegurar que ttrIdbovino siempre esté presente
       }))
     } catch (error) {
       console.error('Error en getAllBovines (LotService):', error)

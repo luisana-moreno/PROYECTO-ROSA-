@@ -77,6 +77,21 @@ export const clientService = {
     return true
   },
 
+  checkClientDocument: async (documento) => {
+    const response = await fetch(`${API_URL}/clientes/check-document/${documento}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al verificar documento')
+    }
+    const data = await response.json()
+    return data
+  },
+
   getNaturalClients: async () => {
     const response = await fetch(`${API_URL}/clientes/natural`, {
       method: 'GET',

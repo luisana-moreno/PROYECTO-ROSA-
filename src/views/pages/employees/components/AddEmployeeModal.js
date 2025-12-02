@@ -12,6 +12,7 @@ import {
   CModalTitle,
 } from '@coreui/react'
 import { toast } from 'react-toastify'
+import { employeeService } from '../../../../api/employeeService'
 
 const AddEmployeeModal = ({
   visible,
@@ -23,6 +24,8 @@ const AddEmployeeModal = ({
 }) => {
   const today = new Date().toISOString().split('T')[0]
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [idExists, setIdExists] = useState(false)
+  const [isVerifying, setIsVerifying] = useState(false)
 
   const handleChange = (e) => {
     setAddEmployee({ ...addEmployee, [e.target.name]: e.target.value })
@@ -41,6 +44,26 @@ const AddEmployeeModal = ({
       ...addEmployee,
       ttrIdcargp: e.target.value === '' ? '' : parseInt(e.target.value, 10),
     })
+  }
+
+  const handleIdBlur = async () => {
+    if (!addEmployee.ttrDocumen) return
+
+    setIsVerifying(true)
+    try {
+      const result = await employeeService.checkEmployeeId(addEmployee.ttrDocumen)
+      if (result.exists) {
+        setIdExists(true)
+        toast.warning(result.message)
+      } else {
+        setIdExists(false)
+      }
+    } catch (error) {
+      console.error('Error verifying ID:', error)
+      toast.error('Error al verificar el documento')
+    } finally {
+      setIsVerifying(false)
+    }
   }
 
   const handleAddEmployeeWithValidation = () => {
@@ -68,6 +91,20 @@ const AddEmployeeModal = ({
         <CRow className="g-3 mt-2">
           <h4 className="text-green mt-1 me-5">Datos Personales del empleado</h4>
 
+          <CCol md={12}>
+            <CFormInput
+              className="modal-name custom-select"
+              placeholder="Numero de documento"
+              aria-label="Numero de documento"
+              name="ttrDocumen"
+              value={addEmployee.ttrDocumen}
+              onChange={handleDocumentChange}
+              onBlur={handleIdBlur}
+              maxLength={8}
+            />
+            <small className="text-muted">Ingrese el numero de documento.</small>
+          </CCol>
+
           <CCol md={6}>
             <CFormInput
               className="modal-name custom-select"
@@ -77,6 +114,7 @@ const AddEmployeeModal = ({
               value={addEmployee.ttrNombrel}
               onChange={handleChange}
               maxLength={100}
+              disabled={idExists || !addEmployee.ttrDocumen}
             />
             <small className="text-muted">Ingrese el nombre.</small>
           </CCol>
@@ -90,23 +128,12 @@ const AddEmployeeModal = ({
               value={addEmployee.ttrApellid}
               onChange={handleChange}
               maxLength={100}
+              disabled={idExists || !addEmployee.ttrDocumen}
             />
             <small className="text-muted">Ingrese el apellido.</small>
           </CCol>
         </CRow>
         <CRow className="g-3 mt-2">
-          <CCol md={6}>
-            <CFormInput
-              className="modal-name custom-select"
-              placeholder="Numero de documento"
-              aria-label="Numero de documento"
-              name="ttrDocumen"
-              value={addEmployee.ttrDocumen}
-              onChange={handleDocumentChange}
-              maxLength={8}
-            />
-            <small className="text-muted">Ingrese el numero de documento.</small>
-          </CCol>
           <CCol md={6}>
             <CFormInput
               className="modal-name custom-select"
@@ -117,11 +144,10 @@ const AddEmployeeModal = ({
               value={addEmployee.ttrFecnaci}
               onChange={handleChange}
               max={today}
+              disabled={idExists || !addEmployee.ttrDocumen}
             />
             <small className="text-muted">Ingrese la fecha de nacimiento.</small>
           </CCol>
-        </CRow>
-        <CRow className="g-3 mt-2">
           <CCol md={6}>
             <CFormInput
               className="modal-name custom-select"
@@ -131,10 +157,12 @@ const AddEmployeeModal = ({
               value={addEmployee.ttrTelefon}
               onChange={handlePhoneChange}
               maxLength={11}
+              disabled={idExists || !addEmployee.ttrDocumen}
             />
             <small className="text-muted">Ingrese el numero de Telefono.</small>
           </CCol>
-
+        </CRow>
+        <CRow className="g-3 mt-2">
           <CCol md={6}>
             <CFormInput
               className="modal-name custom-select"
@@ -144,6 +172,7 @@ const AddEmployeeModal = ({
               value={addEmployee.ttrDirecci}
               onChange={handleChange}
               maxLength={255}
+              disabled={idExists || !addEmployee.ttrDocumen}
             />
             <small className="text-muted">Ingrese la Direccion.</small>
           </CCol>
@@ -158,6 +187,7 @@ const AddEmployeeModal = ({
               value={addEmployee.ttrFeccont}
               onChange={handleChange}
               max={today}
+              disabled={idExists || !addEmployee.ttrDocumen}
             />
             <small className="text-muted">Ingrese la fecha de Contrato.</small>
           </CCol>
@@ -169,6 +199,7 @@ const AddEmployeeModal = ({
               name="ttrIdcargp"
               value={addEmployee.ttrIdcargp}
               onChange={handlePositionChange}
+              disabled={idExists || !addEmployee.ttrDocumen}
             >
               <option key="default-position-add" value="">
                 Seleccione el cargo

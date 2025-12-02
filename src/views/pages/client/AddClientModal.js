@@ -12,6 +12,7 @@ import {
   CRow,
 } from '@coreui/react'
 import { toast } from 'react-toastify'
+import { clientService } from '../../../api/clientService'
 
 const ClientTypeSelection = ({ clientType, setClientType }) => (
   <CRow className="g-3 mt-2">
@@ -33,7 +34,7 @@ const ClientTypeSelection = ({ clientType, setClientType }) => (
   </CRow>
 )
 
-const PersonClientFields = ({ addClient, setAddClient }) => (
+const PersonClientFields = ({ addClient, setAddClient, handleDocumentBlur, documentExists }) => (
   <>
     <CRow className="g-3 mt-2">
       <CCol md={6}>
@@ -43,6 +44,7 @@ const PersonClientFields = ({ addClient, setAddClient }) => (
           aria-label="Nombre"
           value={addClient.firts_name}
           onChange={(e) => setAddClient({ ...addClient, firts_name: e.target.value })}
+          disabled={documentExists || !addClient.Document_Number}
         />
         <small className="text-muted">Ingrese el nombre.</small>
       </CCol>
@@ -53,6 +55,7 @@ const PersonClientFields = ({ addClient, setAddClient }) => (
           aria-label="Apellido"
           value={addClient.Firts_Las_Name}
           onChange={(e) => setAddClient({ ...addClient, Firts_Las_Name: e.target.value })}
+          disabled={documentExists || !addClient.Document_Number}
         />
         <small className="text-muted">Ingrese el apellido.</small>
       </CCol>
@@ -70,6 +73,7 @@ const PersonClientFields = ({ addClient, setAddClient }) => (
               setAddClient({ ...addClient, Document_Number: value })
             }
           }}
+          onBlur={() => handleDocumentBlur(addClient.Document_Number)}
           maxLength={10}
         />
         <small className="text-muted">Ingrese el numero de documento (máximo 10 dígitos).</small>
@@ -78,7 +82,7 @@ const PersonClientFields = ({ addClient, setAddClient }) => (
   </>
 )
 
-const CompanyClientFields = ({ addClient, setAddClient }) => (
+const CompanyClientFields = ({ addClient, setAddClient, handleDocumentBlur, documentExists }) => (
   <>
     <CRow className="g-3 mt-2">
       <CCol md={6}>
@@ -88,6 +92,7 @@ const CompanyClientFields = ({ addClient, setAddClient }) => (
           aria-label="Nombre de la Empresa"
           value={addClient.company_name}
           onChange={(e) => setAddClient({ ...addClient, company_name: e.target.value })}
+          disabled={documentExists || !addClient.Rif}
         />
         <small className="text-muted">Ingrese nombre de la empresa.</small>
       </CCol>
@@ -103,6 +108,7 @@ const CompanyClientFields = ({ addClient, setAddClient }) => (
               setAddClient({ ...addClient, Rif: value })
             }
           }}
+          onBlur={() => handleDocumentBlur(addClient.Rif)}
           maxLength={10}
         />
         <small className="text-muted">Ingrese el rif (máximo 10 dígitos).</small>
@@ -111,55 +117,66 @@ const CompanyClientFields = ({ addClient, setAddClient }) => (
   </>
 )
 
-const CommonClientFields = ({ addClient, setAddClient }) => (
-  <>
-    <CRow className="g-3 mt-2">
-      <CCol md={6}>
-        <CFormInput
-          className="modal-name custom-select"
-          placeholder="Telefono"
-          aria-label="Telefono"
-          value={addClient.Phone}
-          onChange={(e) => {
-            const value = e.target.value
-            if (/^\d*$/.test(value) && value.length <= 11) {
-              setAddClient({ ...addClient, Phone: value })
-            }
-          }}
-          maxLength={11}
-        />
-        <small className="text-muted">Ingrese el numero de telefono (11 dígitos).</small>
-      </CCol>
-      <CCol md={6}>
-        <CFormInput
-          className="modal-name custom-select"
-          placeholder="Direccion"
-          aria-label="Direccion"
-          value={addClient.Address}
-          onChange={(e) => setAddClient({ ...addClient, Address: e.target.value })}
-        />
-        <small className="text-muted">Ingrese la direccion.</small>
-      </CCol>
-      <CCol md={12}>
-        <CFormInput
-          className="modal-name custom-select"
-          placeholder="email"
-          aria-label="email"
-          value={addClient.email}
-          onChange={(e) => setAddClient({ ...addClient, email: e.target.value })}
-        />
-        <small className="text-muted">Ingrese el email.</small>
-      </CCol>
-    </CRow>
-  </>
-)
+const CommonClientFields = ({ addClient, setAddClient, documentExists, clientTypeSelected }) => {
+  const isDocumentEntered =
+    clientTypeSelected === 'Person' ? !!addClient.Document_Number : !!addClient.Rif
+
+  return (
+    <>
+      <CRow className="g-3 mt-2">
+        <CCol md={6}>
+          <CFormInput
+            className="modal-name custom-select"
+            placeholder="Telefono"
+            aria-label="Telefono"
+            value={addClient.Phone}
+            onChange={(e) => {
+              const value = e.target.value
+              if (/^\d*$/.test(value) && value.length <= 11) {
+                setAddClient({ ...addClient, Phone: value })
+              }
+            }}
+            maxLength={11}
+            disabled={documentExists || !isDocumentEntered}
+          />
+          <small className="text-muted">Ingrese el numero de telefono (11 dígitos).</small>
+        </CCol>
+        <CCol md={6}>
+          <CFormInput
+            className="modal-name custom-select"
+            placeholder="Direccion"
+            aria-label="Direccion"
+            value={addClient.Address}
+            onChange={(e) => setAddClient({ ...addClient, Address: e.target.value })}
+            disabled={documentExists || !isDocumentEntered}
+          />
+          <small className="text-muted">Ingrese la direccion.</small>
+        </CCol>
+        <CCol md={12}>
+          <CFormInput
+            className="modal-name custom-select"
+            placeholder="email"
+            aria-label="email"
+            value={addClient.email}
+            onChange={(e) => setAddClient({ ...addClient, email: e.target.value })}
+            disabled={documentExists || !isDocumentEntered}
+          />
+          <small className="text-muted">Ingrese el email.</small>
+        </CCol>
+      </CRow>
+    </>
+  )
+}
 
 const AddClientModal = ({ visible, setVisible, addClient, setAddClient, handleAddClient }) => {
   const [clientTypeSelected, setClientTypeSelected] = useState('')
+  const [documentExists, setDocumentExists] = useState(false)
+  const [isVerifying, setIsVerifying] = useState(false)
 
   useEffect(() => {
     if (!visible) {
       setClientTypeSelected('') // Resetear la selección cuando el modal se cierra
+      setDocumentExists(false)
       setAddClient({
         client_type: '',
         company_name: '',
@@ -177,6 +194,27 @@ const AddClientModal = ({ visible, setVisible, addClient, setAddClient, handleAd
   const handleClientTypeChange = (type) => {
     setClientTypeSelected(type)
     setAddClient((prev) => ({ ...prev, client_type: type }))
+    setDocumentExists(false) // Reset state on type change
+  }
+
+  const handleDocumentBlur = async (documento) => {
+    if (!documento) return
+
+    setIsVerifying(true)
+    try {
+      const result = await clientService.checkClientDocument(documento)
+      if (result.exists) {
+        setDocumentExists(true)
+        toast.warning(result.message)
+      } else {
+        setDocumentExists(false)
+      }
+    } catch (error) {
+      console.error('Error verifying document:', error)
+      toast.error('Error al verificar el documento')
+    } finally {
+      setIsVerifying(false)
+    }
   }
 
   const validateForm = () => {
@@ -261,14 +299,29 @@ const AddClientModal = ({ visible, setVisible, addClient, setAddClient, handleAd
         />
 
         {clientTypeSelected === 'Person' && (
-          <PersonClientFields addClient={addClient} setAddClient={setAddClient} />
+          <PersonClientFields
+            addClient={addClient}
+            setAddClient={setAddClient}
+            handleDocumentBlur={handleDocumentBlur}
+            documentExists={documentExists}
+          />
         )}
         {clientTypeSelected === 'Company' && (
-          <CompanyClientFields addClient={addClient} setAddClient={setAddClient} />
+          <CompanyClientFields
+            addClient={addClient}
+            setAddClient={setAddClient}
+            handleDocumentBlur={handleDocumentBlur}
+            documentExists={documentExists}
+          />
         )}
 
         {clientTypeSelected && (
-          <CommonClientFields addClient={addClient} setAddClient={setAddClient} />
+          <CommonClientFields
+            addClient={addClient}
+            setAddClient={setAddClient}
+            documentExists={documentExists}
+            clientTypeSelected={clientTypeSelected}
+          />
         )}
       </CModalBody>
       <CModalFooter>

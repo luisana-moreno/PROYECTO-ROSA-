@@ -105,6 +105,21 @@ export const employeeService = {
     return true
   },
 
+  checkEmployeeId: async (id) => {
+    const response = await fetch(`${API_URL}/empleados/check-document/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al verificar documento')
+    }
+    const data = await response.json()
+    return data
+  },
+
   getAllPositions: async () => {
     const response = await fetch(`${API_URL}/empleados/cargos`, {
       method: 'GET',

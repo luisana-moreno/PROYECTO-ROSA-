@@ -50,6 +50,7 @@ const LotDetailsModal = ({
   const [selectedBovinesToAdd, setSelectedBovinesToAdd] = useState([])
   const [assignmentDate, setAssignmentDate] = useState(formatDateToYYYYMMDD(new Date())) // Usar formatDateToYYYYMMDD
   const [visibleCattleSelectionModal, setVisibleCattleSelectionModal] = useState(false) // Nuevo estado para el modal de selección de bovinos
+  const [selectedPastureId, setSelectedPastureId] = useState('') // Estado para el potrero seleccionado
 
   useEffect(() => {
     if (visible && lot) {
@@ -57,6 +58,7 @@ const LotDetailsModal = ({
       fetchBovinesInLot(lot.id) // Cargar historial completo de asignaciones
       setSelectedBovinesToAdd([])
       setAssignmentDate(formatDateToYYYYMMDD(new Date())) // Usar formatDateToYYYYMMDD
+      setSelectedPastureId('') // Resetear potrero
     }
   }, [visible, lot, fetchActiveBovinesInLot, fetchBovinesInLot])
 
@@ -73,15 +75,20 @@ const LotDetailsModal = ({
       toast.warning('Debe seleccionar una fecha de inicio de asignación.')
       return
     }
+    // if (!selectedPastureId) {
+    //   toast.warning('Debe seleccionar un potrero.')
+    //   return
+    // }
 
     await addBovinesToLot(
       lot.id, // Usar lot.id
-      null, // No se selecciona potrero desde este modal, enviar null
+      selectedPastureId || null, // Enviar null si no hay potrero seleccionado
       selectedBovinesToAdd.map((b) => b.id), // Obtener solo los IDs de los objetos seleccionados
       assignmentDate,
     )
     setSelectedBovinesToAdd([])
     setAssignmentDate(formatDateToYYYYMMDD(new Date())) // Usar formatDateToYYYYMMDD
+    setSelectedPastureId('')
   }
 
   const handleRemoveBovine = async (idBovino) => {
@@ -90,7 +97,7 @@ const LotDetailsModal = ({
       return
     }
     if (window.confirm('¿Está seguro de desasociar este bovino del lote?')) {
-      await removeBovineFromLot(lot.idlote, idBovino)
+      await removeBovineFromLot(lot.id, idBovino)
     }
   }
 
@@ -100,11 +107,11 @@ const LotDetailsModal = ({
 
   // Columnas para CustomTableModal de bovinos
   const cattleColumns = [
-    { key: 'numerobv', label: 'Número' },
-    { key: 'razanombre', label: 'Raza' },
-    { key: 'pesokilo', label: 'Peso (Kg)' },
-    { key: 'etapanombre', label: 'Etapa' },
-    { key: 'estadonombre', label: 'Estado' },
+    { key: 'ttrNumerobv', label: 'Número' },
+    { key: 'razaNombre', label: 'Raza' },
+    { key: 'ttrPesokilo', label: 'Peso (Kg)' },
+    { key: 'etapaNombre', label: 'Etapa' },
+    { key: 'estadoNombre', label: 'Estado' },
   ]
 
   // Opciones de potrero (removidas)
@@ -159,7 +166,7 @@ const LotDetailsModal = ({
                     {activeBovinesInLot.map((bovine) => (
                       <CTableRow key={bovine.idbovino}>
                         <CTableDataCell>{bovine.numerobovino}</CTableDataCell>
-                        <CTableDataCell>{bovine.codpotrero}</CTableDataCell>
+                        <CTableDataCell>{bovine.codpotrero || 'Sin Potrero'}</CTableDataCell>
                         <CTableDataCell>{formatDateToDDMMYYYY(bovine.fechainicio)}</CTableDataCell>
                         <CTableDataCell>
                           <CButton
@@ -196,13 +203,27 @@ const LotDetailsModal = ({
                   </CButton>
                   <ul className="list-unstyled mt-2">
                     {selectedBovinesToAdd.map((bovine) => (
-                      <li key={bovine.id}>{`Bovino ${bovine.numerobv}`}</li>
+                      <li key={bovine.id}>{`Bovino ${bovine.ttrNumerobv}`}</li>
                     ))}
                   </ul>
                 </CCol>
                 <CCol md={6}>
-                  {' '}
-                  {/* Cambiado a md={6} ya que se eliminó la columna del potrero */}
+                  <CFormLabel htmlFor="selectPasture">Potrero</CFormLabel>
+                  <CFormSelect
+                    id="selectPasture"
+                    value={selectedPastureId}
+                    onChange={(e) => setSelectedPastureId(e.target.value)}
+                    disabled={loading}
+                    className="mb-3"
+                  >
+                    <option value="">Seleccione un potrero</option>
+                    {allPastures.map((pasture) => (
+                      <option key={pasture.id} value={pasture.id}>
+                        {pasture.codigo} - {pasture.nombre}
+                      </option>
+                    ))}
+                  </CFormSelect>
+
                   <CFormLabel htmlFor="assignmentDate">Fecha de Inicio</CFormLabel>
                   <CFormInput
                     id="assignmentDate"
@@ -243,7 +264,7 @@ const LotDetailsModal = ({
                       <CTableRow key={item.idbovlotpot}>
                         <CTableDataCell>{item.numerobovino}</CTableDataCell>
                         <CTableDataCell>{item.razanombre}</CTableDataCell>
-                        <CTableDataCell>{item.codpotrero}</CTableDataCell>
+                        <CTableDataCell>{item.codpotrero || 'Sin Potrero'}</CTableDataCell>
                         <CTableDataCell>{formatDateToDDMMYYYY(item.fechainicio)}</CTableDataCell>
                         <CTableDataCell>
                           {item.fechafin ? (

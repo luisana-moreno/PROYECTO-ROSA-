@@ -7,6 +7,7 @@ import LotForm from './components/LotForm'
 import LotsTable from './components/LotsTable'
 import LotDetailsModal from './components/LotDetailsModal'
 import LotFilters from './components/LotFilters'
+import CustomTableModal from '../../../components/CustomTableModal' // Importar CustomTableModal
 
 const LotRegistration = () => {
   const {
@@ -34,7 +35,9 @@ const LotRegistration = () => {
   } = useLots()
 
   const [detailsModalVisible, setDetailsModalVisible] = useState(false)
+
   const [selectedLotForDetails, setSelectedLotForDetails] = useState(null)
+  const [bovinesModalVisible, setBovinesModalVisible] = useState(false) // Estado para el modal de ver bovinos
 
   const handleEditClick = (lot) => {
     setFormData({ nombre: lot.nombre }) // Lote solo tiene nombre
@@ -49,6 +52,11 @@ const LotRegistration = () => {
   const handleViewDetails = (lot) => {
     setSelectedLotForDetails(lot)
     setDetailsModalVisible(true)
+  }
+
+  const handleViewBovines = (lot) => {
+    fetchActiveBovinesInLot(lot.id)
+    setBovinesModalVisible(true)
   }
 
   const handleSubmit = () => {
@@ -81,6 +89,7 @@ const LotRegistration = () => {
           onEdit={handleEditClick}
           onDelete={handleDeleteLot}
           onViewDetails={handleViewDetails}
+          onViewBovines={handleViewBovines} // Pasar la función
           loading={loading}
         />
       </CCardBody>
@@ -99,6 +108,23 @@ const LotRegistration = () => {
         addBovinesToLot={addBovinesToLot}
         removeBovineFromLot={removeBovineFromLot}
         updateBovineLotAssignment={updateBovineLotAssignment}
+      />
+
+      <CustomTableModal
+        visible={bovinesModalVisible}
+        onClose={() => setBovinesModalVisible(false)}
+        data={activeBovinesInLot}
+        columns={[
+          { key: 'numerobovino', label: 'Número' },
+          { key: 'razanombre', label: 'Raza' },
+          { key: 'pesokilo', label: 'Peso (Kg)' },
+          { key: 'etapanombre', label: 'Etapa' },
+          { key: 'codpotrero', label: 'Potrero' },
+        ]}
+        onSelect={() => {}} // No hace nada en readOnly
+        title="Bovinos en el Lote"
+        searchPlaceholder="Buscar bovinos..."
+        readOnly={true} // Solo lectura
       />
     </CCard>
   )
