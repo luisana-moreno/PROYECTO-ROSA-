@@ -1,4 +1,6 @@
-const API_URL = import.meta.env.VITE_API_URL
+import { helpFetch } from '../helpper/helpFetch'
+
+const { get, post, put, del } = helpFetch()
 
 // Función auxiliar para mapear nombres de columnas de la base de datos a camelCase para el frontend
 const mapKeysToCamelCase = (data) => {
@@ -9,7 +11,17 @@ const mapKeysToCamelCase = (data) => {
   const newObject = {}
   for (const key in data) {
     if (Object.prototype.hasOwnProperty.call(data, key)) {
-      const newKey = key.toLowerCase().replace(/_([a-z])/g, (g) => g[1].toUpperCase())
+      let newKey = key.toLowerCase().replace(/_([a-z])/g, (g) => g[1].toUpperCase())
+      // Mapear claves específicas para el frontend
+      if (newKey === 'idbovino') newKey = 'idBovino'
+      if (newKey === 'numerobovino') newKey = 'numeroBovino'
+      if (newKey === 'razanombre') newKey = 'razaNombre'
+      if (newKey === 'ttrIdbovlec') newKey = 'idBovinoLeche'
+      if (newKey === 'ttrIdprodlc') newKey = 'idProduccionLeche'
+      if (newKey === 'ttrIdprolot') newKey = 'idProduccionLecheLote'
+      if (newKey === 'ttrLitrsprd') newKey = 'litrosProducidos'
+      if (newKey === 'ttrFechapro') newKey = 'fechaProduccion'
+
       newObject[newKey] = data[key]
     }
   }
@@ -19,95 +31,95 @@ const mapKeysToCamelCase = (data) => {
 export const prodlecheService = {
   // Servicios para Producción de Leche (TTRPRODLECH)
   getAllProduccionLeche: async () => {
-    const response = await fetch(`${API_URL}/prodleche`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al obtener registros de producción de leche')
+    try {
+      const data = await get('prodleche/bovino') // Cambio aquí
+      return mapKeysToCamelCase(data)
+    } catch (error) {
+      console.error('Error en getAllProduccionLeche:', error)
+      throw new Error(error.message || 'Error al obtener registros de producción de leche')
     }
-    const data = await response.json()
-    return mapKeysToCamelCase(data)
   },
 
   getProduccionLecheById: async (id) => {
-    const response = await fetch(`${API_URL}/prodleche/${id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(
-        errorData.message || 'Error al obtener registro de producción de leche por ID',
-      )
+    try {
+      const data = await get(`prodleche/bovino/${id}`) // Cambio aquí
+      return mapKeysToCamelCase(data)
+    } catch (error) {
+      console.error('Error en getProduccionLecheById:', error)
+      throw new Error(error.message || 'Error al obtener registro de producción de leche por ID')
     }
-    const data = await response.json()
-    return mapKeysToCamelCase(data)
   },
 
   createProduccionLeche: async (produccionLecheData) => {
-    const response = await fetch(`${API_URL}/prodleche`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(produccionLecheData),
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al crear registro de producción de leche')
+    try {
+      const data = await post('prodleche/bovino', produccionLecheData) // Cambio aquí
+      return mapKeysToCamelCase(data)
+    } catch (error) {
+      console.error('Error en createProduccionLeche:', error)
+      throw new Error(error.message || 'Error al crear registro de producción de leche')
     }
-    const data = await response.json()
-    return mapKeysToCamelCase(data)
   },
 
   updateProduccionLeche: async (id, produccionLecheData) => {
-    const response = await fetch(`${API_URL}/prodleche/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(produccionLecheData),
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al actualizar registro de producción de leche')
+    try {
+      const data = await put('prodleche/bovino', id, produccionLecheData) // Cambio aquí
+      return mapKeysToCamelCase(data)
+    } catch (error) {
+      console.error('Error en updateProduccionLeche:', error)
+      throw new Error(error.message || 'Error al actualizar registro de producción de leche')
     }
-    const data = await response.json()
-    return mapKeysToCamelCase(data)
   },
 
   deleteProduccionLeche: async (id) => {
-    const response = await fetch(`${API_URL}/prodleche/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al eliminar registro de producción de leche')
+    try {
+      await del('prodleche/bovino', id) // Cambio aquí
+      return true
+    } catch (error) {
+      console.error('Error en deleteProduccionLeche:', error)
+      throw new Error(error.message || 'Error al eliminar registro de producción de leche')
     }
-    return true
   },
 
   getMilkProductionByBovinoId: async (idBovino) => {
-    const response = await fetch(`${API_URL}/prodleche/bovino/${idBovino}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al obtener producción de leche por ID de bovino')
+    try {
+      const data = await get(`prodleche/bovino/${idBovino}`) // Cambio aquí, ya era relativo
+      return mapKeysToCamelCase(data)
+    } catch (error) {
+      console.error('Error en getMilkProductionByBovinoId:', error)
+      throw new Error(error.message || 'Error al obtener producción de leche por ID de bovino')
     }
-    const data = await response.json()
-    return mapKeysToCamelCase(data)
+  },
+
+  // Nuevo servicio para Producción de Leche por Lote (TTRPRODLOTE)
+  createProduccionLechePorLote: async (lotProductionData) => {
+    try {
+      const data = await post('prodleche/lote', lotProductionData) // Cambio aquí
+      return mapKeysToCamelCase(data)
+    } catch (error) {
+      console.error('Error en createProduccionLechePorLote:', error)
+      throw new Error(error.message || 'Error al crear registro de producción por lote')
+    }
+  },
+
+  getAllMilkProductionLots: async () => {
+    try {
+      const data = await get('prodleche/lote') // Nueva función para obtener producción por lotes
+      return mapKeysToCamelCase(data)
+    } catch (error) {
+      console.error('Error en getAllMilkProductionLots:', error)
+      throw new Error(error.message || 'Error al obtener producción de leche por lotes')
+    }
+  },
+
+  getAllIndividualMilkRecords: async () => {
+    try {
+      const data = await get('prodleche/bovino') // Nueva función para obtener todos los registros individuales
+      return mapKeysToCamelCase(data)
+    } catch (error) {
+      console.error('Error en getAllIndividualMilkRecords:', error)
+      throw new Error(
+        error.message || 'Error al obtener registros individuales de producción de leche',
+      )
+    }
   },
 }

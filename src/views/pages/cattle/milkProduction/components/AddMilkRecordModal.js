@@ -1,4 +1,4 @@
-import React from 'react'
+'use client'
 import {
   CButton,
   CModal,
@@ -10,119 +10,187 @@ import {
   CFormSelect,
   CRow,
   CCol,
+  CFormLabel,
+  CTable,
+  CTableHead,
+  CTableBody,
+  CTableRow,
+  CTableHeaderCell,
+  CTableDataCell,
+  CCard,
+  CCardBody,
+  CBadge,
 } from '@coreui/react'
 
 export const AddMilkRecordModal = ({
   visible,
   setVisible,
-  newRecord,
-  setNewRecord,
+  lots,
+  selectedLotId,
+  setSelectedLotId,
+  productionDate,
+  setProductionDate,
+  bovinesInSelectedLot,
+  individualBovineProduction,
+  setIndividualBovineProduction,
   handleAddRecord,
-  days,
+  isLoading, // Recibir isLoading como prop
 }) => {
+  const handleIndividualLitersChange = (bovineId, liters) => {
+    setIndividualBovineProduction((prev) => ({
+      ...prev,
+      [bovineId]: liters,
+    }))
+  }
+
+  const today = new Date().toISOString().split('T')[0]
+
+  const totalLiters = Object.values(individualBovineProduction).reduce((sum, val) => {
+    return sum + (Number.parseFloat(val) || 0)
+  }, 0)
+
   return (
-    <CModal alignment="center" scrollable visible={visible} onClose={() => setVisible(false)}>
-      <CModalHeader>
-        <CModalTitle>Agregar Registro</CModalTitle>
+    <CModal
+      alignment="center"
+      scrollable
+      visible={visible}
+      onClose={() => setVisible(false)}
+      size="lg"
+    >
+      <CModalHeader closeButton>
+        <CModalTitle>Registrar Producción de Leche por Lote</CModalTitle>
       </CModalHeader>
       <CModalBody>
-        <CRow className="g-3 mt-2">
+        <CRow className="g-3 mb-4">
           <CCol md={6}>
+            <CFormLabel htmlFor="selectLot" className="fw-bold">
+              Seleccionar Lote
+            </CFormLabel>
             <CFormSelect
-              value={newRecord.type}
-              onChange={(e) => setNewRecord({ ...newRecord, type: e.target.value })}
+              id="selectLot"
+              value={selectedLotId}
+              onChange={(e) => setSelectedLotId(e.target.value)}
             >
-              <option value="Bovino">Bovino</option>
-              <option value="Lote">Lote</option>
-            </CFormSelect>
-            <small className="text-muted">Seleccione el tipo de registro.</small>
-          </CCol>
-          <CCol md={6}>
-            <CFormInput
-              placeholder={newRecord.type === 'Bovino' ? 'Número de Bovino' : 'Número de Lote'}
-              value={newRecord.identifier}
-              onChange={(e) => setNewRecord({ ...newRecord, identifier: e.target.value })}
-            />
-            <small className="text-muted">
-              {newRecord.type === 'Bovino'
-                ? 'Ingrese el número de bovino.'
-                : 'Ingrese el número de lote.'}
-            </small>
-          </CCol>
-        </CRow>
-        <CRow className="g-3 mt-2">
-          <CCol md={6}>
-            <CFormSelect
-              value={newRecord.day}
-              onChange={(e) => setNewRecord({ ...newRecord, day: e.target.value })}
-            >
-              <option value="">Seleccione el día</option>
-              {days.map((day) => (
-                <option key={day} value={day}>
-                  {day.charAt(0).toUpperCase() + day.slice(1)}
+              <option value="">Seleccione un lote</option>
+              {lots.map((lot) => (
+                <option key={lot.id} value={lot.id}>
+                  {lot.nombre}
                 </option>
               ))}
             </CFormSelect>
-            <small className="text-muted">Seleccione el día de la semana.</small>
           </CCol>
           <CCol md={6}>
+            <CFormLabel htmlFor="productionDate" className="fw-bold">
+              Fecha de Producción
+            </CFormLabel>
             <CFormInput
-              type="number"
-              placeholder="Cantidad de Litros"
-              value={newRecord.liters}
-              onChange={(e) => setNewRecord({ ...newRecord, liters: e.target.value })}
+              id="productionDate"
+              type="date"
+              value={productionDate}
+              onChange={(e) => setProductionDate(e.target.value)}
+              max={today}
             />
-            <small className="text-muted">Ingrese la cantidad de litros producidos.</small>
           </CCol>
         </CRow>
-        <CRow className="g-3 mt-2">
-          <CCol md={6}>
-            <CFormInput
-              type="time"
-              placeholder="Inicio Mañana"
-              value={newRecord.morningStart}
-              onChange={(e) => setNewRecord({ ...newRecord, morningStart: e.target.value })}
-            />
-            <small className="text-muted">Ingrese la hora de inicio del ordeño en la mañana.</small>
-          </CCol>
-          <CCol md={6}>
-            <CFormInput
-              type="time"
-              placeholder="Fin Mañana"
-              value={newRecord.morningEnd}
-              onChange={(e) => setNewRecord({ ...newRecord, morningEnd: e.target.value })}
-            />
-            <small className="text-muted">
-              Ingrese la hora de finalización del ordeño en la mañana.
-            </small>
-          </CCol>
-        </CRow>
-        <CRow className="g-3 mt-2">
-          <CCol md={6}>
-            <CFormInput
-              type="time"
-              placeholder="Inicio Tarde"
-              value={newRecord.afternoonStart}
-              onChange={(e) => setNewRecord({ ...newRecord, afternoonStart: e.target.value })}
-            />
-            <small className="text-muted">Ingrese la hora de inicio del ordeño en la tarde.</small>
-          </CCol>
-          <CCol md={6}>
-            <CFormInput
-              type="time"
-              placeholder="Fin Tarde"
-              value={newRecord.afternoonEnd}
-              onChange={(e) => setNewRecord({ ...newRecord, afternoonEnd: e.target.value })}
-            />
-            <small className="text-muted">
-              Ingrese la hora de finalización del ordeño en la tarde.
-            </small>
-          </CCol>
-        </CRow>
+
+        {selectedLotId && bovinesInSelectedLot.length > 0 && (
+          <div>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h6 className="mb-0">Producción Individual por Bovino</h6>
+              <CBadge color="primary">Total: {totalLiters.toFixed(2)} L</CBadge>
+            </div>
+
+            <div
+              style={{
+                maxHeight: '400px',
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                border: '1px solid #e0e0e0',
+                borderRadius: '4px',
+              }}
+            >
+              <CTable hover responsive className="mb-0">
+                <CTableHead position="sticky" style={{ top: 0 }}>
+                  <CTableRow color="light">
+                    <CTableHeaderCell scope="col" style={{ width: '15%' }}>
+                      Nº Bovino
+                    </CTableHeaderCell>
+                    <CTableHeaderCell scope="col" style={{ width: '25%' }}>
+                      Raza
+                    </CTableHeaderCell>
+                    <CTableHeaderCell scope="col" style={{ width: '30%' }}>
+                      Producción (Litros)
+                    </CTableHeaderCell>
+                    <CTableHeaderCell scope="col" style={{ width: '15%', textAlign: 'center' }}>
+                      Acción
+                    </CTableHeaderCell>
+                  </CTableRow>
+                </CTableHead>
+                <CTableBody>
+                  {bovinesInSelectedLot.map((bovine) => (
+                    <CTableRow key={bovine.idBovino} className="align-middle">
+                      <CTableDataCell>
+                        <strong>{bovine.numeroBovino}</strong>
+                      </CTableDataCell>
+                      <CTableDataCell>
+                        <CBadge color="info">{bovine.razaNombre}</CBadge>
+                      </CTableDataCell>
+                      <CTableDataCell>
+                        <CFormInput
+                          type="number"
+                          placeholder="0.00"
+                          step="0.1"
+                          min="0"
+                          value={individualBovineProduction[bovine.idBovino] || ''}
+                          onChange={(e) =>
+                            handleIndividualLitersChange(bovine.idBovino, e.target.value)
+                          }
+                          style={{ maxWidth: '120px' }}
+                        />
+                      </CTableDataCell>
+                      <CTableDataCell style={{ textAlign: 'center' }}>
+                        {individualBovineProduction[bovine.idBovino] && (
+                          <CBadge color="success">
+                            {individualBovineProduction[bovine.idBovino]} L
+                          </CBadge>
+                        )}
+                      </CTableDataCell>
+                    </CTableRow>
+                  ))}
+                </CTableBody>
+              </CTable>
+            </div>
+          </div>
+        )}
+
+        {selectedLotId && bovinesInSelectedLot.length === 0 && (
+          <CCard className="border-warning">
+            <CCardBody>
+              <p className="text-warning mb-0">No hay bovinos activos en este lote.</p>
+            </CCardBody>
+          </CCard>
+        )}
+
+        {!selectedLotId && (
+          <CCard className="border-info">
+            <CCardBody>
+              <p className="text-info mb-0">Seleccione un lote para ver los bovinos activos.</p>
+            </CCardBody>
+          </CCard>
+        )}
       </CModalBody>
       <CModalFooter>
-        <CButton className="button-no-hover-green text-white" onClick={handleAddRecord}>
-          Agregar
+        <CButton color="secondary" onClick={() => setVisible(false)}>
+          Cancelar
+        </CButton>
+        <CButton
+          color="success"
+          onClick={handleAddRecord}
+          disabled={
+            !selectedLotId || bovinesInSelectedLot.length === 0 || totalLiters === 0 || isLoading
+          } // Deshabilitar si está cargando
+        >
+          {isLoading ? 'Agregando...' : `Agregar Producción (${totalLiters.toFixed(2)} L)`}
         </CButton>
       </CModalFooter>
     </CModal>

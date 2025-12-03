@@ -19,9 +19,13 @@ export const DeleteMilkRecordModal = ({
   return (
     <CModal visible={deleteVisible} onClose={() => setDeleteVisible(false)}>
       <CModalHeader>
-        <CModalTitle>Eliminar Registro</CModalTitle>
+        <CModalTitle>Eliminar Registro de Producción Individual</CModalTitle>
       </CModalHeader>
       <CModalBody>
+        <h6>
+          ¿Está seguro que desea eliminar este registro de producción individual del bovino{' '}
+          {/* currentRecord?.bovino_numero */}?
+        </h6>
         <h6>Por favor escriba "confirmar" para eliminar el registro</h6>
         <CFormInput
           placeholder="confirmar"

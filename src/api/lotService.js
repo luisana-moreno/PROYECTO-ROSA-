@@ -18,6 +18,9 @@ const mapKeysToCamelCase = (data) => {
       // Mapear claves específicas de lotes para el frontend
       if (newKey === 'tmaIdlote') newKey = 'id'
       if (newKey === 'tmaNomlote') newKey = 'nombre'
+      if (newKey === 'idbovino') newKey = 'idBovino'
+      if (newKey === 'numerobovino') newKey = 'numeroBovino'
+      if (newKey === 'razanombre') newKey = 'razaNombre'
       newObject[newKey] = data[key]
     }
   }
@@ -331,6 +334,27 @@ export const lotService = {
     } catch (error) {
       console.error('Error en getLotPastureHistoryByBovinoId (LotService):', error)
       toast.error(error.message || 'Error al obtener historial de lotes/potreros.')
+      throw error
+    }
+  },
+
+  getAllActiveBovinesInLot: async (idLote) => {
+    try {
+      const response = await fetch(`${LOTES_API_URL}/${idLote}/bovinos/activos`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Error al obtener bovinos activos en lote')
+      }
+      const data = await response.json()
+      return mapKeysToCamelCase(data)
+    } catch (error) {
+      console.error('Error en getAllActiveBovinesInLot (LotService):', error)
+      toast.error(error.message || 'Error al obtener bovinos activos en lote.')
       throw error
     }
   },
