@@ -242,4 +242,34 @@ export const attendanceService = {
       throw error
     }
   },
+
+  qrCheckIn: async (qrCode) => {
+    try {
+      const response = await fetch(`${API_URL}/asistencias/qr-checkin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ qrCode }),
+      })
+
+      const contentType = response.headers.get('content-type')
+      if (contentType && contentType.indexOf('application/json') !== -1) {
+        const data = await response.json()
+        if (!response.ok) {
+          throw new Error(data.message || 'Error al procesar código QR')
+        }
+        return data
+      } else {
+        const text = await response.text()
+        console.error('Respuesta no JSON del servidor:', text)
+        throw new Error(
+          'El servidor devolvió una respuesta no válida (posible error 500). Revisa la consola.',
+        )
+      }
+    } catch (error) {
+      console.error('Error en qrCheckIn:', error)
+      throw error
+    }
+  },
 }

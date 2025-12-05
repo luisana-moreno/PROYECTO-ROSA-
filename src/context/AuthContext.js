@@ -52,6 +52,8 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     setLoading(true)
     try {
+      console.log(credentials)
+
       const { token, user: userProfile } = await authLogin(
         credentials.correo,
         credentials.contrasena,

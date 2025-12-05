@@ -18,10 +18,10 @@ import {
 import PropTypes from 'prop-types'
 import moment from 'moment'
 import { toast } from 'react-toastify'
-import { cattleService } from '../../../../api/cattleService'
-import { regmedicosService } from '../../../../api/regmedicosService' // Importar servicio de registros médicos
-import { prodlecheService } from '../../../../api/prodlecheService' // Importar servicio de producción de leche
-import { lotService } from '../../../../api/lotService' // Importar servicio de lotes/potreros
+import { cattleService } from '../../../api/cattleService'
+import { regmedicosService } from '../../../api/regmedicosService' // Importar servicio de registros médicos
+import { prodlecheService } from '../../../api/prodlecheService' // Importar servicio de producción de leche
+import { lotService } from '../../../api/lotService' // Importar servicio de lotes/potreros
 
 const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
   const [medicalRecords, setMedicalRecords] = useState([])

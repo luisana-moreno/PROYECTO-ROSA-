@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'node:path'
 import autoprefixer from 'autoprefixer'
+import mkcert from 'vite-plugin-mkcert'
 
 export default defineConfig(() => {
   return {
@@ -29,7 +30,7 @@ export default defineConfig(() => {
         },
       },
     },
-    plugins: [react()],
+    plugins: [react(), mkcert()],
     resolve: {
       alias: [
         {
@@ -41,6 +42,7 @@ export default defineConfig(() => {
     },
     server: {
       port: 3000,
+      host: true,
       proxy: {
         // https://vitejs.dev/config/server-options.html
       },

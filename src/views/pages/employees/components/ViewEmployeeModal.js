@@ -1,4 +1,5 @@
 'use client'
+import { useState } from 'react'
 import {
   CButton,
   CModal,
@@ -13,15 +14,64 @@ import {
   CBadge,
   CListGroup,
   CListGroupItem,
+  CSpinner,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilUser, cilPhone, cilLocationPin, cilCalendar, cilBriefcase } from '@coreui/icons'
+import {
+  cilUser,
+  cilPhone,
+  cilLocationPin,
+  cilCalendar,
+  cilBriefcase,
+  cilCloudDownload,
+} from '@coreui/icons'
 import { formatDateToDDMMYYYY } from '../../../../utils/dateFormatter'
 
 const ViewEmployeeModal = ({ viewVisible, setViewVisible, currentEmployee }) => {
+  const [generating, setGenerating] = useState(false)
+
   if (!currentEmployee) return null
+  console.log(currentEmployee)
 
   const fullName = `${currentEmployee.ttrNombrel} ${currentEmployee.ttrApellid}`.toUpperCase()
+
+  const handleGenerateBadge = async () => {
+    setGenerating(true)
+    try {
+      // Llamar al endpoint del backend
+      const response = await fetch(
+        `http://localhost:5000/api/empleados/${currentEmployee.id}/generate-badge`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/pdf',
+          },
+        },
+      )
+
+      if (!response.ok) {
+        throw new Error('Error al generar carnet')
+      }
+
+      // Descargar el PDF
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `carnet-${currentEmployee.ttrDocumen}.pdf`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+
+      console.log('Carnet generado exitosamente')
+    } catch (error) {
+      console.error('Error al generar carnet:', error)
+      alert('Error al generar el carnet. Por favor, intenta nuevamente.')
+    } finally {
+      setGenerating(false)
+    }
+  }
 
   return (
     <CModal
@@ -151,6 +201,19 @@ const ViewEmployeeModal = ({ viewVisible, setViewVisible, currentEmployee }) => 
       </CModalBody>
 
       <CModalFooter className="border-top bg-light">
+        <CButton color="primary" onClick={handleGenerateBadge} disabled={generating}>
+          {generating ? (
+            <>
+              <CSpinner size="sm" className="me-2" />
+              Generando...
+            </>
+          ) : (
+            <>
+              <CIcon icon={cilCloudDownload} className="me-2" />
+              Generar Carnet
+            </>
+          )}
+        </CButton>
         <CButton color="secondary" onClick={() => setViewVisible(false)}>
           Cerrar
         </CButton>
