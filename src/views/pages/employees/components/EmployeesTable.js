@@ -9,8 +9,12 @@ import {
   CTableRow,
   CPagination,
   CPaginationItem,
+  CBadge,
+  CAlert,
 } from '@coreui/react'
-import { formatDateToDDMMYYYY } from 'src/utils/dateFormatter' // Importa la función de formato
+import CIcon from '@coreui/icons-react'
+import { cilPencil, cilTrash } from '@coreui/icons'
+import { formatDateToDDMMYYYY } from 'src/utils/dateFormatter'
 
 const EmployeesTable = ({
   employees,
@@ -23,89 +27,116 @@ const EmployeesTable = ({
   currentPage,
   paginate,
 }) => {
-  console.log(employees)
+  // Función para obtener el color del badge según el cargo
+  const getPositionBadgeColor = (positionName) => {
+    const positionColors = {
+      gerente: 'danger',
+      veterinario: 'success',
+      trabajador: 'info',
+      supervisor: 'warning',
+      administrador: 'primary',
+    }
+    return positionColors[positionName?.toLowerCase()] || 'secondary'
+  }
+
   return (
     <>
-      <CTable hover responsive className="shadow-sm">
-        <CTableHead className="table-header-custom">
+      <CTable striped hover responsive>
+        <CTableHead>
           <CTableRow>
-            <CTableHeaderCell className="text-green">N°</CTableHeaderCell>
-            <CTableHeaderCell className="text-green">Nombre Completo</CTableHeaderCell>
-            <CTableHeaderCell className="text-green">Cargo</CTableHeaderCell>
-            <CTableHeaderCell className="text-green">Fecha de Contrato</CTableHeaderCell>
-            <CTableHeaderCell className="text-green">Teléfono</CTableHeaderCell>
-            <CTableHeaderCell className="text-green">Acciones</CTableHeaderCell>
+            <CTableHeaderCell>N°</CTableHeaderCell>
+            <CTableHeaderCell>Nombre Completo</CTableHeaderCell>
+            <CTableHeaderCell>Cargo</CTableHeaderCell>
+            <CTableHeaderCell>Fecha de Contrato</CTableHeaderCell>
+            <CTableHeaderCell>Teléfono</CTableHeaderCell>
+            <CTableHeaderCell>Acciones</CTableHeaderCell>
           </CTableRow>
         </CTableHead>
         <CTableBody>
           {employees.map((employee, index) => (
-            <CTableRow key={employee.ttr_idemplo || index}>
+            <CTableRow key={employee.ttr_idemplo || employee.id || index}>
               <CTableDataCell>{indexOfFirstEmployee + index + 1}</CTableDataCell>
               <CTableDataCell>
-                {`${employee?.ttrNombrel || ''} ${employee?.ttrApellid || ''}`}
+                <strong>{`${employee?.ttrNombrel || ''} ${employee?.ttrApellid || ''}`}</strong>
               </CTableDataCell>
-              <CTableDataCell>{employee?.cargoNombre || ''}</CTableDataCell>
-              <CTableDataCell>{formatDateToDDMMYYYY(employee?.ttrFeccont)}</CTableDataCell>
-              <CTableDataCell>{employee?.ttrTelefon || ''}</CTableDataCell>
               <CTableDataCell>
-                <div className="d-flex">
-                  <CButton
-                    className="me-2 mb-2"
-                    size="sm"
-                    color="info"
-                    variant="outline"
-                    onClick={() => {
-                      setCurrentEmployee(employee)
-                      setViewVisible(true)
-                    }}
-                  >
-                    Visualizar
-                  </CButton>
-                  <CButton
-                    className="me-2 mb-2"
-                    size="sm"
-                    color="info"
-                    variant="outline"
-                    onClick={() => {
-                      setCurrentEmployee(employee)
-                      setEditVisible(true)
-                    }}
-                  >
-                    Editar
-                  </CButton>
-                  <CButton
-                    className="me-2 mb-2"
-                    size="sm"
-                    color="danger"
-                    variant="outline"
-                    onClick={() => {
-                      setCurrentEmployee(employee)
-                      setDeleteVisible(true)
-                    }}
-                  >
-                    Eliminar
-                  </CButton>
-                </div>
+                <CBadge color={getPositionBadgeColor(employee?.cargoNombre)}>
+                  {employee?.cargoNombre || 'Sin cargo'}
+                </CBadge>
+              </CTableDataCell>
+              <CTableDataCell>{formatDateToDDMMYYYY(employee?.ttrFeccont)}</CTableDataCell>
+              <CTableDataCell>{employee?.ttrTelefon || '-'}</CTableDataCell>
+              <CTableDataCell>
+                <CButton
+                  color="info"
+                  size="sm"
+                  className="me-2"
+                  onClick={() => {
+                    setCurrentEmployee(employee)
+                    setViewVisible(true)
+                  }}
+                >
+                  <CIcon icon={'cilEye'} size="sm" className="me-1" />
+                  Ver
+                </CButton>
+                <CButton
+                  color="warning"
+                  size="sm"
+                  className="me-2"
+                  onClick={() => {
+                    setCurrentEmployee(employee)
+                    setEditVisible(true)
+                  }}
+                >
+                  <CIcon icon={cilPencil} size="sm" className="me-1" />
+                  Editar
+                </CButton>
+                <CButton
+                  color="danger"
+                  size="sm"
+                  onClick={() => {
+                    setCurrentEmployee(employee)
+                    setDeleteVisible(true)
+                  }}
+                >
+                  <CIcon icon={cilTrash} size="sm" className="me-1" />
+                  Eliminar
+                </CButton>
               </CTableDataCell>
             </CTableRow>
           ))}
         </CTableBody>
       </CTable>
-      <CPagination
-        align="center"
-        aria-label="Page navigation example"
-        className="custom-pagination"
-      >
-        {Array.from({ length: Math.ceil(employees.length / employeesPerPage) }, (_, i) => (
-          <CPaginationItem
-            key={i + 1}
-            active={i + 1 === currentPage}
-            onClick={() => paginate(i + 1)}
-          >
-            {i + 1}
-          </CPaginationItem>
-        ))}
-      </CPagination>
+
+      {employees.length === 0 && (
+        <CAlert color="info">No hay empleados registrados en el sistema.</CAlert>
+      )}
+
+      {/* Paginación */}
+      {employees.length > employeesPerPage && (
+        <div className="d-flex justify-content-center mt-3">
+          <CPagination aria-label="Navegación de empleados">
+            <CPaginationItem disabled={currentPage === 1} onClick={() => paginate(currentPage - 1)}>
+              Anterior
+            </CPaginationItem>
+            {Array.from({ length: Math.ceil(employees.length / employeesPerPage) }, (_, i) => (
+              <CPaginationItem
+                key={i + 1}
+                active={i + 1 === currentPage}
+                onClick={() => paginate(i + 1)}
+              >
+                {i + 1}
+              </CPaginationItem>
+            ))}
+            <CPaginationItem
+              disabled={currentPage === Math.ceil(employees.length / employeesPerPage)}
+              onClick={() => paginate(currentPage + 1)}
+            >
+              Siguiente
+            </CPaginationItem>
+          </CPagination>
+        </div>
+      )}
     </>
   )
 }

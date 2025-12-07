@@ -18,6 +18,7 @@ import {
   cilRain,
   cilGraph,
   cilSettings, // Añadido para el módulo de configuración
+  cilMedicalCross, // Añadido para Control de Sanidad
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -100,11 +101,48 @@ const _nav = [
         roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
       },
       {
-        component: CNavItem,
-        name: 'Registro de Vacunas',
-        to: '/vaccination',
-        icon: <CIcon icon={cilCalendar} customClassName="nav-icon" />,
+        component: CNavGroup,
+        name: 'Control de Sanidad',
+        icon: <CIcon icon={cilMedicalCross} customClassName="nav-icon" />,
         roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
+        items: [
+          {
+            component: CNavItem,
+            name: 'Dashboard',
+            to: '/sanidad/dashboard',
+            roles: [1, 2],
+          },
+          {
+            component: CNavItem,
+            name: 'Vacunaciones',
+            to: '/sanidad/vacunaciones',
+            roles: [1, 2],
+          },
+          {
+            component: CNavItem,
+            name: 'Gestión de Preñez',
+            to: '/sanidad/prenez',
+            roles: [1, 2],
+          },
+          {
+            component: CNavItem,
+            name: 'Visitas Veterinarias',
+            to: '/sanidad/visitas-veterinarias',
+            roles: [1, 2],
+          },
+          {
+            component: CNavItem,
+            name: 'Planes de Vacunación',
+            to: '/sanidad/planes-vacunacion',
+            roles: [1, 2],
+          },
+          {
+            component: CNavItem,
+            name: 'Reportes',
+            to: '/sanidad/reportes',
+            roles: [1, 2],
+          },
+        ],
       },
       {
         component: CNavItem,

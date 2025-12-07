@@ -7,7 +7,10 @@ import {
   CModalFooter,
   CModalHeader,
   CModalTitle,
+  CAlert,
 } from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilWarning, cilTrash } from '@coreui/icons'
 
 const DeleteUserModal = ({
   deleteVisible,
@@ -16,31 +19,44 @@ const DeleteUserModal = ({
   setDeleteConfirmation,
   handleDeleteUser,
 }) => {
+  const handleClose = () => {
+    setDeleteVisible(false)
+    setDeleteConfirmation('')
+  }
+
   return (
-    <CModal
-      visible={deleteVisible}
-      onClose={() => setDeleteVisible(false)}
-      className="modern-modal"
-      backdrop="static"
-    >
-      <CModalHeader className="modern-modal-header">
-        <CModalTitle className="modern-modal-title">Eliminar Usuario</CModalTitle>
+    <CModal visible={deleteVisible} onClose={handleClose} backdrop="static" alignment="center">
+      <CModalHeader>
+        <CModalTitle>
+          <CIcon icon={cilWarning} className="me-2" style={{ color: '#dc3545' }} />
+          Eliminar Usuario
+        </CModalTitle>
       </CModalHeader>
-      <CModalBody className="modern-modal-body">
-        <h6>Por favor escriba "confirmar" para eliminar el usuario</h6>
+      <CModalBody>
+        <CAlert color="danger">
+          <strong>¡Advertencia!</strong> Esta acción no se puede deshacer.
+        </CAlert>
+        <p className="mb-3">
+          Por favor escriba <strong>"confirmar"</strong> para eliminar el usuario
+        </p>
         <CFormInput
-          placeholder="confirmar"
-          className="modal-border"
+          placeholder="Escriba: confirmar"
           value={deleteConfirmation}
           onChange={(e) => setDeleteConfirmation(e.target.value)}
+          autoFocus
         />
       </CModalBody>
-      <CModalFooter className="modern-modal-footer">
-        <CButton className="button-no-hover green" onClick={() => setDeleteVisible(false)}>
-          <h6 className="typography-color">Cancelar</h6>
+      <CModalFooter>
+        <CButton color="secondary" onClick={handleClose}>
+          Cancelar
         </CButton>
-        <CButton className="button-no-hover-green" onClick={handleDeleteUser}>
-          <h6 className="typography-color">Eliminar</h6>
+        <CButton
+          color="danger"
+          onClick={handleDeleteUser}
+          disabled={deleteConfirmation.toLowerCase() !== 'confirmar'}
+        >
+          <CIcon icon={cilTrash} className="me-2" />
+          Eliminar Usuario
         </CButton>
       </CModalFooter>
     </CModal>

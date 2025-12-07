@@ -1,5 +1,15 @@
 import React from 'react'
-import { CButton, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle } from '@coreui/react'
+import {
+  CButton,
+  CModal,
+  CModalBody,
+  CModalFooter,
+  CModalHeader,
+  CModalTitle,
+  CForm,
+} from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilSave } from '@coreui/icons'
 import EditUserForm from './EditUserForm'
 import { toast } from 'react-toastify'
 
@@ -9,7 +19,7 @@ const EditUserModal = ({
   currentUser,
   setCurrentUser,
   handleEditUser,
-  roles, // Aceptar roles como prop
+  roles,
 }) => {
   const validateForm = () => {
     if (
@@ -39,7 +49,7 @@ const EditUserModal = ({
       toast.error('El teléfono debe tener exactamente 11 dígitos.')
       return false
     }
-    // La contraseña es opcional en edición, solo validar si se proporciona
+    // La contraseña es opcional en edición
     if (currentUser.contrasena && currentUser.contrasena.length > 255) {
       toast.error('La contraseña no puede exceder los 255 caracteres.')
       return false
@@ -48,7 +58,8 @@ const EditUserModal = ({
     return true
   }
 
-  const handleEditUserWithValidation = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault()
     if (validateForm()) {
       handleEditUser()
     }
@@ -60,23 +71,26 @@ const EditUserModal = ({
       scrollable
       visible={editVisible}
       onClose={() => setEditVisible(false)}
-      className="modern-modal"
       backdrop="static"
+      size="lg"
     >
-      <CModalHeader className="modern-modal-header">
-        <CModalTitle className="modern-modal-title">Editar Usuario</CModalTitle>
+      <CModalHeader>
+        <CModalTitle>Editar Usuario</CModalTitle>
       </CModalHeader>
-      <CModalBody className="modern-modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-        <EditUserForm currentUser={currentUser} setCurrentUser={setCurrentUser} roles={roles} />
-      </CModalBody>
-      <CModalFooter className="modern-modal-footer">
-        <CButton
-          className="button-no-hover-green text-white"
-          onClick={handleEditUserWithValidation}
-        >
-          Guardar cambios
-        </CButton>
-      </CModalFooter>
+      <CForm onSubmit={handleSubmit}>
+        <CModalBody style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+          <EditUserForm currentUser={currentUser} setCurrentUser={setCurrentUser} roles={roles} />
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setEditVisible(false)}>
+            Cancelar
+          </CButton>
+          <CButton color="success" type="submit">
+            <CIcon icon={cilSave} className="me-2" />
+            Guardar Cambios
+          </CButton>
+        </CModalFooter>
+      </CForm>
     </CModal>
   )
 }

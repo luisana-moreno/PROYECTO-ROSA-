@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
   CButton,
   CCol,
   CFormInput,
+  CFormLabel,
   CRow,
   CFormSelect,
   CModal,
@@ -10,7 +11,11 @@ import {
   CModalBody,
   CModalFooter,
   CModalTitle,
+  CForm,
+  CAlert,
 } from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilSave } from '@coreui/icons'
 import { toast } from 'react-toastify'
 import { employeeService } from '../../../../api/employeeService'
 
@@ -23,7 +28,6 @@ const AddEmployeeModal = ({
   positions,
 }) => {
   const today = new Date().toISOString().split('T')[0]
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [idExists, setIdExists] = useState(false)
   const [isVerifying, setIsVerifying] = useState(false)
 
@@ -66,12 +70,14 @@ const AddEmployeeModal = ({
     }
   }
 
-  const handleAddEmployeeWithValidation = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault()
     handleAddEmployee()
   }
 
-  const handleCloseModal = () => {
+  const handleClose = () => {
     setVisible(false)
+    setIdExists(false)
   }
 
   return (
@@ -79,150 +85,160 @@ const AddEmployeeModal = ({
       alignment="center"
       scrollable
       visible={visible}
-      onClose={handleCloseModal}
-      className="modern-modal"
+      onClose={handleClose}
       backdrop="static"
+      size="lg"
     >
-      <CModalHeader className="modern-modal-header">
-        <CModalTitle className="modern-modal-title">Registro de Empleados</CModalTitle>
+      <CModalHeader>
+        <CModalTitle>Nuevo Empleado</CModalTitle>
       </CModalHeader>
+      <CForm onSubmit={handleSubmit}>
+        <CModalBody style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+          <CAlert color="info" className="mb-4">
+            <strong>Información:</strong> Complete todos los campos para registrar un nuevo
+            empleado.
+          </CAlert>
 
-      <CModalBody className="modern-modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-        <CRow className="g-3 mt-2">
-          <h4 className="text-green mt-1 me-5">Datos Personales del empleado</h4>
+          {/* Documento */}
+          <CRow className="mb-3">
+            <CCol md={12}>
+              <CFormLabel>Número de Documento *</CFormLabel>
+              <CFormInput
+                placeholder="Ingrese el número de documento"
+                name="ttrDocumen"
+                value={addEmployee.ttrDocumen}
+                onChange={handleDocumentChange}
+                onBlur={handleIdBlur}
+                maxLength={8}
+                required
+              />
+              <small className="text-muted">Máximo 8 dígitos</small>
+              {isVerifying && <small className="text-info d-block">Verificando documento...</small>}
+              {idExists && (
+                <small className="text-danger d-block">Este documento ya está registrado</small>
+              )}
+            </CCol>
+          </CRow>
 
-          <CCol md={12}>
-            <CFormInput
-              className="modal-name custom-select"
-              placeholder="Numero de documento"
-              aria-label="Numero de documento"
-              name="ttrDocumen"
-              value={addEmployee.ttrDocumen}
-              onChange={handleDocumentChange}
-              onBlur={handleIdBlur}
-              maxLength={8}
-            />
-            <small className="text-muted">Ingrese el numero de documento.</small>
-          </CCol>
+          {/* Nombre y Apellido */}
+          <CRow className="mb-3">
+            <CCol md={6}>
+              <CFormLabel>Nombre *</CFormLabel>
+              <CFormInput
+                placeholder="Ingrese el nombre"
+                name="ttrNombrel"
+                value={addEmployee.ttrNombrel}
+                onChange={handleChange}
+                maxLength={100}
+                disabled={idExists || !addEmployee.ttrDocumen}
+                required
+              />
+              <small className="text-muted">Máximo 100 caracteres</small>
+            </CCol>
+            <CCol md={6}>
+              <CFormLabel>Apellido *</CFormLabel>
+              <CFormInput
+                placeholder="Ingrese el apellido"
+                name="ttrApellid"
+                value={addEmployee.ttrApellid}
+                onChange={handleChange}
+                maxLength={100}
+                disabled={idExists || !addEmployee.ttrDocumen}
+                required
+              />
+              <small className="text-muted">Máximo 100 caracteres</small>
+            </CCol>
+          </CRow>
 
-          <CCol md={6}>
-            <CFormInput
-              className="modal-name custom-select"
-              placeholder="Nombre"
-              aria-label="Nombre"
-              name="ttrNombrel"
-              value={addEmployee.ttrNombrel}
-              onChange={handleChange}
-              maxLength={100}
-              disabled={idExists || !addEmployee.ttrDocumen}
-            />
-            <small className="text-muted">Ingrese el nombre.</small>
-          </CCol>
+          {/* Fecha de Nacimiento y Teléfono */}
+          <CRow className="mb-3">
+            <CCol md={6}>
+              <CFormLabel>Fecha de Nacimiento *</CFormLabel>
+              <CFormInput
+                type="date"
+                name="ttrFecnaci"
+                value={addEmployee.ttrFecnaci}
+                onChange={handleChange}
+                max={today}
+                disabled={idExists || !addEmployee.ttrDocumen}
+                required
+              />
+            </CCol>
+            <CCol md={6}>
+              <CFormLabel>Teléfono *</CFormLabel>
+              <CFormInput
+                placeholder="04121234567"
+                name="ttrTelefon"
+                value={addEmployee.ttrTelefon}
+                onChange={handlePhoneChange}
+                maxLength={11}
+                disabled={idExists || !addEmployee.ttrDocumen}
+                required
+              />
+              <small className="text-muted">Máximo 11 dígitos</small>
+            </CCol>
+          </CRow>
 
-          <CCol md={6}>
-            <CFormInput
-              className="modal-name custom-select"
-              placeholder="Apellido"
-              aria-label="Apellido"
-              name="ttrApellid"
-              value={addEmployee.ttrApellid}
-              onChange={handleChange}
-              maxLength={100}
-              disabled={idExists || !addEmployee.ttrDocumen}
-            />
-            <small className="text-muted">Ingrese el apellido.</small>
-          </CCol>
-        </CRow>
-        <CRow className="g-3 mt-2">
-          <CCol md={6}>
-            <CFormInput
-              className="modal-name custom-select"
-              type="date"
-              aria-label="Fecha de nacimiento"
-              placeholder="Fecha de nacimiento"
-              name="ttrFecnaci"
-              value={addEmployee.ttrFecnaci}
-              onChange={handleChange}
-              max={today}
-              disabled={idExists || !addEmployee.ttrDocumen}
-            />
-            <small className="text-muted">Ingrese la fecha de nacimiento.</small>
-          </CCol>
-          <CCol md={6}>
-            <CFormInput
-              className="modal-name custom-select"
-              placeholder="Telefono"
-              aria-label="Telefono"
-              name="ttrTelefon"
-              value={addEmployee.ttrTelefon}
-              onChange={handlePhoneChange}
-              maxLength={11}
-              disabled={idExists || !addEmployee.ttrDocumen}
-            />
-            <small className="text-muted">Ingrese el numero de Telefono.</small>
-          </CCol>
-        </CRow>
-        <CRow className="g-3 mt-2">
-          <CCol md={6}>
-            <CFormInput
-              className="modal-name custom-select"
-              placeholder="Direccion"
-              aria-label="Direccion"
-              name="ttrDirecci"
-              value={addEmployee.ttrDirecci}
-              onChange={handleChange}
-              maxLength={255}
-              disabled={idExists || !addEmployee.ttrDocumen}
-            />
-            <small className="text-muted">Ingrese la Direccion.</small>
-          </CCol>
+          {/* Dirección y Fecha de Contrato */}
+          <CRow className="mb-3">
+            <CCol md={6}>
+              <CFormLabel>Dirección *</CFormLabel>
+              <CFormInput
+                placeholder="Ingrese la dirección"
+                name="ttrDirecci"
+                value={addEmployee.ttrDirecci}
+                onChange={handleChange}
+                maxLength={255}
+                disabled={idExists || !addEmployee.ttrDocumen}
+                required
+              />
+              <small className="text-muted">Máximo 255 caracteres</small>
+            </CCol>
+            <CCol md={6}>
+              <CFormLabel>Fecha de Contrato *</CFormLabel>
+              <CFormInput
+                type="date"
+                name="ttrFeccont"
+                value={addEmployee.ttrFeccont}
+                onChange={handleChange}
+                max={today}
+                disabled={idExists || !addEmployee.ttrDocumen}
+                required
+              />
+            </CCol>
+          </CRow>
 
-          <CCol md={6}>
-            <CFormInput
-              className="modal-name custom-select"
-              type="date"
-              placeholder="Fecha de Contrato"
-              aria-label="Fecha de Contrato"
-              name="ttrFeccont"
-              value={addEmployee.ttrFeccont}
-              onChange={handleChange}
-              max={today}
-              disabled={idExists || !addEmployee.ttrDocumen}
-            />
-            <small className="text-muted">Ingrese la fecha de Contrato.</small>
-          </CCol>
-
-          <CCol md={6}>
-            <CFormSelect
-              className="modal-name custom-select"
-              aria-label="Cargo"
-              name="ttrIdcargp"
-              value={addEmployee.ttrIdcargp}
-              onChange={handlePositionChange}
-              disabled={idExists || !addEmployee.ttrDocumen}
-            >
-              <option key="default-position-add" value="">
-                Seleccione el cargo
-              </option>
-              {positions.map((pos) => (
-                <option key={pos.id} value={pos.id}>
-                  {pos.nombre}
-                </option>
-              ))}
-            </CFormSelect>
-            <small className="text-muted">Ingrese el cargo.</small>
-          </CCol>
-        </CRow>
-      </CModalBody>
-
-      <CModalFooter className="modern-modal-footer">
-        <CButton
-          className="button-no-hover-green text-white"
-          onClick={handleAddEmployeeWithValidation}
-        >
-          Agregar
-        </CButton>
-      </CModalFooter>
+          {/* Cargo */}
+          <CRow className="mb-3">
+            <CCol md={6}>
+              <CFormLabel>Cargo *</CFormLabel>
+              <CFormSelect
+                name="ttrIdcargp"
+                value={addEmployee.ttrIdcargp}
+                onChange={handlePositionChange}
+                disabled={idExists || !addEmployee.ttrDocumen}
+                required
+              >
+                <option value="">Seleccione el cargo</option>
+                {positions.map((pos) => (
+                  <option key={pos.id} value={pos.id}>
+                    {pos.nombre}
+                  </option>
+                ))}
+              </CFormSelect>
+            </CCol>
+          </CRow>
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={handleClose}>
+            Cancelar
+          </CButton>
+          <CButton color="success" type="submit" disabled={idExists}>
+            <CIcon icon={cilSave} className="me-2" />
+            Guardar Empleado
+          </CButton>
+        </CModalFooter>
+      </CForm>
     </CModal>
   )
 }

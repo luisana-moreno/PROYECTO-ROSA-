@@ -1,16 +1,14 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
-import { cilPlus } from '@coreui/icons'
-import { CCard, CButton, CCardBody, CCardHeader } from '@coreui/react'
-// import { ToastContainer, toast } from 'react-toastify' // Eliminado
-// import 'react-toastify/dist/ReactToastify.css' // Eliminado
+import { cilPlus, cilUser } from '@coreui/icons'
+import { CCard, CButton, CCardBody, CCardHeader, CRow, CCol } from '@coreui/react'
 
 import { useUsers } from './hooks/useUsers'
 import UsersTable from './components/UsersTable'
 import AddUserModal from './components/AddUserModal'
 import EditUserModal from './components/EditUserModal'
 import DeleteUserModal from './components/DeleteUserModal'
-import UserFilters from './components/UserFilters' // Importar el nuevo componente de filtros
+import UserFilters from './components/UserFilters'
 
 const Users = () => {
   const {
@@ -30,50 +28,77 @@ const Users = () => {
     handleAddUser,
     handleEditUser,
     handleDeleteUser,
-    roles, // Obtener roles del hook
-    searchTerm, // Nuevo estado de búsqueda
-    setSearchTerm, // Nuevo setter de búsqueda
-    filterRole, // Nuevo estado de filtro por rol
-    setFilterRole, // Nuevo setter de filtro por rol
-    filteredUsers, // Usuarios filtrados
+    roles,
+    searchTerm,
+    setSearchTerm,
+    filterRole,
+    setFilterRole,
+    filteredUsers,
   } = useUsers()
 
   return (
-    <CCard>
-      <CCardHeader>
-        <h4 className="typography-color-title mb-0 d-flex justify-content-between align-items-center">
-          Gestion de Usuarios
-          <CButton
-            className="button-no-hover-green text-white"
-            onClick={() => setVisible(!visible)}
-          >
-            <CIcon icon={cilPlus} className="me-2" />
-            Agregar Usuario
-          </CButton>
-        </h4>
-        <UserFilters
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          filterRole={filterRole}
-          setFilterRole={setFilterRole}
-          roles={roles}
-        />
-      </CCardHeader>
-      <CCardBody>
-        <UsersTable
-          users={filteredUsers}
-          setCurrentUser={setCurrentUser}
-          setEditVisible={setEditVisible}
-          setDeleteVisible={setDeleteVisible}
-        />
-      </CCardBody>
+    <>
+      {/* Header Card con descripción */}
+      <CRow>
+        <CCol xs={12}>
+          <CCard className="mb-4">
+            <CCardHeader>
+              <div className="d-flex align-items-center">
+                <CIcon icon={cilUser} className="me-2" size="lg" style={{ color: '#28a745' }} />
+                <strong>Gestión de Usuarios</strong>
+              </div>
+            </CCardHeader>
+            <CCardBody>
+              <p className="text-medium-emphasis mb-0">
+                Administra los usuarios del sistema. Crea, edita y elimina cuentas de usuario,
+                asigna roles y controla el acceso a diferentes módulos de la aplicación.
+              </p>
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+
+      {/* Contenido Principal */}
+      <CRow>
+        <CCol xs={12}>
+          <CCard className="mb-4">
+            <CCardHeader className="d-flex justify-content-between align-items-center">
+              <strong>Lista de Usuarios</strong>
+              <CButton color="success" onClick={() => setVisible(!visible)}>
+                <CIcon icon={cilPlus} className="me-2" />
+                Nuevo Usuario
+              </CButton>
+            </CCardHeader>
+            <CCardBody>
+              {/* Filtros de búsqueda */}
+              <UserFilters
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                filterRole={filterRole}
+                setFilterRole={setFilterRole}
+                roles={roles}
+              />
+
+              {/* Tabla de usuarios */}
+              <UsersTable
+                users={filteredUsers}
+                setCurrentUser={setCurrentUser}
+                setEditVisible={setEditVisible}
+                setDeleteVisible={setDeleteVisible}
+              />
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+
+      {/* Modales */}
       <AddUserModal
         visible={visible}
         setVisible={setVisible}
         addUserForm={addUserForm}
         setAddUserForm={setAddUserForm}
         handleAddUser={handleAddUser}
-        roles={roles} // Pasar roles al modal de agregar
+        roles={roles}
       />
       <EditUserModal
         editVisible={editVisible}
@@ -81,7 +106,7 @@ const Users = () => {
         currentUser={currentUser}
         setCurrentUser={setCurrentUser}
         handleEditUser={handleEditUser}
-        roles={roles} // Pasar roles al modal de editar
+        roles={roles}
       />
       <DeleteUserModal
         deleteVisible={deleteVisible}
@@ -90,8 +115,7 @@ const Users = () => {
         setDeleteConfirmation={setDeleteConfirmation}
         handleDeleteUser={handleDeleteUser}
       />
-      {/* <ToastContainer /> Eliminado porque ya está en App.js */}
-    </CCard>
+    </>
   )
 }
 

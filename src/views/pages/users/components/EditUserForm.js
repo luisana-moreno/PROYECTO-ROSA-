@@ -1,96 +1,103 @@
 import React from 'react'
-import { CCol, CFormInput, CFormSelect, CRow } from '@coreui/react'
+import { CCol, CFormInput, CFormSelect, CFormLabel, CRow, CAlert } from '@coreui/react'
 
 const EditUserForm = ({ currentUser, setCurrentUser, roles }) => {
   return (
     <div>
-      <CRow className="g-3 mt-2">
-        <h4 className="text-green mt-1 me-5">Editar Datos del Usuario</h4>
+      <CAlert color="warning" className="mb-4">
+        <strong>Nota:</strong> La contraseña solo se actualizará si ingresa una nueva. Déjela en
+        blanco para mantener la actual.
+      </CAlert>
+
+      <CRow className="mb-3">
         <CCol md={6}>
+          <CFormLabel>Nombre *</CFormLabel>
           <CFormInput
-            className="modal-name custom-select"
-            placeholder="Nombre"
-            aria-label="Nombre"
+            placeholder="Ingrese el nombre"
             value={currentUser?.nombre || ''}
             onChange={(e) => setCurrentUser({ ...currentUser, nombre: e.target.value })}
             maxLength={100}
+            required
           />
-          <small className="text-muted">Ingrese el primer nombre.</small>
+          <small className="text-muted">Máximo 100 caracteres</small>
         </CCol>
         <CCol md={6}>
+          <CFormLabel>Apellido *</CFormLabel>
           <CFormInput
-            className="modal-name custom-select"
-            placeholder="Apellido"
-            aria-label="Apellido"
+            placeholder="Ingrese el apellido"
             value={currentUser?.apellido || ''}
             onChange={(e) => setCurrentUser({ ...currentUser, apellido: e.target.value })}
             maxLength={100}
+            required
           />
-          <small className="text-muted">Ingrese el segundo nombre.</small>
+          <small className="text-muted">Máximo 100 caracteres</small>
         </CCol>
-        <CRow className="users-las-name g-3 mt-2">
-          <CCol md={6}>
-            <CFormInput
-              className="modal-name custom-select"
-              placeholder="Correo"
-              aria-label="Correo"
-              value={currentUser?.correo || ''}
-              onChange={(e) => setCurrentUser({ ...currentUser, correo: e.target.value })}
-              maxLength={100}
-            />
-            <small className="text-muted">Ingrese el correo.</small>
-          </CCol>
-          <CCol md={6}>
-            <CFormInput
-              className="modal-name custom-select"
-              type="tel"
-              placeholder="Telefono"
-              aria-label="Telefono"
-              value={currentUser?.telefono || ''}
-              onChange={(e) => {
-                const value = e.target.value
-                if (value.length <= 11 && /^\d*$/.test(value)) {
-                  setCurrentUser({ ...currentUser, telefono: value })
-                }
-              }}
-              maxLength="11"
-              pattern="[0-9]{11}"
-              required
-            />
-            {currentUser?.telefono && currentUser.telefono.length !== 11 && (
-              <small className="text-danger">El teléfono debe tener exactamente 11 dígitos.</small>
-            )}
-            <small className="text-muted">Ingrese el telefono (11 dígitos).</small>
-          </CCol>
-        </CRow>
       </CRow>
-      <CRow className="g-3 mt-2">
+
+      <CRow className="mb-3">
         <CCol md={6}>
+          <CFormLabel>Correo Electrónico *</CFormLabel>
+          <CFormInput
+            type="email"
+            placeholder="ejemplo@correo.com"
+            value={currentUser?.correo || ''}
+            onChange={(e) => setCurrentUser({ ...currentUser, correo: e.target.value })}
+            maxLength={100}
+            required
+          />
+          <small className="text-muted">Máximo 100 caracteres</small>
+        </CCol>
+        <CCol md={6}>
+          <CFormLabel>Teléfono *</CFormLabel>
+          <CFormInput
+            type="tel"
+            placeholder="04121234567"
+            value={currentUser?.telefono || ''}
+            onChange={(e) => {
+              const value = e.target.value
+              if (value.length <= 11 && /^\d*$/.test(value)) {
+                setCurrentUser({ ...currentUser, telefono: value })
+              }
+            }}
+            maxLength="11"
+            pattern="[0-9]{11}"
+            required
+          />
+          {currentUser?.telefono && currentUser.telefono.length !== 11 && (
+            <small className="text-danger">El teléfono debe tener exactamente 11 dígitos</small>
+          )}
+          {(!currentUser?.telefono || currentUser.telefono.length === 11) && (
+            <small className="text-muted">Debe tener exactamente 11 dígitos</small>
+          )}
+        </CCol>
+      </CRow>
+
+      <CRow className="mb-3">
+        <CCol md={6}>
+          <CFormLabel>Rol *</CFormLabel>
           <CFormSelect
-            className="modal-name custom-select"
-            aria-label="Cargo"
             value={currentUser?.idRol || ''}
             onChange={(e) => setCurrentUser({ ...currentUser, idRol: e.target.value })}
+            required
           >
-            <option value="">Seleccione un Cargo</option>
+            <option value="">Seleccione un rol</option>
             {roles.map((role) => (
               <option key={role.tma_idrolus} value={role.tma_idrolus}>
                 {role.tma_nomrolu}
               </option>
             ))}
           </CFormSelect>
-          <small className="text-muted">Seleccione el cargo.</small>
+          <small className="text-muted">Define los permisos del usuario</small>
         </CCol>
         <CCol md={6}>
+          <CFormLabel>Nueva Contraseña (opcional)</CFormLabel>
           <CFormInput
             type="password"
-            className="modal-name custom-select"
-            placeholder="Contraseña (opcional)"
-            aria-label="Contraseña"
+            placeholder="Dejar en blanco para no cambiar"
             onChange={(e) => setCurrentUser({ ...currentUser, contrasena: e.target.value })}
             maxLength={255}
           />
-          <small className="text-muted">Ingrese la nueva contraseña si desea cambiarla.</small>
+          <small className="text-muted">Solo si desea cambiarla</small>
         </CCol>
       </CRow>
     </div>

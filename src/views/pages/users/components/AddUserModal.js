@@ -1,7 +1,15 @@
 import React from 'react'
-import { CButton, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle } from '@coreui/react'
+import {
+  CButton,
+  CModal,
+  CModalBody,
+  CModalFooter,
+  CModalHeader,
+  CModalTitle,
+  CForm,
+} from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilPlus } from '@coreui/icons'
+import { cilSave } from '@coreui/icons'
 import AddUserForm from './AddUserForm'
 import { toast } from 'react-toastify'
 
@@ -35,7 +43,7 @@ const AddUserModal = ({
       return false
     }
     if (addUserForm.correo.length > 75) {
-      toast.error('El correo no puede exceder los 100 caracteres.')
+      toast.error('El correo no puede exceder los 75 caracteres.')
       return false
     }
     if (addUserForm.telefono.length !== 11) {
@@ -50,7 +58,8 @@ const AddUserModal = ({
     return true
   }
 
-  const handleAddUserWithValidation = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault()
     if (validateForm()) {
       handleAddUser()
     }
@@ -62,21 +71,26 @@ const AddUserModal = ({
       scrollable
       visible={visible}
       onClose={() => setVisible(false)}
-      className="modern-modal"
       backdrop="static"
+      size="lg"
     >
-      <CModalHeader className="modern-modal-header">
-        <CModalTitle className="modern-modal-title">Registro de Usuario</CModalTitle>
+      <CModalHeader>
+        <CModalTitle>Nuevo Usuario</CModalTitle>
       </CModalHeader>
-      <CModalBody className="modern-modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-        <AddUserForm addUserForm={addUserForm} setAddUserForm={setAddUserForm} roles={roles} />
-      </CModalBody>
-      <CModalFooter className="modern-modal-footer">
-        <CButton className="button-no-hover-green text-white" onClick={handleAddUserWithValidation}>
-          <CIcon icon={cilPlus} className="me-2" />
-          Agregar
-        </CButton>
-      </CModalFooter>
+      <CForm onSubmit={handleSubmit}>
+        <CModalBody style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+          <AddUserForm addUserForm={addUserForm} setAddUserForm={setAddUserForm} roles={roles} />
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setVisible(false)}>
+            Cancelar
+          </CButton>
+          <CButton color="success" type="submit">
+            <CIcon icon={cilSave} className="me-2" />
+            Guardar Usuario
+          </CButton>
+        </CModalFooter>
+      </CForm>
     </CModal>
   )
 }

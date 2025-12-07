@@ -1,7 +1,7 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
-import { cilPlus } from '@coreui/icons'
-import { CCard, CButton, CCardBody, CCardHeader } from '@coreui/react'
+import { cilPlus, cilPeople } from '@coreui/icons'
+import { CCard, CButton, CCardBody, CCardHeader, CRow, CCol } from '@coreui/react'
 
 import { useEmployees } from './hooks/useEmployees'
 import EmployeesTable from './components/EmployeesTable'
@@ -9,7 +9,7 @@ import AddEmployeeModal from './components/AddEmployeeModal'
 import EditEmployeeModal from './components/EditEmployeeModal'
 import DeleteEmployeeModal from './components/DeleteEmployeeModal'
 import ViewEmployeeModal from './components/ViewEmployeeModal'
-import EmployeeFilters from './components/EmployeeFilters' // Importar el nuevo componente de filtros
+import EmployeeFilters from './components/EmployeeFilters'
 
 const Employees = () => {
   const {
@@ -37,48 +37,75 @@ const Employees = () => {
     currentPage,
     paginate,
     positions,
-    searchTerm, // Nuevo estado de búsqueda
-    setSearchTerm, // Nuevo setter de búsqueda
-    filterPosition, // Nuevo estado de filtro por cargo
-    setFilterPosition, // Nuevo setter de filtro por cargo
-    filteredEmployees, // Empleados filtrados
-    originalEmployee, // Obtener el originalEmployee del hook
+    searchTerm,
+    setSearchTerm,
+    filterPosition,
+    setFilterPosition,
+    filteredEmployees,
+    originalEmployee,
   } = useEmployees()
 
   return (
-    <CCard>
-      <CCardHeader>
-        <h4 className="typography-color-title mb-0 d-flex justify-content-between align-items-center">
-          Gestion de Empleados
-          <CButton
-            className="button-no-hover-green text-white"
-            onClick={() => setVisible(!visible)}
-          >
-            <CIcon icon={cilPlus} className="me-2" />
-            Agregar Empleado
-          </CButton>
-        </h4>
-        <EmployeeFilters
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          filterPosition={filterPosition}
-          setFilterPosition={setFilterPosition}
-          positions={positions}
-        />
-      </CCardHeader>
-      <CCardBody>
-        <EmployeesTable
-          employees={filteredEmployees}
-          indexOfFirstEmployee={indexOfFirstEmployee}
-          setEditVisible={setEditVisible}
-          setDeleteVisible={setDeleteVisible}
-          setViewVisible={setViewVisible}
-          setCurrentEmployee={setCurrentEmployee}
-          employeesPerPage={employeesPerPage}
-          currentPage={currentPage}
-          paginate={paginate}
-        />
-      </CCardBody>
+    <>
+      {/* Header Card con descripción */}
+      <CRow>
+        <CCol xs={12}>
+          <CCard className="mb-4">
+            <CCardHeader>
+              <div className="d-flex align-items-center">
+                <CIcon icon={cilPeople} className="me-2" size="lg" style={{ color: '#28a745' }} />
+                <strong>Gestión de Empleados</strong>
+              </div>
+            </CCardHeader>
+            <CCardBody>
+              <p className="text-medium-emphasis mb-0">
+                Administra el personal de la finca. Registra empleados, asigna cargos, controla
+                asistencia y gestiona la información laboral del equipo de trabajo.
+              </p>
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+
+      {/* Contenido Principal */}
+      <CRow>
+        <CCol xs={12}>
+          <CCard className="mb-4">
+            <CCardHeader className="d-flex justify-content-between align-items-center">
+              <strong>Lista de Empleados</strong>
+              <CButton color="success" onClick={() => setVisible(!visible)}>
+                <CIcon icon={cilPlus} className="me-2" />
+                Nuevo Empleado
+              </CButton>
+            </CCardHeader>
+            <CCardBody>
+              {/* Filtros de búsqueda */}
+              <EmployeeFilters
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                filterPosition={filterPosition}
+                setFilterPosition={setFilterPosition}
+                positions={positions}
+              />
+
+              {/* Tabla de empleados */}
+              <EmployeesTable
+                employees={filteredEmployees}
+                indexOfFirstEmployee={indexOfFirstEmployee}
+                setEditVisible={setEditVisible}
+                setDeleteVisible={setDeleteVisible}
+                setViewVisible={setViewVisible}
+                setCurrentEmployee={setCurrentEmployee}
+                employeesPerPage={employeesPerPage}
+                currentPage={currentPage}
+                paginate={paginate}
+              />
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+
+      {/* Modales */}
       <AddEmployeeModal
         visible={visible}
         setVisible={setVisible}
@@ -108,7 +135,7 @@ const Employees = () => {
         setViewVisible={setViewVisible}
         currentEmployee={currentEmployee}
       />
-    </CCard>
+    </>
   )
 }
 

@@ -1,5 +1,4 @@
-'use client'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import {
   CButton,
   CModal,
@@ -7,13 +6,9 @@ import {
   CModalBody,
   CModalFooter,
   CModalTitle,
-  CCard,
-  CCardBody,
   CRow,
   CCol,
   CBadge,
-  CListGroup,
-  CListGroupItem,
   CSpinner,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
@@ -31,14 +26,12 @@ const ViewEmployeeModal = ({ viewVisible, setViewVisible, currentEmployee }) => 
   const [generating, setGenerating] = useState(false)
 
   if (!currentEmployee) return null
-  console.log(currentEmployee)
 
-  const fullName = `${currentEmployee.ttrNombrel} ${currentEmployee.ttrApellid}`.toUpperCase()
+  const fullName = `${currentEmployee.ttrNombrel} ${currentEmployee.ttrApellid}`
 
   const handleGenerateBadge = async () => {
     setGenerating(true)
     try {
-      // Llamar al endpoint del backend
       const response = await fetch(
         `http://localhost:5000/api/empleados/${currentEmployee.id}/generate-badge`,
         {
@@ -53,7 +46,6 @@ const ViewEmployeeModal = ({ viewVisible, setViewVisible, currentEmployee }) => 
         throw new Error('Error al generar carnet')
       }
 
-      // Descargar el PDF
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
@@ -63,8 +55,6 @@ const ViewEmployeeModal = ({ viewVisible, setViewVisible, currentEmployee }) => 
       link.click()
       document.body.removeChild(link)
       window.URL.revokeObjectURL(url)
-
-      console.log('Carnet generado exitosamente')
     } catch (error) {
       console.error('Error al generar carnet:', error)
       alert('Error al generar el carnet. Por favor, intenta nuevamente.')
@@ -72,6 +62,32 @@ const ViewEmployeeModal = ({ viewVisible, setViewVisible, currentEmployee }) => 
       setGenerating(false)
     }
   }
+
+  // Función para obtener el color del badge según el cargo
+  const getPositionBadgeColor = (positionName) => {
+    const positionColors = {
+      gerente: 'danger',
+      veterinario: 'success',
+      trabajador: 'info',
+      supervisor: 'warning',
+      administrador: 'primary',
+    }
+    return positionColors[positionName?.toLowerCase()] || 'secondary'
+  }
+
+  const InfoRow = ({ icon, label, value }) => (
+    <CRow className="mb-3 align-items-center">
+      <CCol xs={5} className="text-medium-emphasis">
+        <CIcon icon={icon} className="me-2" />
+        <small>
+          <strong>{label}</strong>
+        </small>
+      </CCol>
+      <CCol xs={7}>
+        <span>{value || '-'}</span>
+      </CCol>
+    </CRow>
+  )
 
   return (
     <CModal
@@ -82,126 +98,71 @@ const ViewEmployeeModal = ({ viewVisible, setViewVisible, currentEmployee }) => 
       size="lg"
       backdrop="static"
     >
-      <CModalHeader
-        closeButton
-        style={{
-          backgroundColor: 'rgb(45, 129, 30)',
-          borderColor: 'rgb(45, 129, 30)',
-        }}
-        className="text-white border-0"
-      >
-        <CModalTitle className="fw-bold">
+      <CModalHeader style={{ backgroundColor: '#28a745', color: 'white' }}>
+        <CModalTitle>
           <CIcon icon={cilUser} className="me-2" />
           Información del Empleado
         </CModalTitle>
       </CModalHeader>
 
       <CModalBody className="p-4">
-        <CCard className="border-0 shadow-sm mb-4 bg-light">
-          <CCardBody className="p-4">
-            <CRow className="align-items-center">
-              <CCol md="8">
-                <h5 className="mb-1 text-dark fw-bold">{fullName}</h5>
-                <CBadge color="info" className="me-2 py-2 px-3 fs-6">
-                  <CIcon icon={cilBriefcase} className="me-1" />
-                  {currentEmployee.cargoNombre}
-                </CBadge>
-              </CCol>
-              <CCol md="4" className="text-end">
-                <small className="text-muted">ID: {currentEmployee.ttrDocumen}</small>
-              </CCol>
-            </CRow>
-          </CCardBody>
-        </CCard>
+        {/* Header con nombre y cargo */}
+        <div className="text-center mb-4 pb-4 border-bottom">
+          <div className="mb-3">
+            <div
+              className="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
+              style={{
+                width: '80px',
+                height: '80px',
+                backgroundColor: '#28a745',
+                color: 'white',
+              }}
+            >
+              <CIcon icon={cilUser} size="3xl" />
+            </div>
+          </div>
+          <h4 className="mb-2">{fullName}</h4>
+          <CBadge
+            color={getPositionBadgeColor(currentEmployee.cargoNombre)}
+            className="px-3 py-2"
+            style={{ fontSize: '0.9rem' }}
+          >
+            <CIcon icon={cilBriefcase} className="me-2" />
+            {currentEmployee.cargoNombre}
+          </CBadge>
+        </div>
 
-        <CCard className="border-0 shadow-sm mb-4">
-          <CCardBody className="p-4">
-            <h6 className="mb-3 text-dark fw-bold border-bottom pb-2">Información Personal</h6>
-            <CListGroup flush>
-              <CListGroupItem className="border-0 px-0 py-2">
-                <CRow className="align-items-center">
-                  <CCol md="4" className="fw-bold text-muted">
-                    <CIcon icon={''} className="me-2" />
-                    Número de Documento:
-                  </CCol>
-                  <CCol md="8">
-                    <span className="text-dark">{currentEmployee.ttrDocumen}</span>
-                  </CCol>
-                </CRow>
-              </CListGroupItem>
+        {/* Información Personal */}
+        <div className="mb-4">
+          <h6 className="text-success mb-3">
+            <strong>Información Personal</strong>
+          </h6>
+          <InfoRow icon={'cilIdCard'} label="Documento" value={currentEmployee.ttrDocumen} />
+          <InfoRow
+            icon={cilCalendar}
+            label="Fecha de Nacimiento"
+            value={formatDateToDDMMYYYY(currentEmployee.ttrFecnaci)}
+          />
+          <InfoRow icon={cilPhone} label="Teléfono" value={currentEmployee.ttrTelefon} />
+          <InfoRow icon={cilLocationPin} label="Dirección" value={currentEmployee.ttrDirecci} />
+        </div>
 
-              <CListGroupItem className="border-0 px-0 py-2">
-                <CRow className="align-items-center">
-                  <CCol md="4" className="fw-bold text-muted">
-                    <CIcon icon={cilCalendar} className="me-2" />
-                    Fecha de Nacimiento:
-                  </CCol>
-                  <CCol md="8">
-                    <span className="text-dark">
-                      {formatDateToDDMMYYYY(currentEmployee.ttrFecnaci)}
-                    </span>
-                  </CCol>
-                </CRow>
-              </CListGroupItem>
-
-              <CListGroupItem className="border-0 px-0 py-2">
-                <CRow className="align-items-center">
-                  <CCol md="4" className="fw-bold text-muted">
-                    <CIcon icon={cilPhone} className="me-2" />
-                    Teléfono:
-                  </CCol>
-                  <CCol md="8">
-                    <span className="text-dark">{currentEmployee.ttrTelefon}</span>
-                  </CCol>
-                </CRow>
-              </CListGroupItem>
-
-              <CListGroupItem className="border-0 px-0 py-2">
-                <CRow className="align-items-center">
-                  <CCol md="4" className="fw-bold text-muted">
-                    <CIcon icon={cilLocationPin} className="me-2" />
-                    Dirección:
-                  </CCol>
-                  <CCol md="8">
-                    <span className="text-dark">{currentEmployee.ttrDirecci}</span>
-                  </CCol>
-                </CRow>
-              </CListGroupItem>
-            </CListGroup>
-          </CCardBody>
-        </CCard>
-
-        <CCard className="border-0 shadow-sm mb-4">
-          <CCardBody className="p-4">
-            <h6 className="mb-3 text-dark fw-bold border-bottom pb-2">Información Contractual</h6>
-            <CRow>
-              <CCol md="6">
-                <div className="mb-3">
-                  <small className="text-muted d-block mb-1 fw-bold">
-                    <CIcon icon={cilCalendar} className="me-1" />
-                    Fecha de Contrato
-                  </small>
-                  <span className="text-dark fw-bold">
-                    {formatDateToDDMMYYYY(currentEmployee.ttrFeccont)}
-                  </span>
-                </div>
-              </CCol>
-              <CCol md="6">
-                <div className="mb-3">
-                  <small className="text-muted d-block mb-1 fw-bold">
-                    <CIcon icon={cilBriefcase} className="me-1" />
-                    Cargo
-                  </small>
-                  <span className="text-dark fw-bold">{currentEmployee.cargoNombre}</span>
-                </div>
-              </CCol>
-            </CRow>
-          </CCardBody>
-        </CCard>
+        {/* Información Contractual */}
+        <div>
+          <h6 className="text-success mb-3">
+            <strong>Información Contractual</strong>
+          </h6>
+          <InfoRow
+            icon={cilCalendar}
+            label="Fecha de Contrato"
+            value={formatDateToDDMMYYYY(currentEmployee.ttrFeccont)}
+          />
+          <InfoRow icon={cilBriefcase} label="Cargo Actual" value={currentEmployee.cargoNombre} />
+        </div>
       </CModalBody>
 
-      <CModalFooter className="border-top bg-light">
-        <CButton color="primary" onClick={handleGenerateBadge} disabled={generating}>
+      <CModalFooter>
+        <CButton color="success" onClick={handleGenerateBadge} disabled={generating}>
           {generating ? (
             <>
               <CSpinner size="sm" className="me-2" />

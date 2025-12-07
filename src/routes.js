@@ -4,7 +4,15 @@ const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard')) // Ase
 const Employee = React.lazy(() => import('./views/pages/employees/employees')) // Asegúrate de que este archivo exista
 const Users = React.lazy(() => import('./views/pages/users/users'))
 const Cattle = React.lazy(() => import('./views/pages/cattle/cattle'))
-const Vaccination = React.lazy(() => import('./views/pages/cattle/vaccination'))
+// Control de Sanidad - Módulo completo
+const DashboardSanidad = React.lazy(() => import('./views/pages/sanidad/DashboardSanidad'))
+const VacunacionesIndex = React.lazy(
+  () => import('./views/pages/sanidad/vacunaciones/VacunacionesIndex'),
+)
+const PrenezIndex = React.lazy(() => import('./views/pages/sanidad/prenez/PrenezIndex'))
+const VisitasIndex = React.lazy(() => import('./views/pages/sanidad/visitas/VisitasIndex'))
+const PlanesIndex = React.lazy(() => import('./views/pages/sanidad/planes/PlanesIndex'))
+const ReportesIndex = React.lazy(() => import('./views/pages/sanidad/reportes/ReportesIndex'))
 const Client = React.lazy(() => import('./views/pages/client/client'))
 const Finances = React.lazy(() => import('./views/pages/finances/finances'))
 const Inventory = React.lazy(() => import('./views/pages/inventory/index'))
@@ -41,12 +49,55 @@ const routes = [
     element: Cattle,
     roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
   },
+  // Control de Sanidad - Rutas del módulo completo
   {
-    path: '/vaccination',
+    path: '/sanidad',
     exact: true,
-    name: 'Vaccination',
-    element: Vaccination,
+    name: 'Control de Sanidad',
+    element: DashboardSanidad,
     roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
+  },
+  {
+    path: '/sanidad/dashboard',
+    exact: true,
+    name: 'Dashboard Sanidad',
+    element: DashboardSanidad,
+    roles: [1, 2],
+  },
+  {
+    path: '/sanidad/vacunaciones',
+    exact: true,
+    name: 'Vacunaciones',
+    element: VacunacionesIndex,
+    roles: [1, 2],
+  },
+  {
+    path: '/sanidad/prenez',
+    exact: true,
+    name: 'Gestión de Preñez',
+    element: PrenezIndex,
+    roles: [1, 2],
+  },
+  {
+    path: '/sanidad/visitas-veterinarias',
+    exact: true,
+    name: 'Visitas Veterinarias',
+    element: VisitasIndex,
+    roles: [1, 2],
+  },
+  {
+    path: '/sanidad/planes-vacunacion',
+    exact: true,
+    name: 'Planes de Vacunación',
+    element: PlanesIndex,
+    roles: [1, 2],
+  },
+  {
+    path: '/sanidad/reportes',
+    exact: true,
+    name: 'Reportes de Sanidad',
+    element: ReportesIndex,
+    roles: [1, 2],
   },
   {
     path: '/client',

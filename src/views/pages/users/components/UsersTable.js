@@ -9,11 +9,15 @@ import {
   CTableRow,
   CPagination,
   CPaginationItem,
+  CBadge,
+  CAlert,
 } from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilPencil, cilTrash } from '@coreui/icons'
 
 const UsersTable = ({ users, setCurrentUser, setEditVisible, setDeleteVisible }) => {
   const [currentPage, setCurrentPage] = useState(1)
-  const [usersPerPage] = useState(10) // Número de usuarios por página
+  const [usersPerPage] = useState(10)
 
   // Obtener usuarios actuales
   const indexOfLastUser = currentPage * usersPerPage
@@ -23,85 +27,113 @@ const UsersTable = ({ users, setCurrentUser, setEditVisible, setDeleteVisible })
   // Cambiar de página
   const paginate = (pageNumber) => setCurrentPage(pageNumber)
 
+  // Función para obtener el color del badge según el rol
+  const getRoleBadgeColor = (roleName) => {
+    const roleColors = {
+      administrador: 'danger',
+      veterinario: 'success',
+      empleado: 'info',
+      cliente: 'warning',
+    }
+    return roleColors[roleName?.toLowerCase()] || 'secondary'
+  }
+
   return (
     <>
-      <CTable hover responsive className="shadow-sm">
-        <CTableHead className="table-header-custom">
+      <CTable striped hover responsive>
+        <CTableHead>
           <CTableRow>
-            <CTableHeaderCell className="text-green">N°</CTableHeaderCell>
-            <CTableHeaderCell className="text-green">Nombre</CTableHeaderCell>
-            <CTableHeaderCell className="text-green">Apellido</CTableHeaderCell>
-            <CTableHeaderCell className="text-green">Correo</CTableHeaderCell>
-            <CTableHeaderCell className="text-green">Telefono</CTableHeaderCell>
-            <CTableHeaderCell className="text-green">Cargo</CTableHeaderCell>
-            <CTableHeaderCell className="text-green">Acciones</CTableHeaderCell>
+            <CTableHeaderCell>N°</CTableHeaderCell>
+            <CTableHeaderCell>Nombre Completo</CTableHeaderCell>
+            <CTableHeaderCell>Correo</CTableHeaderCell>
+            <CTableHeaderCell>Teléfono</CTableHeaderCell>
+            <CTableHeaderCell>Rol</CTableHeaderCell>
+            <CTableHeaderCell>Acciones</CTableHeaderCell>
           </CTableRow>
         </CTableHead>
         <CTableBody>
           {currentUsers.map((usr, index) => (
             <CTableRow key={usr.ttr_idusuar}>
               <CTableDataCell>{indexOfFirstUser + index + 1}</CTableDataCell>
-              <CTableDataCell>{usr?.ttr_nombrel || ''}</CTableDataCell>
-              <CTableDataCell>{usr?.ttr_apellid || ''}</CTableDataCell>
+              <CTableDataCell>
+                <strong>
+                  {usr?.ttr_nombrel || ''} {usr?.ttr_apellid || ''}
+                </strong>
+              </CTableDataCell>
               <CTableDataCell>{usr?.ttr_correoe || ''}</CTableDataCell>
               <CTableDataCell>{usr?.ttr_telefon || ''}</CTableDataCell>
-              <CTableDataCell>{usr?.ttr_nombrec || ''}</CTableDataCell>
               <CTableDataCell>
-                <div className="d-flex">
-                  <CButton
-                    className="me-2 mb-2"
-                    size="sm"
-                    color="info"
-                    variant="outline"
-                    onClick={() => {
-                      setCurrentUser({
-                        ttr_idusuar: usr.ttr_idusuar,
-                        nombre: usr.ttr_nombrel,
-                        apellido: usr.ttr_apellid,
-                        correo: usr.ttr_correoe,
-                        telefono: usr.ttr_telefon,
-                        idRol: usr.ttr_idrolus,
-                        contrasena: '', // La contraseña no se carga para edición por seguridad
-                      })
-                      setEditVisible(true)
-                    }}
-                  >
-                    Editar
-                  </CButton>
-                  <CButton
-                    className="me-2 mb-2"
-                    size="sm"
-                    color="danger"
-                    variant="outline"
-                    onClick={() => {
-                      setCurrentUser(usr)
-                      setDeleteVisible(true)
-                    }}
-                  >
-                    Eliminar
-                  </CButton>
-                </div>
+                <CBadge color={getRoleBadgeColor(usr?.ttr_nombrec)}>
+                  {usr?.ttr_nombrec || 'Sin rol'}
+                </CBadge>
+              </CTableDataCell>
+              <CTableDataCell>
+                <CButton
+                  color="warning"
+                  size="sm"
+                  className="me-2"
+                  onClick={() => {
+                    setCurrentUser({
+                      ttr_idusuar: usr.ttr_idusuar,
+                      nombre: usr.ttr_nombrel,
+                      apellido: usr.ttr_apellid,
+                      correo: usr.ttr_correoe,
+                      telefono: usr.ttr_telefon,
+                      idRol: usr.ttr_idrolus,
+                      contrasena: '',
+                    })
+                    setEditVisible(true)
+                  }}
+                >
+                  <CIcon icon={cilPencil} size="sm" className="me-1" />
+                  Editar
+                </CButton>
+                <CButton
+                  color="danger"
+                  size="sm"
+                  onClick={() => {
+                    setCurrentUser(usr)
+                    setDeleteVisible(true)
+                  }}
+                >
+                  <CIcon icon={cilTrash} size="sm" className="me-1" />
+                  Eliminar
+                </CButton>
               </CTableDataCell>
             </CTableRow>
           ))}
         </CTableBody>
       </CTable>
-      <CPagination
-        align="center"
-        aria-label="Page navigation example"
-        className="custom-pagination"
-      >
-        {Array.from({ length: Math.ceil(users.length / usersPerPage) }, (_, i) => (
-          <CPaginationItem
-            key={i + 1}
-            active={i + 1 === currentPage}
-            onClick={() => paginate(i + 1)}
-            color="success"
-          >
-            {i + 1}
-          </CPaginationItem>
-        ))}
-      </CPagination>
+
+      {users.length === 0 && (
+        <CAlert color="info">No hay usuarios registrados en el sistema.</CAlert>
+      )}
+
+      {/* Paginación */}
+      {users.length > usersPerPage && (
+        <div className="d-flex justify-content-center mt-3">
+          <CPagination aria-label="Navegación de usuarios">
+            <CPaginationItem disabled={currentPage === 1} onClick={() => paginate(currentPage - 1)}>
+              Anterior
+            </CPaginationItem>
+            {Array.from({ length: Math.ceil(users.length / usersPerPage) }, (_, i) => (
+              <CPaginationItem
+                key={i + 1}
+                active={i + 1 === currentPage}
+                onClick={() => paginate(i + 1)}
+              >
+                {i + 1}
+              </CPaginationItem>
+            ))}
+            <CPaginationItem
+              disabled={currentPage === Math.ceil(users.length / usersPerPage)}
+              onClick={() => paginate(currentPage + 1)}
+            >
+              Siguiente
+            </CPaginationItem>
+          </CPagination>
+        </div>
+      )}
     </>
   )
 }
