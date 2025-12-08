@@ -1,7 +1,7 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
-import { cilPlus } from '@coreui/icons'
-import { CCard, CButton, CCardBody, CCardHeader } from '@coreui/react'
+import { cilPlus, cilAnimal } from '@coreui/icons'
+import { CCard, CButton, CCardBody, CCardHeader, CRow, CCol } from '@coreui/react'
 
 import { useCattle } from './hooks/useCattle'
 import CattleTable from './components/CattleTable'
@@ -9,8 +9,8 @@ import AddCattleModal from './components/AddCattleModal'
 import EditCattleModal from './components/EditCattleModal'
 import DeleteCattleModal from './components/DeleteCattleModal'
 import ViewCattleModal from './components/ViewCattleModal'
-import ExpBovModal from './components/ExpBovModal' // Importa el nuevo modal de expediente
-import CattleFilters from './components/CattleFilters' // Importa el nuevo componente de filtros
+import ExpBovModal from './components/ExpBovModal'
+import CattleFilters from './components/CattleFilters'
 
 const Cattle = () => {
   const {
@@ -22,8 +22,8 @@ const Cattle = () => {
     setDeleteVisible,
     viewVisible,
     setViewVisible,
-    expBovVisible, // Nuevo estado
-    setExpBovVisible, // Nuevo setter
+    expBovVisible,
+    setExpBovVisible,
     currentCattle,
     setCurrentCattle,
     deleteConfirmation,
@@ -34,7 +34,7 @@ const Cattle = () => {
     handleAddCattle,
     handleEditCattle,
     handleDeleteCattle,
-    handleViewExpBov, // Nueva función
+    handleViewExpBov,
     razas,
     colores,
     etapas,
@@ -53,45 +53,72 @@ const Cattle = () => {
   } = useCattle()
 
   return (
-    <CCard>
-      <CCardHeader>
-        <h4 className="typography-color-title mb-0 d-flex justify-content-between align-items-center">
-          Registro de Ganado
-          <CButton
-            className="button-no-hover-green text-white"
-            onClick={() => setVisible(!visible)}
-          >
-            <CIcon icon={cilPlus} className="me-2" />
-            Agregar Bovino
-          </CButton>
-        </h4>
-        <CattleFilters
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          filterRaza={filterRaza}
-          setFilterRaza={setFilterRaza}
-          filterColor={filterColor}
-          setFilterColor={setFilterColor}
-          filterEtapa={filterEtapa}
-          setFilterEtapa={setFilterEtapa}
-          filterEstado={filterEstado}
-          setFilterEstado={setFilterEstado}
-          razas={razas}
-          colores={colores}
-          etapas={etapas}
-          estados={estados}
-        />
-      </CCardHeader>
-      <CCardBody>
-        <CattleTable
-          cattle={filteredCattle}
-          setCurrentCattle={setCurrentCattle}
-          setEditVisible={setEditVisible}
-          setDeleteVisible={setDeleteVisible}
-          setViewVisible={setViewVisible}
-          handleViewExpBov={handleViewExpBov} // Pasa la nueva función
-        />
-      </CCardBody>
+    <>
+      {/* Header Card con descripción */}
+      <CRow>
+        <CCol xs={12}>
+          <CCard className="mb-4">
+            <CCardHeader>
+              <div className="d-flex align-items-center">
+                <CIcon icon={cilAnimal} className="me-2" size="lg" style={{ color: '#28a745' }} />
+                <strong>Gestión de Ganado</strong>
+              </div>
+            </CCardHeader>
+            <CCardBody>
+              <p className="text-medium-emphasis mb-0">
+                Administra el inventario bovino de la finca. Registra animales, controla razas,
+                etapas de vida, estados de salud y mantén un seguimiento completo del ganado.
+              </p>
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+
+      {/* Contenido Principal */}
+      <CRow>
+        <CCol xs={12}>
+          <CCard className="mb-4">
+            <CCardHeader className="d-flex justify-content-between align-items-center">
+              <strong>Registro de Bovinos</strong>
+              <CButton color="success" onClick={() => setVisible(!visible)}>
+                <CIcon icon={cilPlus} className="me-2" />
+                Nuevo Bovino
+              </CButton>
+            </CCardHeader>
+            <CCardBody>
+              {/* Filtros de búsqueda */}
+              <CattleFilters
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                filterRaza={filterRaza}
+                setFilterRaza={setFilterRaza}
+                filterColor={filterColor}
+                setFilterColor={setFilterColor}
+                filterEtapa={filterEtapa}
+                setFilterEtapa={setFilterEtapa}
+                filterEstado={filterEstado}
+                setFilterEstado={setFilterEstado}
+                razas={razas}
+                colores={colores}
+                etapas={etapas}
+                estados={estados}
+              />
+
+              {/* Tabla de ganado */}
+              <CattleTable
+                cattle={filteredCattle}
+                setCurrentCattle={setCurrentCattle}
+                setEditVisible={setEditVisible}
+                setDeleteVisible={setDeleteVisible}
+                setViewVisible={setViewVisible}
+                handleViewExpBov={handleViewExpBov}
+              />
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+
+      {/* Modales */}
       <AddCattleModal
         visible={visible}
         setVisible={setVisible}
@@ -126,18 +153,12 @@ const Cattle = () => {
         setViewVisible={setViewVisible}
         currentCattle={currentCattle}
       />
-      {console.log(
-        'Cattle.js: Rendering ExpBovModal with expBovVisible:',
-        expBovVisible,
-        'and currentCattle:',
-        currentCattle,
-      )}
-      <ExpBovModal // Nuevo modal de expediente
+      <ExpBovModal
         expBovVisible={expBovVisible}
         setExpBovVisible={setExpBovVisible}
         currentCattle={currentCattle}
       />
-    </CCard>
+    </>
   )
 }
 

@@ -7,21 +7,19 @@ import {
   CTableHeaderCell,
   CTableRow,
   CButton,
-  CBadge,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilPencil, cilTrash, cilInfo } from '@coreui/icons'
+import { cilPencil, cilTrash, cilInfo, cilSearch } from '@coreui/icons'
 
 const LotsTable = ({ lots, onEdit, onDelete, onViewDetails, onViewBovines, loading }) => {
   return (
-    <CTable bordered hover responsive>
+    <CTable hover responsive className="align-middle" striped>
       <CTableHead>
         <CTableRow>
           <CTableHeaderCell>#</CTableHeaderCell>
           <CTableHeaderCell>Nombre</CTableHeaderCell>
           <CTableHeaderCell>Bovinos</CTableHeaderCell>
-
-          <CTableHeaderCell>Acciones</CTableHeaderCell>
+          <CTableHeaderCell className="text-end">Acciones</CTableHeaderCell>
         </CTableRow>
       </CTableHead>
       <CTableBody>
@@ -29,57 +27,57 @@ const LotsTable = ({ lots, onEdit, onDelete, onViewDetails, onViewBovines, loadi
           lots.map((lot, idx) => (
             <CTableRow key={lot.id}>
               <CTableDataCell>{idx + 1}</CTableDataCell>
-              <CTableDataCell>{lot.nombre}</CTableDataCell>
+              <CTableDataCell>
+                <strong>{lot.nombre}</strong>
+              </CTableDataCell>
               <CTableDataCell>
                 <CButton
                   color="info"
-                  variant="outline"
                   size="sm"
+                  className="text-white"
                   onClick={() => onViewBovines(lot)}
                   disabled={loading}
                 >
+                  <CIcon icon={cilSearch} className="me-2" />
                   Ver Bovinos ({lot.bovinos})
                 </CButton>
               </CTableDataCell>
-              <CTableDataCell>
-                <CBadge color="success">{lot.estado}</CBadge>
-              </CTableDataCell>
-              <CTableDataCell>
+              <CTableDataCell className="text-end">
                 <CButton
                   color="info"
-                  variant="outline"
                   size="sm"
-                  className="me-2"
+                  className="me-2 text-white"
+                  title="Detalles"
                   onClick={() => onViewDetails(lot)}
                   disabled={loading}
                 >
-                  Detalles
+                  <CIcon icon={cilInfo} />
                 </CButton>
                 <CButton
                   color="warning"
-                  variant="outline"
                   size="sm"
-                  className="me-2"
+                  className="me-2 text-white"
+                  title="Editar"
                   onClick={() => onEdit(lot)}
                   disabled={loading}
                 >
-                  Editar
+                  <CIcon icon={cilPencil} />
                 </CButton>
                 <CButton
                   color="danger"
-                  variant="outline"
                   size="sm"
+                  title="Eliminar"
                   onClick={() => onDelete(lot.id)}
                   disabled={loading}
                 >
-                  Eliminar
+                  <CIcon icon={cilTrash} />
                 </CButton>
               </CTableDataCell>
             </CTableRow>
           ))
         ) : (
           <CTableRow>
-            <CTableDataCell colSpan="6" className="text-center text-muted">
+            <CTableDataCell colSpan="4" className="text-center text-muted py-5">
               No hay lotes registrados
             </CTableDataCell>
           </CTableRow>

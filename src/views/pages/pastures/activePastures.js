@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { CCard, CCardHeader, CCardBody, CRow, CCol, CBadge } from '@coreui/react'
+import { CCard, CCardHeader, CCardBody, CRow, CCol, CBadge, CAlert } from '@coreui/react'
 import { pastureService } from 'src/api/pastureService'
+import CIcon from '@coreui/icons-react'
+import { cilSearch } from '@coreui/icons'
 
 const ActivePastures = () => {
   const [pastures, setPastures] = useState([])
@@ -28,7 +30,6 @@ const ActivePastures = () => {
         }
       } catch (error) {
         console.error('Error al cargar potreros activos:', error)
-        // Aquí podrías añadir un toast o un mensaje de error en la UI
       }
     }
     fetchActivePastures()
@@ -43,35 +44,47 @@ const ActivePastures = () => {
   }
 
   return (
-    <CCard>
+    <CCard className="mb-4 shadow-sm border-0">
       <CCardHeader>
-        <h4 className="typography-color-title mb-0">Actividad de Potreros</h4>
+        <strong>Actividad de Potreros</strong>
       </CCardHeader>
       <CCardBody>
         <CRow>
-          {pastures.map((pasture) => (
-            <CCol md={4} key={pasture.ttr_idpotrer} className="mb-3">
-              <div className="d-flex align-items-center border rounded p-3">
-                <CBadge
-                  color={getBadgeColor(pasture.tma_nomestp)}
-                  className="me-3"
-                  style={{ width: 20, height: 20, borderRadius: '50%' }}
-                >
-                  &nbsp;
-                </CBadge>
-                <div>
-                  <strong>{pasture.ttr_codpotre}</strong>
+          {pastures.length > 0 ? (
+            pastures.map((pasture) => (
+              <CCol md={4} key={pasture.ttr_idpotrer} className="mb-3">
+                <div className="d-flex align-items-center border rounded p-3 shadow-sm h-100">
+                  <CBadge
+                    color={getBadgeColor(pasture.tma_nomestp)}
+                    className="me-3 p-2"
+                    shape="rounded-circle"
+                    style={{ width: '15px', height: '15px' }}
+                  >
+                    <span className="visually-hidden">{pasture.tma_nomestp}</span>
+                  </CBadge>
                   <div>
-                    Estado: <span>{pasture.tma_nomestp}</span>
-                  </div>
-                  <div>Descripción: {pasture.ttr_descripc}</div>
-                  <div>
-                    Fecha Mantenimiento: {new Date(pasture.ttr_fechamnt).toLocaleDateString()}
+                    <strong className="text-success fs-5">{pasture.ttr_codpotre}</strong>
+                    <div className="text-muted small">
+                      Estado: <span className="fw-semibold text-dark">{pasture.tma_nomestp}</span>
+                    </div>
+                    <div className="text-muted small">{pasture.ttr_descripc}</div>
+                    <div className="text-muted small mt-1">
+                      <small>
+                        Mantenimiento: {new Date(pasture.ttr_fechamnt).toLocaleDateString()}
+                      </small>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </CCol>
+            ))
+          ) : (
+            <CCol xs={12}>
+              <CAlert color="info" className="border-0 shadow-sm">
+                <CIcon icon={cilSearch} className="me-2" />
+                No hay potreros activos (Disponibles o En uso) en este momento.
+              </CAlert>
             </CCol>
-          ))}
+          )}
         </CRow>
       </CCardBody>
     </CCard>

@@ -23,7 +23,18 @@ import {
   CFormInput,
   CFormTextarea,
   CAlert,
+  CFormSelect,
 } from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import {
+  cilPlus,
+  cilTrash,
+  cilSearch,
+  cilCalendar,
+  cilCheckCircle,
+  cilPencil,
+  cilSpreadsheet,
+} from '@coreui/icons'
 import {
   getVisitasVeterinarias,
   getProximaVisitaVeterinaria,
@@ -151,23 +162,24 @@ const VisitasIndex = () => {
     <>
       <CRow>
         <CCol xs={12}>
-          <CCard className="mb-4">
+          <CCard className="mb-4 shadow-sm border-0">
             <CCardHeader className="d-flex justify-content-between align-items-center">
               <strong>Visitas Veterinarias</strong>
-              <CButton color="primary" onClick={() => setShowModal(true)}>
+              <CButton color="success" className="text-white" onClick={() => setShowModal(true)}>
+                <CIcon icon={cilPlus} className="me-2" />
                 Nueva Visita
               </CButton>
             </CCardHeader>
             <CCardBody>
-              <CTable striped hover responsive>
-                <CTableHead>
+              <CTable striped hover responsive className="align-middle">
+                <CTableHead color="light">
                   <CTableRow>
                     <CTableHeaderCell>Fecha</CTableHeaderCell>
                     <CTableHeaderCell>Veterinario</CTableHeaderCell>
                     <CTableHeaderCell>Motivo</CTableHeaderCell>
                     <CTableHeaderCell>Próxima Visita</CTableHeaderCell>
                     <CTableHeaderCell>Estado</CTableHeaderCell>
-                    <CTableHeaderCell>Acciones</CTableHeaderCell>
+                    <CTableHeaderCell className="text-end">Acciones</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
@@ -175,7 +187,9 @@ const VisitasIndex = () => {
                     const diasRestantes = getDiasRestantes(visita.ttr_proxfech)
                     return (
                       <CTableRow key={visita.ttr_idvisvet}>
-                        <CTableDataCell>{formatDate(visita.ttr_fechavis)}</CTableDataCell>
+                        <CTableDataCell className="fw-semibold">
+                          {formatDate(visita.ttr_fechavis)}
+                        </CTableDataCell>
                         <CTableDataCell>{visita.ttr_veterina}</CTableDataCell>
                         <CTableDataCell>{visita.ttr_motivovi}</CTableDataCell>
                         <CTableDataCell>{formatDate(visita.ttr_proxfech)}</CTableDataCell>
@@ -186,21 +200,23 @@ const VisitasIndex = () => {
                             </CBadge>
                           )}
                         </CTableDataCell>
-                        <CTableDataCell>
+                        <CTableDataCell className="text-end">
                           <CButton
                             color="info"
                             size="sm"
-                            className="me-2"
+                            className="me-2 text-white"
+                            title="Ver Bovinos Atendidos"
                             onClick={() => handleVerBovinos(visita)}
                           >
-                            Ver Bovinos
+                            <CIcon icon={cilSearch} className="me-1" />
+                            Detalles
                           </CButton>
                           <CButton
                             color="danger"
                             size="sm"
                             onClick={() => handleDelete(visita.ttr_idvisvet)}
                           >
-                            Eliminar
+                            <CIcon icon={cilTrash} />
                           </CButton>
                         </CTableDataCell>
                       </CTableRow>
@@ -209,14 +225,18 @@ const VisitasIndex = () => {
                 </CTableBody>
               </CTable>
 
-              {visitas.length === 0 && <CAlert color="info">No hay visitas registradas</CAlert>}
+              {visitas.length === 0 && (
+                <CAlert color="info" className="mt-3 border-0 shadow-sm">
+                  <CIcon icon={cilSearch} className="me-2" />
+                  No se encontraron visitas veterinarias registradas.
+                </CAlert>
+              )}
             </CCardBody>
           </CCard>
         </CCol>
       </CRow>
 
-      {/* Modal Nueva Visita */}
-      <CModal visible={showModal} onClose={() => setShowModal(false)} size="lg">
+      <CModal visible={showModal} onClose={() => setShowModal(false)} size="lg" backdrop="static">
         <CModalHeader>
           <CModalTitle>Nueva Visita Veterinaria</CModalTitle>
         </CModalHeader>
@@ -269,58 +289,65 @@ const VisitasIndex = () => {
               </CCol>
             </CRow>
 
-            <CAlert color="info">
-              <strong>Nota:</strong> La próxima visita se programará automáticamente para dentro de
-              3 meses.
+            <CAlert color="info" className="d-flex align-items-center">
+              <CIcon icon={cilCalendar} className="me-2" />
+              <div>
+                <strong>Nota:</strong> La próxima visita se programará automáticamente para dentro
+                de 3 meses.
+              </div>
             </CAlert>
           </CModalBody>
           <CModalFooter>
             <CButton color="secondary" onClick={() => setShowModal(false)}>
               Cancelar
             </CButton>
-            <CButton color="primary" type="submit">
-              Guardar
+            <CButton color="success" type="submit" className="text-white">
+              Guardar Visita
             </CButton>
           </CModalFooter>
         </CForm>
       </CModal>
 
       {/* Modal Bovinos de la Visita */}
-      <CModal visible={showBovinosModal} onClose={() => setShowBovinosModal(false)} size="xl">
-        <CModalHeader>
+      <CModal
+        visible={showBovinosModal}
+        onClose={() => setShowBovinosModal(false)}
+        size="xl"
+        backdrop="static"
+      >
+        <CModalHeader className="bg-success text-white">
           <CModalTitle>
+            <CIcon icon={cilSpreadsheet} className="me-2" />
             Bovinos Revisados - {selectedVisita && formatDate(selectedVisita.ttr_fechavis)}
           </CModalTitle>
         </CModalHeader>
         <CModalBody>
           {/* Formulario para agregar bovino */}
-          <CCard className="mb-3">
-            <CCardHeader>
-              <strong>Agregar Bovino a la Visita</strong>
+          <CCard className="mb-4 shadow-sm border-0 bg-light">
+            <CCardHeader className="bg-transparent border-bottom">
+              <strong className="text-success">Agregar Bovino a la Visita</strong>
             </CCardHeader>
             <CCardBody>
               <CForm onSubmit={handleAddBovino}>
-                <CRow className="mb-3">
+                <CRow className="g-3 align-items-end">
                   <CCol md={3}>
                     <CFormLabel>Bovino *</CFormLabel>
-                    <select
-                      className="form-select"
+                    <CFormSelect
                       value={bovinoForm.idBovino}
                       onChange={(e) => setBovinoForm({ ...bovinoForm, idBovino: e.target.value })}
                       required
                     >
                       <option value="">Seleccione</option>
                       {bovinos.map((b) => (
-                        <option key={b.id} value={b.id}>
+                        <option key={b.ttrIdbovino} value={b.ttrIdbovino}>
                           #{b.ttrNumerobv}
                         </option>
                       ))}
-                    </select>
+                    </CFormSelect>
                   </CCol>
                   <CCol md={3}>
                     <CFormLabel>Estado Reproductivo</CFormLabel>
-                    <select
-                      className="form-select"
+                    <CFormSelect
                       value={bovinoForm.estadoReproductivo}
                       onChange={(e) =>
                         setBovinoForm({ ...bovinoForm, estadoReproductivo: e.target.value })
@@ -330,21 +357,22 @@ const VisitasIndex = () => {
                       <option value="Preñada">Preñada</option>
                       <option value="Vacía">Vacía</option>
                       <option value="En tratamiento">En tratamiento</option>
-                    </select>
+                    </CFormSelect>
                   </CCol>
                   <CCol md={4}>
-                    <CFormLabel>Diagnóstico</CFormLabel>
+                    <CFormLabel>Diagnóstico / Tratamiento</CFormLabel>
                     <CFormInput
                       type="text"
                       value={bovinoForm.diagnostico}
                       onChange={(e) =>
                         setBovinoForm({ ...bovinoForm, diagnostico: e.target.value })
                       }
-                      placeholder="Diagnóstico"
+                      placeholder="Diagnóstico y trat. aplicado"
                     />
                   </CCol>
-                  <CCol md={2} className="d-flex align-items-end">
-                    <CButton color="success" type="submit" className="w-100">
+                  <CCol md={2}>
+                    <CButton color="success" type="submit" className="w-100 text-white">
+                      <CIcon icon={cilPlus} className="me-1" />
                       Agregar
                     </CButton>
                   </CCol>
@@ -354,8 +382,9 @@ const VisitasIndex = () => {
           </CCard>
 
           {/* Lista de bovinos */}
-          <CTable striped>
-            <CTableHead>
+          <h6 className="text-success mb-3">Listado de Bovinos Atendidos</h6>
+          <CTable striped hover responsive className="align-middle border">
+            <CTableHead color="light">
               <CTableRow>
                 <CTableHeaderCell>Bovino</CTableHeaderCell>
                 <CTableHeaderCell>Diagnóstico</CTableHeaderCell>
@@ -366,7 +395,7 @@ const VisitasIndex = () => {
             <CTableBody>
               {bovinosVisita.map((bv, index) => (
                 <CTableRow key={index}>
-                  <CTableDataCell>#{bv.numero_bovino}</CTableDataCell>
+                  <CTableDataCell className="fw-bold">#{bv.numero_bovino}</CTableDataCell>
                   <CTableDataCell>{bv.ttr_diagnost || '-'}</CTableDataCell>
                   <CTableDataCell>
                     <CBadge
@@ -381,14 +410,17 @@ const VisitasIndex = () => {
                       {bv.ttr_estarepro}
                     </CBadge>
                   </CTableDataCell>
-                  <CTableDataCell>{bv.ttr_trataapli || '-'}</CTableDataCell>
+                  <CTableDataCell>{bv.ttr_tratamie || '-'}</CTableDataCell>
                 </CTableRow>
               ))}
             </CTableBody>
           </CTable>
 
           {bovinosVisita.length === 0 && (
-            <CAlert color="info">No hay bovinos registrados en esta visita</CAlert>
+            <CAlert color="info" className="border-0 shadow-sm">
+              <CIcon icon={cilSearch} className="me-2" />
+              No hay bovinos registrados en esta visita. Agregue uno usando el formulario superior.
+            </CAlert>
           )}
         </CModalBody>
         <CModalFooter>

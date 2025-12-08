@@ -15,7 +15,11 @@ import {
   CAlert,
   CButton,
   CFormSelect,
+  CProgress,
+  CProgressBar,
 } from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilChartPie, cilWarning, cilCheckCircle, cilArrowRight, cilChartLine } from '@coreui/icons'
 import {
   getVacunasProximasReporte,
   getCumplimientoVacunacion,
@@ -71,14 +75,18 @@ const ReportesIndex = () => {
     <>
       <CRow>
         <CCol xs={12}>
-          <CCard className="mb-4">
+          <CCard className="mb-4 shadow-sm border-0">
             <CCardHeader>
-              <strong>Reportes de Sanidad</strong>
+              <strong>Reportes de Sanidad e Indicadores Clave</strong>
             </CCardHeader>
             <CCardBody>
-              <p className="text-medium-emphasis">
-                Visualiza estadísticas y reportes del estado sanitario del ganado.
-              </p>
+              <div className="d-flex align-items-center">
+                <CIcon icon={cilChartLine} className="me-3 text-success" size="xl" />
+                <p className="text-medium-emphasis mb-0">
+                  Visualiza estadísticas detalladas y reportes del estado sanitario del ganado,
+                  cumplimiento de protocolos y alertas tempranas.
+                </p>
+              </div>
             </CCardBody>
           </CCard>
         </CCol>
@@ -87,42 +95,47 @@ const ReportesIndex = () => {
       {/* Cumplimiento de Vacunación */}
       <CRow>
         <CCol xs={12}>
-          <CCard className="mb-4">
-            <CCardHeader>
-              <strong>Cumplimiento de Vacunación (Último Año)</strong>
+          <CCard className="mb-4 shadow-sm border-0">
+            <CCardHeader className="d-flex justify-content-between align-items-center">
+              <strong>
+                <CIcon icon={cilChartPie} className="me-2" />
+                Cumplimiento de Vacunación (Último Año)
+              </strong>
             </CCardHeader>
             <CCardBody>
-              <CTable striped hover responsive>
-                <CTableHead>
+              <CTable striped hover responsive className="align-middle">
+                <CTableHead color="light">
                   <CTableRow>
                     <CTableHeaderCell>Vacuna</CTableHeaderCell>
-                    <CTableHeaderCell>Bovinos Vacunados</CTableHeaderCell>
-                    <CTableHeaderCell>Total Bovinos</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">Bovinos Vacunados</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">Total Bovinos</CTableHeaderCell>
                     <CTableHeaderCell>Cumplimiento</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
                   {cumplimiento.map((item, index) => (
                     <CTableRow key={index}>
-                      <CTableDataCell>{item.vacuna}</CTableDataCell>
-                      <CTableDataCell>{item.bovinos_vacunados}</CTableDataCell>
-                      <CTableDataCell>{item.total_bovinos}</CTableDataCell>
+                      <CTableDataCell className="fw-bold">{item.vacuna}</CTableDataCell>
+                      <CTableDataCell className="text-center">
+                        {item.bovinos_vacunados}
+                      </CTableDataCell>
+                      <CTableDataCell className="text-center">{item.total_bovinos}</CTableDataCell>
                       <CTableDataCell>
                         <div className="d-flex align-items-center">
-                          <div className="progress flex-grow-1 me-2" style={{ height: '20px' }}>
-                            <div
-                              className={`progress-bar ${
+                          <CProgress className="flex-grow-1 me-3" height={20}>
+                            <CProgressBar
+                              value={item.porcentaje_cumplimiento}
+                              color={
                                 item.porcentaje_cumplimiento >= 80
-                                  ? 'bg-success'
+                                  ? 'success'
                                   : item.porcentaje_cumplimiento >= 50
-                                    ? 'bg-warning'
-                                    : 'bg-danger'
-                              }`}
-                              style={{ width: `${item.porcentaje_cumplimiento}%` }}
+                                    ? 'warning'
+                                    : 'danger'
+                              }
                             >
                               {item.porcentaje_cumplimiento}%
-                            </div>
-                          </div>
+                            </CProgressBar>
+                          </CProgress>
                         </div>
                       </CTableDataCell>
                     </CTableRow>
@@ -131,7 +144,9 @@ const ReportesIndex = () => {
               </CTable>
 
               {cumplimiento.length === 0 && (
-                <CAlert color="info">No hay datos de cumplimiento disponibles</CAlert>
+                <CAlert color="info" className="border-0 shadow-sm">
+                  No hay datos de cumplimiento disponibles para mostrar.
+                </CAlert>
               )}
             </CCardBody>
           </CCard>
@@ -141,9 +156,12 @@ const ReportesIndex = () => {
       {/* Vacunas Próximas */}
       <CRow>
         <CCol xs={12}>
-          <CCard className="mb-4">
+          <CCard className="mb-4 shadow-sm border-0">
             <CCardHeader className="d-flex justify-content-between align-items-center">
-              <strong>Vacunas Próximas</strong>
+              <strong>
+                <CIcon icon={cilWarning} className="me-2" />
+                Alertas de Vacunación
+              </strong>
               <div>
                 <CFormSelect
                   size="sm"
@@ -159,14 +177,14 @@ const ReportesIndex = () => {
               </div>
             </CCardHeader>
             <CCardBody>
-              <CTable striped hover responsive>
-                <CTableHead>
+              <CTable striped hover responsive className="align-middle">
+                <CTableHead color="light">
                   <CTableRow>
                     <CTableHeaderCell>Bovino</CTableHeaderCell>
                     <CTableHeaderCell>Vacuna</CTableHeaderCell>
                     <CTableHeaderCell>Última Aplicación</CTableHeaderCell>
                     <CTableHeaderCell>Próxima Fecha</CTableHeaderCell>
-                    <CTableHeaderCell>Días Restantes</CTableHeaderCell>
+                    <CTableHeaderCell>Estado</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
@@ -174,10 +192,14 @@ const ReportesIndex = () => {
                     const diasRestantes = getDiasRestantes(vacuna.ttr_proxfech)
                     return (
                       <CTableRow key={vacuna.ttr_idvacuna}>
-                        <CTableDataCell>#{vacuna.numero_bovino}</CTableDataCell>
+                        <CTableDataCell className="fw-semibold">
+                          #{vacuna.numero_bovino}
+                        </CTableDataCell>
                         <CTableDataCell>{vacuna.nombre_vacuna}</CTableDataCell>
                         <CTableDataCell>{formatDate(vacuna.ttr_fechaapl)}</CTableDataCell>
-                        <CTableDataCell>{formatDate(vacuna.ttr_proxfech)}</CTableDataCell>
+                        <CTableDataCell className="fw-bold">
+                          {formatDate(vacuna.ttr_proxfech)}
+                        </CTableDataCell>
                         <CTableDataCell>
                           <CBadge
                             color={
@@ -202,7 +224,10 @@ const ReportesIndex = () => {
               </CTable>
 
               {vacunasProximas.length === 0 && (
-                <CAlert color="success">No hay vacunas próximas en el período seleccionado</CAlert>
+                <CAlert color="success" className="border-0 shadow-sm">
+                  <CIcon icon={cilCheckCircle} className="me-2" />
+                  No hay vacunas pendientes para el período seleccionado.
+                </CAlert>
               )}
             </CCardBody>
           </CCard>
@@ -212,13 +237,13 @@ const ReportesIndex = () => {
       {/* Bovinos que Requieren Atención */}
       <CRow>
         <CCol xs={12}>
-          <CCard className="mb-4">
+          <CCard className="mb-4 shadow-sm border-0">
             <CCardHeader>
-              <strong>Bovinos que Requieren Atención</strong>
+              <strong>Bovinos que Requieren Atención Inmediata</strong>
             </CCardHeader>
             <CCardBody>
-              <CTable striped hover responsive>
-                <CTableHead>
+              <CTable striped hover responsive className="align-middle">
+                <CTableHead color="light">
                   <CTableRow>
                     <CTableHeaderCell>Bovino</CTableHeaderCell>
                     <CTableHeaderCell>Motivo</CTableHeaderCell>
@@ -232,7 +257,7 @@ const ReportesIndex = () => {
                     const diasAtrasado = Math.abs(getDiasRestantes(bovino.fecha_pendiente))
                     return (
                       <CTableRow key={index}>
-                        <CTableDataCell>#{bovino.ttr_numerobv}</CTableDataCell>
+                        <CTableDataCell className="fw-bold">#{bovino.ttr_numerobv}</CTableDataCell>
                         <CTableDataCell>{bovino.motivo}</CTableDataCell>
                         <CTableDataCell>{bovino.detalle}</CTableDataCell>
                         <CTableDataCell>{formatDate(bovino.fecha_pendiente)}</CTableDataCell>
@@ -252,7 +277,10 @@ const ReportesIndex = () => {
               </CTable>
 
               {bovinosAtencion.length === 0 && (
-                <CAlert color="success">¡Excelente! No hay bovinos pendientes de atención</CAlert>
+                <CAlert color="success" className="border-0 shadow-sm">
+                  <CIcon icon={cilCheckCircle} className="me-2" />
+                  ¡Excelente! No hay bovinos con atención pendiente.
+                </CAlert>
               )}
             </CCardBody>
           </CCard>
@@ -262,22 +290,38 @@ const ReportesIndex = () => {
       {/* Botones de Acceso Rápido */}
       <CRow>
         <CCol xs={12}>
-          <CCard>
-            <CCardHeader>
-              <strong>Acciones Rápidas</strong>
+          <CCard className="mb-4 shadow-sm border-0">
+            <CCardHeader className="bg-light">
+              <strong className="text-success">Acciones Rápidas</strong>
             </CCardHeader>
             <CCardBody>
-              <div className="d-grid gap-2 d-md-flex">
-                <CButton color="primary" onClick={() => navigate('/sanidad/vacunaciones')}>
+              <div className="d-grid gap-2 d-md-flex justify-content-md-start">
+                <CButton
+                  color="success"
+                  variant="outline"
+                  onClick={() => navigate('/sanidad/vacunaciones')}
+                >
                   Ir a Vacunaciones
                 </CButton>
-                <CButton color="success" onClick={() => navigate('/sanidad/prenez')}>
+                <CButton
+                  color="success"
+                  variant="outline"
+                  onClick={() => navigate('/sanidad/prenez')}
+                >
                   Ir a Gestión de Preñez
                 </CButton>
-                <CButton color="info" onClick={() => navigate('/sanidad/visitas-veterinarias')}>
+                <CButton
+                  color="success"
+                  variant="outline"
+                  onClick={() => navigate('/sanidad/visitas-veterinarias')}
+                >
                   Ir a Visitas Veterinarias
                 </CButton>
-                <CButton color="warning" onClick={() => navigate('/sanidad/planes-vacunacion')}>
+                <CButton
+                  color="warning"
+                  variant="outline"
+                  onClick={() => navigate('/sanidad/planes-vacunacion')}
+                >
                   Ir a Planes de Vacunación
                 </CButton>
               </div>

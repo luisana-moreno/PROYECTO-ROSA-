@@ -46,18 +46,7 @@ const ClientTable = ({
   }
 
   const handleDelete = (client) => {
-    setCurrentClient({
-      id: client.ttr_idclient,
-      client_type: client.client_type,
-      company_name: client.ttr_nomcompa,
-      firts_name: client.ttr_nombrecl,
-      Firts_Las_Name: client.ttr_apellido,
-      Document_Number: client.ttr_documecl,
-      Rif: client.ttr_documecl,
-      Phone: client.ttr_telefono,
-      Address: client.ttr_direccio,
-      email: client.ttr_correocl,
-    })
+    setCurrentClient({ ...client, id: client.ttr_idclient })
     setDeleteVisibleClient(true)
   }
 
@@ -137,7 +126,6 @@ const ClientTable = ({
               ))}
             </CTableBody>
           </CTable>
-
           {naturalClients.length === 0 && (
             <CAlert color="info">No hay clientes naturales registrados.</CAlert>
           )}
@@ -185,7 +173,6 @@ const ClientTable = ({
               ))}
             </CTableBody>
           </CTable>
-
           {juridicalClients.length === 0 && (
             <CAlert color="info">No hay clientes jurídicos registrados.</CAlert>
           )}

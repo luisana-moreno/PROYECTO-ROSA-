@@ -185,6 +185,7 @@ export const AddMilkRecordModal = ({
         </CButton>
         <CButton
           color="success"
+          className="text-white"
           onClick={handleAddRecord}
           disabled={
             !selectedLotId || bovinesInSelectedLot.length === 0 || totalLiters === 0 || isLoading

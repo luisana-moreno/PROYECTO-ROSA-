@@ -9,6 +9,9 @@ import {
   CButton,
 } from '@coreui/react'
 
+import CIcon from '@coreui/icons-react'
+import { cilPencil, cilTrash } from '@coreui/icons'
+
 export const MilkRecordsTable = ({
   milkRecords,
   setCurrentRecord,
@@ -44,28 +47,28 @@ export const MilkRecordsTable = ({
             <CTableDataCell>
               <div className="d-flex">
                 <CButton
-                  className="me-2 mb-2"
+                  className="me-2 mb-2 text-white"
                   size="sm"
-                  color="info"
-                  variant="outline"
+                  color="warning"
+                  title="Editar"
                   onClick={() => {
                     setCurrentRecord(record)
                     setEditVisible(true)
                   }}
                 >
-                  Editar
+                  <CIcon icon={cilPencil} />
                 </CButton>
                 <CButton
-                  className="me-2 mb-2"
+                  className="me-2 mb-2 text-white"
                   size="sm"
                   color="danger"
-                  variant="outline"
+                  title="Eliminar"
                   onClick={() => {
                     setCurrentRecord(record)
                     setDeleteVisible(true)
                   }}
                 >
-                  Eliminar
+                  <CIcon icon={cilTrash} />
                 </CButton>
               </div>
             </CTableDataCell>

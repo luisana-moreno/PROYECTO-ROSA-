@@ -14,6 +14,7 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilMedicalCross, cilWarning, cilCalendar, cilCheckCircle } from '@coreui/icons'
+// Usando rutas relativas correctas según structure
 import {
   getDashboardSanidad,
   getVacunasProximasReporte,
@@ -79,9 +80,9 @@ const DashboardSanidad = () => {
     <>
       <CRow>
         <CCol xs={12}>
-          <CCard className="mb-4">
+          <CCard className="mb-4 shadow-sm border-0">
             <CCardHeader>
-              <strong>Control Sanitario de Bovinos</strong>
+              <h4>Control Sanitario de Bovinos</h4>
             </CCardHeader>
             <CCardBody>
               <p className="text-medium-emphasis">
@@ -97,7 +98,7 @@ const DashboardSanidad = () => {
       <CRow>
         <CCol xs={12} sm={6} lg={3}>
           <CWidgetStatsF
-            className="mb-3"
+            className="mb-3 shadow-sm"
             color="primary"
             icon={<CIcon icon={cilCalendar} height={24} />}
             title="Vacunas Próximas (15 días)"
@@ -108,7 +109,7 @@ const DashboardSanidad = () => {
         </CCol>
         <CCol xs={12} sm={6} lg={3}>
           <CWidgetStatsF
-            className="mb-3"
+            className="mb-3 shadow-sm"
             color="danger"
             icon={<CIcon icon={cilWarning} height={24} />}
             title="Vacunas Vencidas"
@@ -119,7 +120,7 @@ const DashboardSanidad = () => {
         </CCol>
         <CCol xs={12} sm={6} lg={3}>
           <CWidgetStatsF
-            className="mb-3"
+            className="mb-3 shadow-sm"
             color="success"
             icon={<CIcon icon={cilCheckCircle} height={24} />}
             title="Preñeces Activas"
@@ -130,7 +131,7 @@ const DashboardSanidad = () => {
         </CCol>
         <CCol xs={12} sm={6} lg={3}>
           <CWidgetStatsF
-            className="mb-3"
+            className="mb-3 shadow-sm"
             color="warning"
             icon={<CIcon icon={cilMedicalCross} height={24} />}
             title="Tratamientos Próximos"
@@ -144,66 +145,81 @@ const DashboardSanidad = () => {
       {/* Próxima Visita Veterinaria */}
       <CRow>
         <CCol xs={12} md={6}>
-          <CCard className="mb-4">
-            <CCardHeader>
-              <strong>Próxima Visita Veterinaria</strong>
+          <CCard className="mb-4 shadow-sm border-0">
+            <CCardHeader className="bg-light">
+              <strong className="text-success">Próxima Visita Veterinaria</strong>
             </CCardHeader>
             <CCardBody>
               {dashboard.proximaVisita ? (
-                <CAlert color="info">
-                  <strong>Fecha programada:</strong> {formatDate(dashboard.proximaVisita)}
-                  <br />
-                  <small>
-                    {getDiasRestantes(dashboard.proximaVisita) > 0
-                      ? `Faltan ${getDiasRestantes(dashboard.proximaVisita)} días`
-                      : 'Visita vencida'}
-                  </small>
+                <CAlert color="info" className="d-flex align-items-center border-0 shadow-sm">
+                  <CIcon icon={cilCalendar} className="flex-shrink-0 me-2" width={24} height={24} />
+                  <div>
+                    <strong>Fecha programada:</strong> {formatDate(dashboard.proximaVisita)}
+                    <br />
+                    <small>
+                      {getDiasRestantes(dashboard.proximaVisita) > 0
+                        ? `Faltan ${getDiasRestantes(dashboard.proximaVisita)} días`
+                        : 'Visita vencida'}
+                    </small>
+                  </div>
                 </CAlert>
               ) : (
-                <CAlert color="warning">No hay próxima visita programada</CAlert>
+                <CAlert color="warning" className="border-0 shadow-sm">
+                  No hay próxima visita programada
+                </CAlert>
               )}
-              <CButton color="primary" onClick={() => navigate('/sanidad/visitas-veterinarias')}>
-                Ver Visitas
-              </CButton>
+              <div className="d-grid mt-3">
+                <CButton color="success" onClick={() => navigate('/sanidad/visitas-veterinarias')}>
+                  Ver Calendario de Visitas
+                </CButton>
+              </div>
             </CCardBody>
           </CCard>
         </CCol>
 
         {/* Accesos Rápidos */}
         <CCol xs={12} md={6}>
-          <CCard className="mb-4">
-            <CCardHeader>
-              <strong>Accesos Rápidos</strong>
+          <CCard className="mb-4 shadow-sm border-0">
+            <CCardHeader className="bg-light">
+              <strong className="text-success">Accesos Rápidos</strong>
             </CCardHeader>
             <CCardBody>
               <div className="d-grid gap-2">
                 <CButton
-                  color="primary"
+                  color="success"
                   variant="outline"
-                  onClick={() => navigate('/sanidad/vacunaciones/nueva')}
+                  className="text-start"
+                  onClick={() => navigate('/sanidad/vacunaciones')}
                 >
-                  Registrar Vacunación
+                  <CIcon icon={cilMedicalCross} className="me-2" />
+                  Gestionar Vacunación
                 </CButton>
                 <CButton
                   color="success"
                   variant="outline"
-                  onClick={() => navigate('/sanidad/prenez/nueva')}
+                  className="text-start"
+                  onClick={() => navigate('/sanidad/prenez')}
                 >
-                  Registrar Preñez
+                  <CIcon icon={cilCheckCircle} className="me-2" />
+                  Gestionar Reproducción
                 </CButton>
                 <CButton
-                  color="info"
+                  color="success"
                   variant="outline"
-                  onClick={() => navigate('/sanidad/visitas-veterinarias/nueva')}
+                  className="text-start"
+                  onClick={() => navigate('/sanidad/visitas-veterinarias')}
                 >
-                  Registrar Visita Veterinaria
+                  <CIcon icon={cilCalendar} className="me-2" />
+                  Agendar Visita Veterinaria
                 </CButton>
                 <CButton
                   color="warning"
                   variant="outline"
+                  className="text-start"
                   onClick={() => navigate('/sanidad/reportes')}
                 >
-                  Ver Reportes
+                  <CIcon icon={cilWarning} className="me-2" />
+                  Ver Reportes Sanitarios
                 </CButton>
               </div>
             </CCardBody>
@@ -215,16 +231,16 @@ const DashboardSanidad = () => {
       {vacunasProximas.length > 0 && (
         <CRow>
           <CCol xs={12}>
-            <CCard className="mb-4">
-              <CCardHeader>
-                <strong>Vacunas Próximas (15 días)</strong>
+            <CCard className="mb-4 shadow-sm border-0">
+              <CCardHeader className="bg-danger text-white">
+                <strong className="text-white">Vacunas Próximas (15 días)</strong>
               </CCardHeader>
               <CCardBody>
-                <CListGroup>
+                <CListGroup flush>
                   {vacunasProximas.slice(0, 5).map((vacuna) => (
                     <CListGroupItem
                       key={vacuna.ttr_idvacuna}
-                      className="d-flex justify-content-between align-items-center"
+                      className="d-flex justify-content-between align-items-center border-bottom"
                     >
                       <div>
                         <strong>Bovino #{vacuna.numero_bovino}</strong> - {vacuna.nombre_vacuna}
@@ -244,7 +260,7 @@ const DashboardSanidad = () => {
                 {vacunasProximas.length > 5 && (
                   <div className="mt-3 text-center">
                     <CButton
-                      color="primary"
+                      color="danger"
                       variant="ghost"
                       onClick={() => navigate('/sanidad/vacunaciones')}
                     >
@@ -262,12 +278,12 @@ const DashboardSanidad = () => {
       {bovinosAtencion.length > 0 && (
         <CRow>
           <CCol xs={12}>
-            <CCard className="mb-4">
-              <CCardHeader>
+            <CCard className="mb-4 shadow-sm border-0">
+              <CCardHeader className="bg-warning text-dark">
                 <strong>Bovinos que Requieren Atención</strong>
               </CCardHeader>
               <CCardBody>
-                <CListGroup>
+                <CListGroup flush>
                   {bovinosAtencion.slice(0, 5).map((bovino, index) => (
                     <CListGroupItem
                       key={index}

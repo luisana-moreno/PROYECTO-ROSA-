@@ -33,6 +33,7 @@
     "@fullcalendar/interaction": "^6.1.17",
     "@fullcalendar/react": "^6.1.17",
     "@popperjs/core": "^2.11.8",
+    "@tailwindcss/vite": "^4.1.17",
     "bootstrap-multiselect": "^2.0.0",
     "chart.js": "^4.4.9",
     "classnames": "^2.5.1",
@@ -50,7 +51,8 @@
     "react-router-dom": "^7.1.5",
     "react-toastify": "^11.0.5",
     "redux": "5.0.1",
-    "simplebar-react": "^3.3.0"
+    "simplebar-react": "^3.3.0",
+    "tailwindcss": "^4.1.17"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",

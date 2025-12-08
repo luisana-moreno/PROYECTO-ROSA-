@@ -25,6 +25,8 @@ import {
   CFormTextarea,
   CAlert,
 } from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilPlus, cilTrash, cilFilter, cilSearch, cilCheckCircle, cilCalendar } from '@coreui/icons'
 import {
   getPreneces,
   getPrenecesActivas,
@@ -135,36 +137,38 @@ const PrenezIndex = () => {
     <>
       <CRow>
         <CCol xs={12}>
-          <CCard className="mb-4">
+          <CCard className="mb-4 shadow-sm border-0">
             <CCardHeader className="d-flex justify-content-between align-items-center">
-              <strong>Gestión de Preñez</strong>
-              <CButton color="primary" onClick={() => setShowModal(true)}>
+              <strong>Gestión de Preñez y Partos</strong>
+              <CButton color="success" className="text-white" onClick={() => setShowModal(true)}>
+                <CIcon icon={cilPlus} className="me-2" />
                 Nueva Preñez
               </CButton>
             </CCardHeader>
             <CCardBody>
               {/* Filtros */}
-              <div className="mb-3">
+              <div className="mb-4 d-flex gap-2">
                 <CButton
-                  color={filter === 'activas' ? 'success' : 'secondary'}
-                  variant={filter === 'activas' ? '' : 'outline'}
-                  className="me-2"
+                  color={filter === 'activas' ? 'success' : 'light'}
+                  variant={filter === 'activas' ? '' : 'ghost'}
                   onClick={() => setFilter('activas')}
                 >
+                  <CIcon icon={cilCheckCircle} className="me-2" />
                   Activas
                 </CButton>
                 <CButton
-                  color={filter === 'todas' ? 'primary' : 'secondary'}
-                  variant={filter === 'todas' ? '' : 'outline'}
+                  color={filter === 'todas' ? 'primary' : 'light'}
+                  variant={filter === 'todas' ? '' : 'ghost'}
                   onClick={() => setFilter('todas')}
                 >
-                  Todas
+                  <CIcon icon={cilFilter} className="me-2" />
+                  Historial Completo
                 </CButton>
               </div>
 
               {/* Tabla */}
-              <CTable striped hover responsive>
-                <CTableHead>
+              <CTable striped hover responsive className="align-middle">
+                <CTableHead color="light">
                   <CTableRow>
                     <CTableHeaderCell>Bovino</CTableHeaderCell>
                     <CTableHeaderCell>Fecha Inicio</CTableHeaderCell>
@@ -172,7 +176,7 @@ const PrenezIndex = () => {
                     <CTableHeaderCell>Fecha Real Parto</CTableHeaderCell>
                     <CTableHeaderCell>Estado</CTableHeaderCell>
                     <CTableHeaderCell>Días Restantes</CTableHeaderCell>
-                    <CTableHeaderCell>Acciones</CTableHeaderCell>
+                    <CTableHeaderCell className="text-end">Acciones</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
@@ -180,15 +184,19 @@ const PrenezIndex = () => {
                     const diasRestantes = getDiasRestantes(prenez.ttr_fechaestp)
                     return (
                       <CTableRow key={prenez.ttr_idprenez}>
-                        <CTableDataCell>#{prenez.numero_bovino}</CTableDataCell>
+                        <CTableDataCell className="fw-semibold">
+                          #{prenez.numero_bovino}
+                        </CTableDataCell>
                         <CTableDataCell>{formatDate(prenez.ttr_fechaini)}</CTableDataCell>
-                        <CTableDataCell>{formatDate(prenez.ttr_fechaestp)}</CTableDataCell>
+                        <CTableDataCell>
+                          <strong>{formatDate(prenez.ttr_fechaestp)}</strong>
+                        </CTableDataCell>
                         <CTableDataCell>{formatDate(prenez.ttr_fechareal)}</CTableDataCell>
                         <CTableDataCell>
                           <CBadge
                             color={
                               prenez.ttr_estadopre === 'Finalizada'
-                                ? 'success'
+                                ? 'secondary'
                                 : prenez.ttr_estadopre === 'Confirmada'
                                   ? 'primary'
                                   : 'warning'
@@ -203,24 +211,29 @@ const PrenezIndex = () => {
                               {diasRestantes > 0 ? `${diasRestantes} días` : 'Vencida'}
                             </CBadge>
                           )}
+                          {prenez.ttr_estadopre === 'Finalizada' && (
+                            <span className="text-muted">-</span>
+                          )}
                         </CTableDataCell>
-                        <CTableDataCell>
+                        <CTableDataCell className="text-end">
                           {prenez.ttr_estadopre !== 'Finalizada' && (
                             <CButton
                               color="success"
                               size="sm"
-                              className="me-2"
+                              className="text-white me-2"
+                              title="Registrar Parto"
                               onClick={() => handleRegistrarParto(prenez.ttr_idprenez)}
                             >
-                              Registrar Parto
+                              <CIcon icon={cilCheckCircle} />
                             </CButton>
                           )}
                           <CButton
                             color="danger"
                             size="sm"
+                            title="Eliminar registro"
                             onClick={() => handleDelete(prenez.ttr_idprenez)}
                           >
-                            Eliminar
+                            <CIcon icon={cilTrash} />
                           </CButton>
                         </CTableDataCell>
                       </CTableRow>
@@ -229,14 +242,19 @@ const PrenezIndex = () => {
                 </CTableBody>
               </CTable>
 
-              {preneces.length === 0 && <CAlert color="info">No hay preñeces registradas</CAlert>}
+              {preneces.length === 0 && (
+                <CAlert color="info" className="mt-3 border-0 shadow-sm">
+                  <CIcon icon={cilSearch} className="me-2" />
+                  No se encontraron registros de preñez con los filtros actuales.
+                </CAlert>
+              )}
             </CCardBody>
           </CCard>
         </CCol>
       </CRow>
 
       {/* Modal Nueva Preñez */}
-      <CModal visible={showModal} onClose={() => setShowModal(false)} size="lg">
+      <CModal visible={showModal} onClose={() => setShowModal(false)} size="lg" backdrop="static">
         <CModalHeader>
           <CModalTitle>Nueva Preñez</CModalTitle>
         </CModalHeader>
@@ -305,16 +323,19 @@ const PrenezIndex = () => {
               </CCol>
             </CRow>
 
-            <CAlert color="info">
-              <strong>Nota:</strong> La duración promedio de una preñez bovina es de 280 días
-              (aproximadamente 9 meses).
+            <CAlert color="info" className="d-flex align-items-center">
+              <CIcon icon={cilCalendar} className="me-2" />
+              <div>
+                <strong>Nota:</strong> La duración promedio de una preñez bovina es de 280 días
+                (aprox. 9 meses).
+              </div>
             </CAlert>
           </CModalBody>
           <CModalFooter>
             <CButton color="secondary" onClick={() => setShowModal(false)}>
               Cancelar
             </CButton>
-            <CButton color="primary" type="submit">
+            <CButton color="success" type="submit" className="text-white">
               Guardar
             </CButton>
           </CModalFooter>

@@ -41,18 +41,15 @@ const Pastures = () => {
   } = usePastures()
 
   return (
-    <CCard>
-      <CCardHeader>
-        <h4 className="typography-color-title mb-0 d-flex justify-content-between align-items-center">
-          Gestión de Potreros
-          <CButton
-            className="button-no-hover-green text-white"
-            onClick={() => setVisible(!visible)}
-          >
-            <CIcon icon={cilPlus} className="me-2" />
-            Crear Potrero
-          </CButton>
-        </h4>
+    <CCard className="mb-4 shadow-sm border-0">
+      <CCardHeader className="d-flex justify-content-between align-items-center">
+        <strong>Gestión de Potreros</strong>
+        <CButton color="success" className="text-white" onClick={() => setVisible(!visible)}>
+          <CIcon icon={cilPlus} className="me-2" />
+          Crear Potrero
+        </CButton>
+      </CCardHeader>
+      <CCardBody>
         <PastureFilters
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -63,8 +60,6 @@ const Pastures = () => {
           estadosPotrero={estadosPotrero}
           tiposMantenimiento={tiposMantenimiento}
         />
-      </CCardHeader>
-      <CCardBody>
         <PasturesTable
           pastures={filteredPastures}
           setCurrentPasture={setCurrentPasture}
@@ -101,14 +96,13 @@ const Pastures = () => {
         <div
           style={{
             position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
+            bottom: '20px',
+            right: '20px',
             zIndex: 9999,
             minWidth: 300,
           }}
         >
-          <CAlert color={toast.color} className="text-center m-0">
+          <CAlert color={toast.color} className="shadow-sm border-0">
             {toast.message}
           </CAlert>
         </div>

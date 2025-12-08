@@ -10,7 +10,8 @@ import {
   CCollapse,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilCaretBottom, cilCaretTop } from '@coreui/icons'
+import { cilCaretBottom, cilCaretTop, cilPencil, cilTrash } from '@coreui/icons'
+import { formatDateToDDMMYYYY } from '../../../../../utils/dateFormatter'
 
 export const MilkProductionLotTable = ({
   milkProductionLots,
@@ -27,12 +28,12 @@ export const MilkProductionLotTable = ({
 
   const getIndividualRecordsForLot = (lotId, date) => {
     return individualMilkRecords.filter(
-      (record) => record.ttr_idlote === lotId && record.ttr_fechapro === date,
+      (record) => record.ttrIdlote === lotId && record.fechaProduccion === date,
     )
   }
 
   return (
-    <CTable hover responsive>
+    <CTable striped hover responsive>
       <CTableHead>
         <CTableRow>
           <CTableHeaderCell>Lote</CTableHeaderCell>
@@ -43,14 +44,27 @@ export const MilkProductionLotTable = ({
       </CTableHead>
       <CTableBody>
         {milkProductionLots.map((lotProduction) => (
-          <React.Fragment key={lotProduction.ttr_idprolot}>
+          <React.Fragment key={lotProduction.idProduccionLecheLote || lotProduction.ttrIdprolot}>
             <CTableRow>
-              <CTableDataCell>{lotProduction.nombre_lote}</CTableDataCell>
-              <CTableDataCell>{lotProduction.ttr_fechapro}</CTableDataCell>
-              <CTableDataCell>{lotProduction.ttr_totlitrs}</CTableDataCell>
               <CTableDataCell>
-                <CButton color="link" onClick={() => toggleDetails(lotProduction.ttr_idprolot)}>
-                  {visibleDetail[lotProduction.ttr_idprolot] ? (
+                <strong> {lotProduction.nombreLote || lotProduction.nombre_lote}</strong>
+              </CTableDataCell>
+              <CTableDataCell>
+                {formatDateToDDMMYYYY(lotProduction.fechaProduccion || lotProduction.ttr_fechapro)}
+              </CTableDataCell>
+              <CTableDataCell>
+                {lotProduction.ttrTotlitrs.toFixed(2) || lotProduction.ttr_totlitrs.toFixed(2)}
+              </CTableDataCell>
+              <CTableDataCell>
+                <CButton
+                  color="link"
+                  onClick={() =>
+                    toggleDetails(lotProduction.idProduccionLecheLote || lotProduction.ttrIdprolot)
+                  }
+                >
+                  {visibleDetail[
+                    lotProduction.idProduccionLecheLote || lotProduction.ttrIdprolot
+                  ] ? (
                     <React.Fragment>
                       Ocultar Bovinos
                       <CIcon icon={cilCaretTop} />
@@ -66,11 +80,19 @@ export const MilkProductionLotTable = ({
             </CTableRow>
             <CTableRow>
               <CTableDataCell colSpan={4} className="p-0">
-                <CCollapse visible={visibleDetail[lotProduction.ttr_idprolot]}>
+                <CCollapse
+                  visible={
+                    visibleDetail[lotProduction.idProduccionLecheLote || lotProduction.ttrIdprolot]
+                  }
+                >
                   <div className="p-3">
                     <h6>
-                      Producción Individual de Bovinos en Lote {lotProduction.nombre_lote} (
-                      {lotProduction.ttr_fechapro})
+                      Producción Individual de Bovinos en Lote{' '}
+                      {lotProduction.nombreLote || lotProduction.nombre_lote} (
+                      {formatDateToDDMMYYYY(
+                        lotProduction.fechaProduccion || lotProduction.ttr_fechapro,
+                      )}
+                      )
                     </h6>
                     <CTable striped hover small className="mb-0">
                       <CTableHead>
@@ -82,36 +104,44 @@ export const MilkProductionLotTable = ({
                       </CTableHead>
                       <CTableBody>
                         {getIndividualRecordsForLot(
-                          lotProduction.ttr_idlote,
-                          lotProduction.ttr_fechapro,
+                          lotProduction.ttrIdlote || lotProduction.ttr_idlote,
+                          lotProduction.fechaProduccion || lotProduction.ttr_fechapro,
                         ).map((individualRecord) => (
-                          <CTableRow key={individualRecord.ttr_idprodlc}>
-                            <CTableDataCell>{individualRecord.bovino_numero}</CTableDataCell>
-                            <CTableDataCell>{individualRecord.ttr_litrsprd}</CTableDataCell>
+                          <CTableRow
+                            key={
+                              individualRecord.idProduccionLeche || individualRecord.ttr_idprodlc
+                            }
+                          >
+                            <CTableDataCell>
+                              {individualRecord.bovinoNumero || individualRecord.bovinoNumero}
+                            </CTableDataCell>
+                            <CTableDataCell>
+                              {individualRecord.litrosProducidos || individualRecord.ttr_litrsprd}
+                            </CTableDataCell>
                             <CTableDataCell>
                               <CButton
-                                className="me-2 mb-2"
+                                className="me-2 mb-2 text-white"
                                 size="sm"
-                                color="info"
-                                variant="outline"
+                                color="warning"
+                                title="Editar"
                                 onClick={() => {
                                   setCurrentRecord(individualRecord)
                                   setEditVisible(true)
                                 }}
                               >
-                                Editar
+                                <CIcon icon={cilPencil} />
                               </CButton>
                               <CButton
-                                className="me-2 mb-2"
+                                className="me-2 mb-2 text-white"
                                 size="sm"
                                 color="danger"
-                                variant="outline"
+                                title="Eliminar"
                                 onClick={() => {
                                   setCurrentRecord(individualRecord)
                                   setDeleteVisible(true)
                                 }}
                               >
-                                Eliminar
+                                <CIcon icon={cilTrash} />
                               </CButton>
                             </CTableDataCell>
                           </CTableRow>

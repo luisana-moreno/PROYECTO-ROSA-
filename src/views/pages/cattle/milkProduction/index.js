@@ -1,5 +1,7 @@
 import React from 'react'
-import { CCard, CCardHeader, CCardBody, CButton } from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilPlus, cilDrop } from '@coreui/icons'
+import { CCard, CCardHeader, CCardBody, CButton, CRow, CCol } from '@coreui/react'
 import { useMilkRecords } from './hooks/useMilkRecords'
 import { MilkProductionLotTable } from './components/MilkProductionLotTable'
 import { AddMilkRecordModal } from './components/AddMilkRecordModal'
@@ -28,31 +30,55 @@ const MilkProduction = () => {
     setIndividualBovineProduction,
     milkProductionLots,
     individualMilkRecords,
-    isLoading, // Importar isLoading
+    isLoading,
     handleAddRecord,
     handleEditRecord,
     handleDeleteRecord,
   } = useMilkRecords()
 
   return (
-    <CCard>
-      <CCardHeader>
-        <h4 className="typography-color-title mb-0 d-flex justify-content-between align-items-center">
-          Registro de Producción de Leche por Lote
-          <CButton className="button-no-hover-green text-white" onClick={() => setVisible(true)}>
-            Agregar Producción por Lote
-          </CButton>
-        </h4>
-      </CCardHeader>
-      <CCardBody>
-        <MilkProductionLotTable
-          milkProductionLots={milkProductionLots}
-          individualMilkRecords={individualMilkRecords}
-          setCurrentRecord={setCurrentRecord}
-          setEditVisible={setEditVisible}
-          setDeleteVisible={setDeleteVisible}
-        />
-      </CCardBody>
+    <>
+      <CRow>
+        <CCol xs={12}>
+          <CCard className="mb-4">
+            <CCardHeader>
+              <div className="d-flex align-items-center">
+                <CIcon icon={cilDrop} className="me-2" size="lg" style={{ color: '#28a745' }} />
+                <strong>Gestión de Producción de Leche</strong>
+              </div>
+            </CCardHeader>
+            <CCardBody>
+              <p className="text-medium-emphasis mb-0">
+                Administra los registros de producción de leche. Registra la producción diaria por
+                lotes, visualiza historiales y gestiona la información individual de tus bovinos.
+              </p>
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+
+      <CRow>
+        <CCol xs={12}>
+          <CCard className="mb-4">
+            <CCardHeader className="d-flex justify-content-between align-items-center">
+              <strong>Lista de Producción por Lote</strong>
+              <CButton color="success" className="text-white" onClick={() => setVisible(true)}>
+                <CIcon icon={cilPlus} className="me-2" />
+                Agregar Producción
+              </CButton>
+            </CCardHeader>
+            <CCardBody>
+              <MilkProductionLotTable
+                milkProductionLots={milkProductionLots}
+                individualMilkRecords={individualMilkRecords}
+                setCurrentRecord={setCurrentRecord}
+                setEditVisible={setEditVisible}
+                setDeleteVisible={setDeleteVisible}
+              />
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
 
       <AddMilkRecordModal
         visible={visible}
@@ -65,7 +91,7 @@ const MilkProduction = () => {
         bovinesInSelectedLot={bovinesInSelectedLot}
         individualBovineProduction={individualBovineProduction}
         setIndividualBovineProduction={setIndividualBovineProduction}
-        isLoading={isLoading} // Pasar isLoading al modal
+        isLoading={isLoading}
         handleAddRecord={handleAddRecord}
       />
 
@@ -83,8 +109,9 @@ const MilkProduction = () => {
         deleteConfirmation={deleteConfirmation}
         setDeleteConfirmation={setDeleteConfirmation}
         handleDeleteRecord={handleDeleteRecord}
+        currentRecord={currentRecord}
       />
-    </CCard>
+    </>
   )
 }
 

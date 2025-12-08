@@ -10,6 +10,8 @@ import {
   CFormLabel,
 } from '@coreui/react'
 
+import { formatDateToDDMMYYYY } from '../../../../../utils/dateFormatter'
+
 export const EditMilkRecordModal = ({
   editVisible,
   setEditVisible,
@@ -30,23 +32,34 @@ export const EditMilkRecordModal = ({
       <CModalBody>
         {currentRecord && (
           <>
-            <CFormLabel>Bovino ID: {currentRecord.ttr_idbovlec}</CFormLabel>
-            <CFormLabel>Número de Bovino: {currentRecord.bovino_numero}</CFormLabel>
-            <CFormLabel>Lote: {currentRecord.nombre_lote}</CFormLabel>
-            <CFormLabel>Fecha de Producción: {currentRecord.ttr_fechapro}</CFormLabel>
+            <CFormLabel>
+              Bovino ID: {currentRecord.idBovinoLeche || currentRecord.ttr_idbovlec}
+            </CFormLabel>
+            <CFormLabel>
+              Número de Bovino: {currentRecord.bovinoNumero || currentRecord.bovino_numero}
+            </CFormLabel>
+            <CFormLabel>Lote: {currentRecord.nombreLote || currentRecord.nombre_lote}</CFormLabel>
+            <CFormLabel>
+              Fecha de Producción:{' '}
+              {formatDateToDDMMYYYY(currentRecord.fechaProduccion || currentRecord.ttr_fechapro)}
+            </CFormLabel>
             <CFormInput
               type="number"
               label="Litros Producidos"
-              value={currentRecord.ttr_litrsprd || ''}
+              value={currentRecord.litrosProducidos || currentRecord.ttr_litrsprd || ''}
               onChange={(e) =>
-                setCurrentRecord({ ...currentRecord, ttr_litrsprd: parseFloat(e.target.value) })
+                setCurrentRecord({
+                  ...currentRecord,
+                  litrosProducidos: parseFloat(e.target.value),
+                  ttr_litrsprd: parseFloat(e.target.value), // Keep both synced just in case
+                })
               }
             />
           </>
         )}
       </CModalBody>
       <CModalFooter>
-        <CButton className="button-no-hover-green text-white" onClick={handleEditRecord}>
+        <CButton color="success" className="text-white" onClick={handleEditRecord}>
           Guardar cambios
         </CButton>
       </CModalFooter>

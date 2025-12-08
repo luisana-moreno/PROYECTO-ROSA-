@@ -7,54 +7,71 @@ import {
   CTableBody,
   CTableDataCell,
   CButton,
+  CBadge,
 } from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilPencil, cilTrash } from '@coreui/icons'
 
 const PasturesTable = ({ pastures, setCurrentPasture, setEditVisible, setDeleteVisible }) => {
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Disponible':
+        return 'success'
+      case 'En uso':
+        return 'primary'
+      case 'En mantenimiento':
+        return 'warning'
+      default:
+        return 'secondary'
+    }
+  }
+
   return (
-    <CTable hover responsive>
-      <CTableHead>
+    <CTable hover responsive className="align-middle">
+      <CTableHead color="light">
         <CTableRow>
           <CTableHeaderCell>Código Potrero</CTableHeaderCell>
           <CTableHeaderCell>Estado</CTableHeaderCell>
           <CTableHeaderCell>Descripción</CTableHeaderCell>
           <CTableHeaderCell>Fecha Mantenimiento</CTableHeaderCell>
-          <CTableHeaderCell>Acciones</CTableHeaderCell>
+          <CTableHeaderCell className="text-end">Acciones</CTableHeaderCell>
         </CTableRow>
       </CTableHead>
       <CTableBody>
         {pastures.map((pasture) => (
           <CTableRow key={pasture.ttr_idpotrer}>
-            <CTableDataCell>{pasture.ttr_codpotre}</CTableDataCell>
-            <CTableDataCell>{pasture.tma_nomestp}</CTableDataCell>
+            <CTableDataCell className="fw-semibold text-success">
+              {pasture.ttr_codpotre}
+            </CTableDataCell>
+            <CTableDataCell>
+              <CBadge color={getStatusColor(pasture.tma_nomestp)}>{pasture.tma_nomestp}</CBadge>
+            </CTableDataCell>
             <CTableDataCell>{pasture.ttr_descripc}</CTableDataCell>
             <CTableDataCell>{new Date(pasture.ttr_fechamnt).toLocaleDateString()}</CTableDataCell>
-            <CTableDataCell>
-              <div className="d-flex">
-                <CButton
-                  className="me-2 mb-2"
-                  size="sm"
-                  color="info"
-                  variant="outline"
-                  onClick={() => {
-                    setCurrentPasture(pasture)
-                    setEditVisible(true)
-                  }}
-                >
-                  Editar
-                </CButton>
-                <CButton
-                  className="me-2 mb-2"
-                  size="sm"
-                  color="danger"
-                  variant="outline"
-                  onClick={() => {
-                    setCurrentPasture(pasture)
-                    setDeleteVisible(true)
-                  }}
-                >
-                  Eliminar
-                </CButton>
-              </div>
+            <CTableDataCell className="text-end">
+              <CButton
+                color="warning"
+                size="sm"
+                className="me-2 text-white"
+                title="Editar"
+                onClick={() => {
+                  setCurrentPasture(pasture)
+                  setEditVisible(true)
+                }}
+              >
+                <CIcon icon={cilPencil} />
+              </CButton>
+              <CButton
+                color="danger"
+                size="sm"
+                title="Eliminar"
+                onClick={() => {
+                  setCurrentPasture(pasture)
+                  setDeleteVisible(true)
+                }}
+              >
+                <CIcon icon={cilTrash} />
+              </CButton>
             </CTableDataCell>
           </CTableRow>
         ))}

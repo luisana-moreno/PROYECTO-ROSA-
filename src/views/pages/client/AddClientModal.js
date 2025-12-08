@@ -79,8 +79,8 @@ const AddClientModal = ({ visible, setVisible, addClient, setAddClient, handleAd
         toast.error('El nombre de la empresa es requerido.')
         return false
       }
-      if (!addClient.Rif || !/^\d{10}$/.test(addClient.Rif)) {
-        toast.error('El RIF debe tener 10 dígitos numéricos.')
+      if (!addClient.Rif || !/^\d{9,10}$/.test(addClient.Rif)) {
+        toast.error('El RIF debe tener formato válido.')
         return false
       }
     } else if (clientTypeSelected === 'Person') {
@@ -92,8 +92,8 @@ const AddClientModal = ({ visible, setVisible, addClient, setAddClient, handleAd
         toast.error('El apellido es requerido.')
         return false
       }
-      if (!addClient.Document_Number || !/^\d{10}$/.test(addClient.Document_Number)) {
-        toast.error('El número de documento debe tener 10 dígitos numéricos.')
+      if (!addClient.Document_Number || !/^\d{7,10}$/.test(addClient.Document_Number)) {
+        toast.error('El número de documento debe tener formato válido.')
         return false
       }
     }
@@ -200,7 +200,7 @@ const AddClientModal = ({ visible, setVisible, addClient, setAddClient, handleAd
                     maxLength={10}
                     required
                   />
-                  <small className="text-muted">Debe tener 10 dígitos</small>
+                  <small className="text-muted">Ingrese solo números</small>
                   {isVerifying && (
                     <small className="text-info d-block">Verificando documento...</small>
                   )}
@@ -241,7 +241,7 @@ const AddClientModal = ({ visible, setVisible, addClient, setAddClient, handleAd
                     maxLength={10}
                     required
                   />
-                  <small className="text-muted">Debe tener 10 dígitos</small>
+                  <small className="text-muted">Ingrese solo números</small>
                   {isVerifying && <small className="text-info d-block">Verificando RIF...</small>}
                   {documentExists && (
                     <small className="text-danger d-block">Este RIF ya está registrado</small>

@@ -7,7 +7,7 @@ import LotForm from './components/LotForm'
 import LotsTable from './components/LotsTable'
 import LotDetailsModal from './components/LotDetailsModal'
 import LotFilters from './components/LotFilters'
-import CustomTableModal from '../../../components/CustomTableModal' // Importar CustomTableModal
+import CustomTableModal from '../../../components/CustomTableModal'
 
 const LotRegistration = () => {
   const {
@@ -27,7 +27,7 @@ const LotRegistration = () => {
     handleAddLot,
     handleEditLot,
     handleDeleteLot,
-    fetchBovinesInLot, // Ahora es para historial
+    fetchBovinesInLot,
     fetchActiveBovinesInLot,
     addBovinesToLot,
     removeBovineFromLot,
@@ -35,12 +35,11 @@ const LotRegistration = () => {
   } = useLots()
 
   const [detailsModalVisible, setDetailsModalVisible] = useState(false)
-
   const [selectedLotForDetails, setSelectedLotForDetails] = useState(null)
-  const [bovinesModalVisible, setBovinesModalVisible] = useState(false) // Estado para el modal de ver bovinos
+  const [bovinesModalVisible, setBovinesModalVisible] = useState(false)
 
   const handleEditClick = (lot) => {
-    setFormData({ nombre: lot.nombre }) // Lote solo tiene nombre
+    setFormData({ nombre: lot.nombre })
     setEditingLot(lot)
   }
 
@@ -68,9 +67,9 @@ const LotRegistration = () => {
   }
 
   return (
-    <CCard>
+    <CCard className="mb-4">
       <CCardHeader>
-        <h4 className="mb-0">Registro de Lotes</h4>
+        <strong>Registro de Lotes</strong>
       </CCardHeader>
       <CCardBody>
         <LotForm
@@ -89,7 +88,7 @@ const LotRegistration = () => {
           onEdit={handleEditClick}
           onDelete={handleDeleteLot}
           onViewDetails={handleViewDetails}
-          onViewBovines={handleViewBovines} // Pasar la función
+          onViewBovines={handleViewBovines}
           loading={loading}
         />
       </CCardBody>
@@ -103,7 +102,7 @@ const LotRegistration = () => {
         bovinesInLot={bovinesInLot}
         activeBovinesInLot={activeBovinesInLot}
         loading={loading}
-        fetchBovinesInLot={fetchBovinesInLot} // Para historial
+        fetchBovinesInLot={fetchBovinesInLot}
         fetchActiveBovinesInLot={fetchActiveBovinesInLot}
         addBovinesToLot={addBovinesToLot}
         removeBovineFromLot={removeBovineFromLot}
@@ -121,10 +120,10 @@ const LotRegistration = () => {
           { key: 'etapanombre', label: 'Etapa' },
           { key: 'codpotrero', label: 'Potrero' },
         ]}
-        onSelect={() => {}} // No hace nada en readOnly
+        onSelect={() => {}}
         title="Bovinos en el Lote"
         searchPlaceholder="Buscar bovinos..."
-        readOnly={true} // Solo lectura
+        readOnly={true}
       />
     </CCard>
   )

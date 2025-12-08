@@ -15,6 +15,7 @@ export const DeleteMilkRecordModal = ({
   deleteConfirmation,
   setDeleteConfirmation,
   handleDeleteRecord,
+  currentRecord,
 }) => {
   return (
     <CModal visible={deleteVisible} onClose={() => setDeleteVisible(false)}>
@@ -24,7 +25,7 @@ export const DeleteMilkRecordModal = ({
       <CModalBody>
         <h6>
           ¿Está seguro que desea eliminar este registro de producción individual del bovino{' '}
-          {/* currentRecord?.bovino_numero */}?
+          {currentRecord?.bovinoNumero || currentRecord?.bovino_numero}?
         </h6>
         <h6>Por favor escriba "confirmar" para eliminar el registro</h6>
         <CFormInput
@@ -35,10 +36,10 @@ export const DeleteMilkRecordModal = ({
         />
       </CModalBody>
       <CModalFooter>
-        <CButton className="button-no-hover green" onClick={() => setDeleteVisible(false)}>
+        <CButton color="secondary" onClick={() => setDeleteVisible(false)}>
           Cancelar
         </CButton>
-        <CButton className="button-no-hover-green" onClick={handleDeleteRecord}>
+        <CButton color="danger" className="text-white" onClick={handleDeleteRecord}>
           Eliminar
         </CButton>
       </CModalFooter>

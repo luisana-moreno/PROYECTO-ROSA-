@@ -13,72 +13,94 @@ import {
   CInputGroupText,
   CRow,
   CImage,
+  CAlert,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilLockLocked, cilUser } from '@coreui/icons'
-import logo from 'src/assets/images/finca/fincalogo.png' // Importa el logo
-import { useAuth } from '../../../context/AuthContext' // Importa useAuth
-import { toast } from 'react-toastify' // Importa toast de react-toastify
+import { cilLockLocked, cilUser, cilHttps } from '@coreui/icons'
+import logo from 'src/assets/images/finca/fincalogo.png'
+import { useAuth } from '../../../context/AuthContext'
+import { toast } from 'react-toastify'
 
 const Login = () => {
   const [correo, setCorreo] = useState('')
   const [contrasena, setContrasena] = useState('')
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
-  const { login } = useAuth() // Usa la función login del AuthContext
-  // const addToast = useToast() // Ya no se usa useToast
+  const { login } = useAuth()
 
   useEffect(() => {
     document.body.classList.add('login-page')
-    // No limpiar el token aquí, AuthContext se encarga de la persistencia
     return () => {
       document.body.classList.remove('login-page')
     }
   }, [])
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e?.preventDefault()
+
     if (!correo || !contrasena) {
-      toast.warning('Por favor, completa todos los campos.')
+      toast.warning('Por favor, ingresa tu correo y contraseña.')
       return
     }
 
+    setLoading(true)
     try {
-      const success = await login({ correo, contrasena }) // Llama a la función login del contexto
+      const success = await login({ correo, contrasena })
       if (success) {
-        toast.success('Bienvenido al sistema.')
+        toast.success('¡Bienvenido de nuevo!')
         navigate('/dashboard')
       } else {
-        toast.error('Credenciales inválidas o error al iniciar sesión.')
+        toast.error('Credenciales incorrectas. Inténtalo de nuevo.')
       }
     } catch (error) {
-      toast.error(error.message || 'Error al iniciar sesión.')
+      toast.error(error.message || 'Error de conexión.')
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
-    <div className="min-vh-100 d-flex flex-row align-items-center login-vignette">
+    <div className=" d-flex flex-row align-items-center min-vh-100">
       <CContainer>
         <CRow className="justify-content-center">
-          <CCol md={8}>
-            <CCardGroup>
-              <CCard className="p-4">
+          <CCol md={8} lg={7} xl={6}>
+            <CCardGroup className="shadow-lg rounded-3 overflow-hidden ">
+              <CCard className="p-4 border-0  ">
                 <CCardBody>
-                  <CForm>
-                    <h1>Acceso</h1>
-                    <p className="text-medium-emphasis">Iniciar sesión en su cuenta</p>
+                  <CForm onSubmit={handleSubmit}>
+                    <div className="text-center mb-4">
+                      <div
+                        className="bg-green d-inline-flex align-items-center justify-content-center  rounded-circle mb-3 p-3 shadow-sm"
+                        style={{ width: '150px', height: '150px' }}
+                      >
+                        <CImage
+                          src={logo}
+                          fluid
+                          style={{ maxHeight: '100px', width: '100px', height: '100px' }}
+                        />
+                      </div>
+                      <h2 className="text-green fw-bold">S.I.G.</h2>
+                      <p className="text-medium-emphasis small">Sistema de Gestión Ganadera</p>
+                    </div>
+
+                    <h4 className="mb-3 text-center">Iniciar Sesión</h4>
+
                     <CInputGroup className="mb-3">
-                      <CInputGroupText>
+                      <CInputGroupText className="bg-light border-end-0 text-green">
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
                       <CFormInput
-                        type="text"
                         placeholder="Correo electrónico"
                         autoComplete="email"
                         value={correo}
                         onChange={(e) => setCorreo(e.target.value)}
+                        className="border-start-0 bg-light"
+                        style={{ boxShadow: 'none' }}
                       />
                     </CInputGroup>
+
                     <CInputGroup className="mb-4">
-                      <CInputGroupText>
+                      <CInputGroupText className="bg-light border-end-0 text-green">
                         <CIcon icon={cilLockLocked} />
                       </CInputGroupText>
                       <CFormInput
@@ -87,42 +109,33 @@ const Login = () => {
                         autoComplete="current-password"
                         value={contrasena}
                         onChange={(e) => setContrasena(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            handleSubmit()
-                          }
-                        }}
+                        className="border-start-0 bg-light"
+                        style={{ boxShadow: 'none' }}
                       />
                     </CInputGroup>
+
                     <CRow>
-                      <CCol xs={6}>
-                        <CButton className="px-4 btn-custom-green" onClick={handleSubmit}>
-                          Acceder
-                        </CButton>
-                      </CCol>
-                      <CCol xs={6} className="text-right">
-                        <CButton color="link" className="px-0 text-white">
-                          ¿Has olvidado tu contraseña?
+                      <CCol xs={12}>
+                        <CButton
+                          color="success"
+                          className="w-100 py-2 button-no-hover-green fw-semibold"
+                          onClick={handleSubmit}
+                          disabled={loading}
+                        >
+                          {loading ? 'Accediendo...' : 'Ingresar'}
                         </CButton>
                       </CCol>
                     </CRow>
+
+                    <div className="mt-4 text-center">
+                      <small className="text-medium-emphasis">
+                        &copy; 2025 UNEFA. Todos los derechos reservados.
+                      </small>
+                    </div>
                   </CForm>
                 </CCardBody>
               </CCard>
-              <CCard className="text-white bg-custom-green py-5" style={{ width: '44%' }}>
-                <CCardBody className="text-center d-flex align-items-center justify-content-center">
-                  <div
-                    style={{
-                      backgroundColor: 'white',
-                      borderRadius: '50%',
-                      padding: '20px',
-                      display: 'inline-block',
-                    }}
-                  >
-                    <CImage src={logo} fluid width={150} />
-                  </div>
-                </CCardBody>
-              </CCard>
+              {/* Opción alternativa: Tarjeta lateral decorativa si se desea, por ahora diseño limpio de una sola tarjeta centrada es más moderno para login */}
             </CCardGroup>
           </CCol>
         </CRow>

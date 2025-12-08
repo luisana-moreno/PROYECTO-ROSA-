@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import {
   CModal,
   CModalHeader,
@@ -27,10 +27,10 @@ import {
   CFormInput,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilPlus, cilX, cilTrash } from '@coreui/icons'
+import { cilPlus, cilTrash } from '@coreui/icons'
 import { toast } from 'react-toastify'
-import { formatDateToYYYYMMDD, formatDateToDDMMYYYY } from '../../../../utils/dateFormatter' // Importar funciones específicas
-import CustomTableModal from '../../../../components/CustomTableModal' // Importar CustomTableModal
+import { formatDateToYYYYMMDD, formatDateToDDMMYYYY } from '../../../../utils/dateFormatter'
+import CustomTableModal from '../../../../components/CustomTableModal'
 
 const LotDetailsModal = ({
   visible,
@@ -38,27 +38,27 @@ const LotDetailsModal = ({
   lot,
   allBovines,
   allPastures,
-  activeBovinesInLot, // Bovinos activos actualmente en este lote
-  bovinesInLot, // Historial de asignaciones de bovinos al lote (incluye finalizados)
+  activeBovinesInLot,
+  bovinesInLot,
   loading,
   fetchActiveBovinesInLot,
-  fetchBovinesInLot, // Renombrado para historial
+  fetchBovinesInLot,
   addBovinesToLot,
   removeBovineFromLot,
 }) => {
   const [activeTab, setActiveTab] = useState('activeBovines')
   const [selectedBovinesToAdd, setSelectedBovinesToAdd] = useState([])
-  const [assignmentDate, setAssignmentDate] = useState(formatDateToYYYYMMDD(new Date())) // Usar formatDateToYYYYMMDD
-  const [visibleCattleSelectionModal, setVisibleCattleSelectionModal] = useState(false) // Nuevo estado para el modal de selección de bovinos
-  const [selectedPastureId, setSelectedPastureId] = useState('') // Estado para el potrero seleccionado
+  const [assignmentDate, setAssignmentDate] = useState(formatDateToYYYYMMDD(new Date()))
+  const [visibleCattleSelectionModal, setVisibleCattleSelectionModal] = useState(false)
+  const [selectedPastureId, setSelectedPastureId] = useState('')
 
   useEffect(() => {
     if (visible && lot) {
-      fetchActiveBovinesInLot(lot.id) // Usar lot.id que ya está mapeado
-      fetchBovinesInLot(lot.id) // Cargar historial completo de asignaciones
+      fetchActiveBovinesInLot(lot.id)
+      fetchBovinesInLot(lot.id)
       setSelectedBovinesToAdd([])
-      setAssignmentDate(formatDateToYYYYMMDD(new Date())) // Usar formatDateToYYYYMMDD
-      setSelectedPastureId('') // Resetear potrero
+      setAssignmentDate(formatDateToYYYYMMDD(new Date()))
+      setSelectedPastureId('')
     }
   }, [visible, lot, fetchActiveBovinesInLot, fetchBovinesInLot])
 
@@ -75,19 +75,15 @@ const LotDetailsModal = ({
       toast.warning('Debe seleccionar una fecha de inicio de asignación.')
       return
     }
-    // if (!selectedPastureId) {
-    //   toast.warning('Debe seleccionar un potrero.')
-    //   return
-    // }
 
     await addBovinesToLot(
-      lot.id, // Usar lot.id
-      selectedPastureId || null, // Enviar null si no hay potrero seleccionado
-      selectedBovinesToAdd.map((b) => b.id), // Obtener solo los IDs de los objetos seleccionados
+      lot.id,
+      selectedPastureId || null,
+      selectedBovinesToAdd.map((b) => b.id),
       assignmentDate,
     )
     setSelectedBovinesToAdd([])
-    setAssignmentDate(formatDateToYYYYMMDD(new Date())) // Usar formatDateToYYYYMMDD
+    setAssignmentDate(formatDateToYYYYMMDD(new Date()))
     setSelectedPastureId('')
   }
 
@@ -105,7 +101,6 @@ const LotDetailsModal = ({
     setSelectedBovinesToAdd(selected)
   }
 
-  // Columnas para CustomTableModal de bovinos
   const cattleColumns = [
     { key: 'ttrNumerobv', label: 'Número' },
     { key: 'razaNombre', label: 'Raza' },
@@ -114,11 +109,9 @@ const LotDetailsModal = ({
     { key: 'estadoNombre', label: 'Estado' },
   ]
 
-  // Opciones de potrero (removidas)
-
   return (
     <>
-      <CModal visible={visible} onClose={onClose} size="xl">
+      <CModal visible={visible} onClose={onClose} size="xl" backdrop="static">
         <CModalHeader closeButton>
           <CModalTitle>Detalles del Lote: {lot?.nombre}</CModalTitle>
         </CModalHeader>
@@ -128,6 +121,7 @@ const LotDetailsModal = ({
               <CNavLink
                 active={activeTab === 'activeBovines'}
                 onClick={() => setActiveTab('activeBovines')}
+                style={{ cursor: 'pointer' }}
               >
                 Bovinos Activos ({activeBovinesInLot.length})
               </CNavLink>
@@ -136,12 +130,17 @@ const LotDetailsModal = ({
               <CNavLink
                 active={activeTab === 'assignBovines'}
                 onClick={() => setActiveTab('assignBovines')}
+                style={{ cursor: 'pointer' }}
               >
                 Asignar Bovinos
               </CNavLink>
             </CNavItem>
             <CNavItem>
-              <CNavLink active={activeTab === 'history'} onClick={() => setActiveTab('history')}>
+              <CNavLink
+                active={activeTab === 'history'}
+                onClick={() => setActiveTab('history')}
+                style={{ cursor: 'pointer' }}
+              >
                 Historial de Asignaciones ({bovinesInLot.length})
               </CNavLink>
             </CNavItem>
@@ -153,7 +152,7 @@ const LotDetailsModal = ({
               {loading ? (
                 <p>Cargando bovinos activos...</p>
               ) : activeBovinesInLot.length > 0 ? (
-                <CTable bordered hover responsive size="sm">
+                <CTable hover responsive size="sm" className="align-middle" striped>
                   <CTableHead>
                     <CTableRow>
                       <CTableHeaderCell>Número de Bovino</CTableHeaderCell>
@@ -165,7 +164,9 @@ const LotDetailsModal = ({
                   <CTableBody>
                     {activeBovinesInLot.map((bovine) => (
                       <CTableRow key={bovine.idbovino}>
-                        <CTableDataCell>{bovine.numerobovino}</CTableDataCell>
+                        <CTableDataCell>
+                          <strong>{bovine.numerobovino}</strong>
+                        </CTableDataCell>
                         <CTableDataCell>{bovine.codpotrero || 'Sin Potrero'}</CTableDataCell>
                         <CTableDataCell>{formatDateToDDMMYYYY(bovine.fechainicio)}</CTableDataCell>
                         <CTableDataCell>
@@ -184,64 +185,90 @@ const LotDetailsModal = ({
                   </CTableBody>
                 </CTable>
               ) : (
-                <p className="text-muted">No hay bovinos activos en este lote.</p>
+                <p className="text-muted p-3 text-center bg-light rounded">
+                  No hay bovinos activos en este lote.
+                </p>
               )}
             </CTabPane>
 
             {/* Pestaña: Asignar Bovinos */}
             <CTabPane visible={activeTab === 'assignBovines'}>
-              <CRow className="g-3 mb-3">
-                <CCol md={6}>
-                  <CFormLabel htmlFor="selectBovines">Bovinos Seleccionados:</CFormLabel>
-                  <CButton
-                    color="info"
-                    size="sm"
-                    onClick={() => setVisibleCattleSelectionModal(true)}
-                    disabled={loading}
-                  >
-                    Seleccionar Bovinos ({selectedBovinesToAdd.length})
-                  </CButton>
-                  <ul className="list-unstyled mt-2">
-                    {selectedBovinesToAdd.map((bovine) => (
-                      <li key={bovine.id}>{`Bovino ${bovine.ttrNumerobv}`}</li>
-                    ))}
-                  </ul>
-                </CCol>
-                <CCol md={6}>
-                  <CFormLabel htmlFor="selectPasture">Potrero</CFormLabel>
-                  <CFormSelect
-                    id="selectPasture"
-                    value={selectedPastureId}
-                    onChange={(e) => setSelectedPastureId(e.target.value)}
-                    disabled={loading}
-                    className="mb-3"
-                  >
-                    <option value="">Seleccione un potrero</option>
-                    {allPastures.map((pasture) => (
-                      <option key={pasture.id} value={pasture.id}>
-                        {pasture.codigo} - {pasture.nombre}
-                      </option>
-                    ))}
-                  </CFormSelect>
+              <div className="p-3 border rounded shadow-sm bg-light mb-3">
+                <h6 className="mb-3 fw-bold">Nueva Asignación</h6>
+                <CRow className="g-3 mb-3">
+                  <CCol md={6}>
+                    <CFormLabel htmlFor="selectBovines" className="fw-semibold">
+                      Bovinos a Asignar:
+                    </CFormLabel>
+                    <div className="d-grid gap-2">
+                      <CButton
+                        color="info"
+                        className="text-white"
+                        onClick={() => setVisibleCattleSelectionModal(true)}
+                        disabled={loading}
+                      >
+                        <CIcon icon={cilPlus} className="me-2" />
+                        Seleccionar Bovinos ({selectedBovinesToAdd.length})
+                      </CButton>
+                    </div>
 
-                  <CFormLabel htmlFor="assignmentDate">Fecha de Inicio</CFormLabel>
-                  <CFormInput
-                    id="assignmentDate"
-                    type="date"
-                    value={assignmentDate}
-                    onChange={(e) => setAssignmentDate(e.target.value)}
-                    disabled={loading}
-                  />
-                </CCol>
-              </CRow>
-              <CButton
-                className="button-no-hover-green text-white"
-                onClick={handleAddBovines}
-                disabled={loading || selectedBovinesToAdd.length === 0}
-              >
-                <CIcon icon={cilPlus} className="me-2" />
-                {loading ? 'Asignando...' : 'Asignar Bovinos al Lote'}
-              </CButton>
+                    {selectedBovinesToAdd.length > 0 && (
+                      <div
+                        className="mt-2 p-2 bg-white border rounded"
+                        style={{ maxHeight: '150px', overflowY: 'auto' }}
+                      >
+                        <small className="text-muted d-block mb-1">Seleccionados:</small>
+                        {selectedBovinesToAdd.map((bovine) => (
+                          <CBadge
+                            key={bovine.id}
+                            color="success"
+                            shape="rounded-pill"
+                            className="me-1 mb-1"
+                          >
+                            {bovine.ttrNumerobv}
+                          </CBadge>
+                        ))}
+                      </div>
+                    )}
+                  </CCol>
+                  <CCol md={6}>
+                    <CFormLabel htmlFor="selectPasture">Potrero (Opcional)</CFormLabel>
+                    <CFormSelect
+                      id="selectPasture"
+                      value={selectedPastureId}
+                      onChange={(e) => setSelectedPastureId(e.target.value)}
+                      disabled={loading}
+                      className="mb-3"
+                    >
+                      <option value="">Seleccione un potrero</option>
+                      {allPastures.map((pasture) => (
+                        <option key={pasture.id} value={pasture.id}>
+                          {pasture.codigo} - {pasture.nombre}
+                        </option>
+                      ))}
+                    </CFormSelect>
+
+                    <CFormLabel htmlFor="assignmentDate">Fecha de Inicio</CFormLabel>
+                    <CFormInput
+                      id="assignmentDate"
+                      type="date"
+                      value={assignmentDate}
+                      onChange={(e) => setAssignmentDate(e.target.value)}
+                      disabled={loading}
+                    />
+                  </CCol>
+                </CRow>
+                <div className="text-end">
+                  <CButton
+                    color="success"
+                    className="text-white"
+                    onClick={handleAddBovines}
+                    disabled={loading || selectedBovinesToAdd.length === 0}
+                  >
+                    Confirmar Asignación
+                  </CButton>
+                </div>
+              </div>
             </CTabPane>
 
             {/* Pestaña: Historial de Asignaciones */}
@@ -249,7 +276,7 @@ const LotDetailsModal = ({
               {loading ? (
                 <p>Cargando historial de asignaciones...</p>
               ) : bovinesInLot.length > 0 ? (
-                <CTable bordered hover responsive size="sm">
+                <CTable hover responsive size="sm" className="align-middle" striped>
                   <CTableHead>
                     <CTableRow>
                       <CTableHeaderCell>Número de Bovino</CTableHeaderCell>
@@ -262,7 +289,9 @@ const LotDetailsModal = ({
                   <CTableBody>
                     {bovinesInLot.map((item) => (
                       <CTableRow key={item.idbovlotpot}>
-                        <CTableDataCell>{item.numerobovino}</CTableDataCell>
+                        <CTableDataCell>
+                          <strong>{item.numerobovino}</strong>
+                        </CTableDataCell>
                         <CTableDataCell>{item.razanombre}</CTableDataCell>
                         <CTableDataCell>{item.codpotrero || 'Sin Potrero'}</CTableDataCell>
                         <CTableDataCell>{formatDateToDDMMYYYY(item.fechainicio)}</CTableDataCell>
@@ -278,7 +307,9 @@ const LotDetailsModal = ({
                   </CTableBody>
                 </CTable>
               ) : (
-                <p className="text-muted">No hay historial de asignaciones para este lote.</p>
+                <p className="text-muted p-3 text-center bg-light rounded">
+                  No hay historial de asignaciones para este lote.
+                </p>
               )}
             </CTabPane>
           </CTabContent>

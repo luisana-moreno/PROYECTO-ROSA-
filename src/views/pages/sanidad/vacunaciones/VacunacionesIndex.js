@@ -24,7 +24,11 @@ import {
   CFormSelect,
   CFormTextarea,
   CAlert,
+  CPagination,
+  CPaginationItem,
 } from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilPlus, cilTrash, cilPencil, cilFilter, cilSearch } from '@coreui/icons'
 import {
   getVacunaciones,
   getVacunacionesProximas,
@@ -136,70 +140,51 @@ const VacunacionesIndex = () => {
     const diff = Math.ceil((fechaObj - hoy) / (1000 * 60 * 60 * 24))
     return diff
   }
-  //Bovino Data
-  // {
-  //   ttrIdbovino: 1,
-  //   ttrNumerobv: 123,
-  //   ttrIdrazabo: 1,
-  //   ttrFecnacim: '2025-11-11T04:00:00.000Z',
-  //   ttrIdcolorb: 1,
-  //   ttrPesokilo: 40,
-  //   ttrIdetapav: 1,
-  //   ttrIdestadb: 1,
-  //   razaNombre: 'Holstein',
-  //   colorNombre: 'Negro y Blanco ',
-  //   etapaNombre: 'lactancia',
-  //   estadoNombre: 'Inactivo',
-  //   id: 1
-  // },
-
-  console.log(vacunaciones)
-  console.log(bovinos)
-  console.log(tiposVacuna)
-  console.log(empleados)
 
   return (
     <>
       <CRow>
         <CCol xs={12}>
-          <CCard className="mb-4">
+          <CCard className="mb-4 shadow-sm border-0">
             <CCardHeader className="d-flex justify-content-between align-items-center">
               <strong>Gestión de Vacunaciones</strong>
-              <CButton color="primary" onClick={() => setShowModal(true)}>
+              <CButton color="success" className="text-white" onClick={() => setShowModal(true)}>
+                <CIcon icon={cilPlus} className="me-2" />
                 Nueva Vacunación
               </CButton>
             </CCardHeader>
             <CCardBody>
               {/* Filtros */}
-              <div className="mb-3">
+              <div className="mb-4 d-flex gap-2">
                 <CButton
-                  color={filter === 'todas' ? 'primary' : 'secondary'}
-                  variant={filter === 'todas' ? '' : 'outline'}
-                  className="me-2"
+                  color={filter === 'todas' ? 'success' : 'light'}
+                  variant={filter === 'todas' ? '' : 'ghost'}
                   onClick={() => setFilter('todas')}
                 >
+                  <CIcon icon={cilFilter} className="me-2" />
                   Todas
                 </CButton>
                 <CButton
-                  color={filter === 'proximas' ? 'warning' : 'secondary'}
-                  variant={filter === 'proximas' ? '' : 'outline'}
-                  className="me-2"
+                  color={filter === 'proximas' ? 'warning' : 'light'}
+                  variant={filter === 'proximas' ? '' : 'ghost'}
                   onClick={() => setFilter('proximas')}
                 >
+                  <CIcon icon={cilSearch} className="me-2" />
                   Próximas (30 días)
                 </CButton>
                 <CButton
-                  color={filter === 'vencidas' ? 'danger' : 'secondary'}
-                  variant={filter === 'vencidas' ? '' : 'outline'}
+                  color={filter === 'vencidas' ? 'danger' : 'light'}
+                  variant={filter === 'vencidas' ? '' : 'ghost'}
                   onClick={() => setFilter('vencidas')}
                 >
+                  <CIcon icon={cilTrash} className="me-2" />
                   Vencidas
                 </CButton>
               </div>
 
               {/* Tabla */}
-              <CTable striped hover responsive>
-                <CTableHead>
+              <CTable striped hover responsive className="align-middle">
+                <CTableHead color="light">
                   <CTableRow>
                     <CTableHeaderCell>Bovino</CTableHeaderCell>
                     <CTableHeaderCell>Vacuna</CTableHeaderCell>
@@ -207,7 +192,7 @@ const VacunacionesIndex = () => {
                     <CTableHeaderCell>Próxima Fecha</CTableHeaderCell>
                     <CTableHeaderCell>Dosis</CTableHeaderCell>
                     <CTableHeaderCell>Estado</CTableHeaderCell>
-                    <CTableHeaderCell>Acciones</CTableHeaderCell>
+                    <CTableHeaderCell className="text-end">Acciones</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
@@ -215,7 +200,9 @@ const VacunacionesIndex = () => {
                     const diasRestantes = getDiasRestantes(vac.ttr_proxfech)
                     return (
                       <CTableRow key={vac.ttr_idvacuna}>
-                        <CTableDataCell>#{vac.numero_bovino}</CTableDataCell>
+                        <CTableDataCell className="fw-semibold">
+                          #{vac.numero_bovino}
+                        </CTableDataCell>
                         <CTableDataCell>{vac.nombre_vacuna}</CTableDataCell>
                         <CTableDataCell>{formatDate(vac.ttr_fechaapl)}</CTableDataCell>
                         <CTableDataCell>{formatDate(vac.ttr_proxfech)}</CTableDataCell>
@@ -239,13 +226,13 @@ const VacunacionesIndex = () => {
                             </CBadge>
                           )}
                         </CTableDataCell>
-                        <CTableDataCell>
+                        <CTableDataCell className="text-end">
                           <CButton
                             color="danger"
                             size="sm"
                             onClick={() => handleDelete(vac.ttr_idvacuna)}
                           >
-                            Eliminar
+                            <CIcon icon={cilTrash} />
                           </CButton>
                         </CTableDataCell>
                       </CTableRow>
@@ -255,7 +242,10 @@ const VacunacionesIndex = () => {
               </CTable>
 
               {vacunaciones.length === 0 && (
-                <CAlert color="info">No hay vacunaciones registradas</CAlert>
+                <CAlert color="info" className="mt-3 border-0 shadow-sm">
+                  <CIcon icon={cilSearch} className="me-2" />
+                  No se encontraron registros de vacunación con los filtros actuales.
+                </CAlert>
               )}
             </CCardBody>
           </CCard>
@@ -263,7 +253,7 @@ const VacunacionesIndex = () => {
       </CRow>
 
       {/* Modal Nueva Vacunación */}
-      <CModal visible={showModal} onClose={() => setShowModal(false)} size="lg">
+      <CModal visible={showModal} onClose={() => setShowModal(false)} size="lg" backdrop="static">
         <CModalHeader>
           <CModalTitle>Nueva Vacunación</CModalTitle>
         </CModalHeader>
@@ -348,7 +338,6 @@ const VacunacionesIndex = () => {
                 />
               </CCol>
             </CRow>
-
             <CRow className="mb-3">
               <CCol>
                 <CFormLabel>Observaciones</CFormLabel>
@@ -360,18 +349,20 @@ const VacunacionesIndex = () => {
                 />
               </CCol>
             </CRow>
-
-            <CAlert color="info">
-              <strong>Nota:</strong> La próxima fecha de vacunación se calculará automáticamente
-              según el tipo de vacuna.
+            <CAlert color="info" className="d-flex align-items-center">
+              <CIcon icon={cilSearch} className="me-2" />
+              <div>
+                <strong>Nota:</strong> La próxima fecha de vacunación se calculará automáticamente
+                según el plan de la vacuna seleccionada.
+              </div>
             </CAlert>
           </CModalBody>
           <CModalFooter>
             <CButton color="secondary" onClick={() => setShowModal(false)}>
               Cancelar
             </CButton>
-            <CButton color="primary" type="submit">
-              Guardar
+            <CButton color="success" type="submit" className="text-white">
+              Guardar Vacunación
             </CButton>
           </CModalFooter>
         </CForm>

@@ -22,6 +22,8 @@ import {
 } from '@coreui/icons'
 import { formatDateToDDMMYYYY } from '../../../../utils/dateFormatter'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+
 const ViewEmployeeModal = ({ viewVisible, setViewVisible, currentEmployee }) => {
   const [generating, setGenerating] = useState(false)
 
@@ -32,15 +34,12 @@ const ViewEmployeeModal = ({ viewVisible, setViewVisible, currentEmployee }) => 
   const handleGenerateBadge = async () => {
     setGenerating(true)
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/empleados/${currentEmployee.id}/generate-badge`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/pdf',
-          },
+      const response = await fetch(`${API_URL}/empleados/${currentEmployee.id}/generate-badge`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/pdf',
         },
-      )
+      })
 
       if (!response.ok) {
         throw new Error('Error al generar carnet')

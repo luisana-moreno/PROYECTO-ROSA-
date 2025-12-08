@@ -25,6 +25,17 @@ import {
   CFormTextarea,
   CAlert,
 } from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import {
+  cilPlus,
+  cilPencil,
+  cilTrash,
+  cilCheckCircle,
+  cilBan,
+  cilCalendar,
+  cilFilter,
+  cilSearch,
+} from '@coreui/icons'
 import {
   getPlanesVacunacion,
   getPlanesVacunacionActivos,
@@ -150,41 +161,44 @@ const PlanesIndex = () => {
     <>
       <CRow>
         <CCol xs={12}>
-          <CCard className="mb-4">
+          <CCard className="mb-4 shadow-sm border-0">
             <CCardHeader className="d-flex justify-content-between align-items-center">
               <strong>Planes de Vacunación</strong>
               <CButton
-                color="primary"
+                color="success"
+                className="text-white"
                 onClick={() => {
                   resetForm()
                   setShowModal(true)
                 }}
               >
+                <CIcon icon={cilPlus} className="me-2" />
                 Nuevo Plan
               </CButton>
             </CCardHeader>
             <CCardBody>
               {/* Filtros */}
-              <div className="mb-3">
+              <div className="mb-4 d-flex gap-2">
                 <CButton
-                  color={filter === 'todos' ? 'primary' : 'secondary'}
-                  variant={filter === 'todos' ? '' : 'outline'}
-                  className="me-2"
+                  color={filter === 'todos' ? 'primary' : 'light'}
+                  variant={filter === 'todos' ? '' : 'ghost'}
                   onClick={() => setFilter('todos')}
                 >
+                  <CIcon icon={cilFilter} className="me-2" />
                   Todos
                 </CButton>
                 <CButton
-                  color={filter === 'activos' ? 'success' : 'secondary'}
-                  variant={filter === 'activos' ? '' : 'outline'}
+                  color={filter === 'activos' ? 'success' : 'light'}
+                  variant={filter === 'activos' ? '' : 'ghost'}
                   onClick={() => setFilter('activos')}
                 >
+                  <CIcon icon={cilCheckCircle} className="me-2" />
                   Activos
                 </CButton>
               </div>
 
-              <CTable striped hover responsive>
-                <CTableHead>
+              <CTable striped hover responsive className="align-middle">
+                <CTableHead color="light">
                   <CTableRow>
                     <CTableHeaderCell>Nombre</CTableHeaderCell>
                     <CTableHeaderCell>Vacuna</CTableHeaderCell>
@@ -192,13 +206,13 @@ const PlanesIndex = () => {
                     <CTableHeaderCell>Intervalo</CTableHeaderCell>
                     <CTableHeaderCell>Dosis</CTableHeaderCell>
                     <CTableHeaderCell>Estado</CTableHeaderCell>
-                    <CTableHeaderCell>Acciones</CTableHeaderCell>
+                    <CTableHeaderCell className="text-end">Acciones</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
                   {planes.map((plan) => (
                     <CTableRow key={plan.ttr_idplanva}>
-                      <CTableDataCell>{plan.ttr_nombrepl}</CTableDataCell>
+                      <CTableDataCell className="fw-semibold">{plan.ttr_nombrepl}</CTableDataCell>
                       <CTableDataCell>{plan.nombre_vacuna}</CTableDataCell>
                       <CTableDataCell>
                         {formatDate(plan.ttr_fechaini)} - {formatDate(plan.ttr_fechafin)}
@@ -210,29 +224,32 @@ const PlanesIndex = () => {
                           {plan.ttr_activo ? 'Activo' : 'Inactivo'}
                         </CBadge>
                       </CTableDataCell>
-                      <CTableDataCell>
+                      <CTableDataCell className="text-end">
                         <CButton
                           color="warning"
                           size="sm"
-                          className="me-2"
+                          className="me-2 text-white"
+                          title="Editar"
                           onClick={() => handleEdit(plan)}
                         >
-                          Editar
+                          <CIcon icon={cilPencil} />
                         </CButton>
                         <CButton
                           color={plan.ttr_activo ? 'secondary' : 'success'}
                           size="sm"
-                          className="me-2"
+                          className="me-2 text-white"
+                          title={plan.ttr_activo ? 'Desactivar' : 'Activar'}
                           onClick={() => handleToggleActivo(plan.ttr_idplanva, plan.ttr_activo)}
                         >
-                          {plan.ttr_activo ? 'Desactivar' : 'Activar'}
+                          <CIcon icon={plan.ttr_activo ? cilBan : cilCheckCircle} />
                         </CButton>
                         <CButton
                           color="danger"
                           size="sm"
+                          title="Eliminar"
                           onClick={() => handleDelete(plan.ttr_idplanva)}
                         >
-                          Eliminar
+                          <CIcon icon={cilTrash} />
                         </CButton>
                       </CTableDataCell>
                     </CTableRow>
@@ -241,7 +258,10 @@ const PlanesIndex = () => {
               </CTable>
 
               {planes.length === 0 && (
-                <CAlert color="info">No hay planes de vacunación registrados</CAlert>
+                <CAlert color="info" className="mt-3 border-0 shadow-sm">
+                  <CIcon icon={cilSearch} className="me-2" />
+                  No se encontraron planes de vacunación registrados.
+                </CAlert>
               )}
             </CCardBody>
           </CCard>
@@ -256,6 +276,7 @@ const PlanesIndex = () => {
           resetForm()
         }}
         size="lg"
+        backdrop="static"
       >
         <CModalHeader>
           <CModalTitle>{editingPlan ? 'Editar' : 'Nuevo'} Plan de Vacunación</CModalTitle>
@@ -347,9 +368,12 @@ const PlanesIndex = () => {
               </CCol>
             </CRow>
 
-            <CAlert color="info">
-              <strong>Nota:</strong> Los planes activos se utilizarán como referencia para programar
-              vacunaciones automáticas.
+            <CAlert color="info" className="d-flex align-items-center">
+              <CIcon icon={cilCalendar} className="me-2" />
+              <div>
+                <strong>Nota:</strong> Los planes activos se utilizarán como referencia para
+                programar vacunaciones automáticas.
+              </div>
             </CAlert>
           </CModalBody>
           <CModalFooter>
@@ -362,7 +386,7 @@ const PlanesIndex = () => {
             >
               Cancelar
             </CButton>
-            <CButton color="primary" type="submit">
+            <CButton color="success" type="submit" className="text-white">
               {editingPlan ? 'Actualizar' : 'Guardar'}
             </CButton>
           </CModalFooter>

@@ -5,12 +5,16 @@ import { cilPlus, cilPencil, cilX } from '@coreui/icons'
 
 const LotForm = ({ formData, setFormData, onSubmit, isEditing, onCancel, loading }) => {
   return (
-    <CForm className="mb-4 p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-      <h5 className="mb-3">{isEditing ? 'Editar Lote' : 'Crear Nuevo Lote'}</h5>
+    <div className="mb-4 p-4 border rounded shadow-sm bg-light">
+      <h5 className="mb-3 text-success fw-bold">
+        {isEditing ? 'Editar Lote' : 'Crear Nuevo Lote'}
+      </h5>
 
-      <CRow className="g-3">
-        <CCol md="6">
-          <CFormLabel htmlFor="lotName">Nombre del Lote</CFormLabel>
+      <CRow className="g-3 align-items-end">
+        <CCol md="8">
+          <CFormLabel htmlFor="lotName" className="fw-semibold">
+            Nombre del Lote
+          </CFormLabel>
           <CFormInput
             id="lotName"
             type="text"
@@ -20,29 +24,28 @@ const LotForm = ({ formData, setFormData, onSubmit, isEditing, onCancel, loading
             disabled={loading}
           />
         </CCol>
-      </CRow>
-
-      <CRow className="g-2 mt-3">
-        <CCol xs="auto">
-          <CButton
-            className="button-no-hover-green text-white"
-            onClick={onSubmit}
-            disabled={loading}
-          >
-            <CIcon icon={isEditing ? cilPencil : cilPlus} className="me-2" />
-            {loading ? 'Guardando...' : isEditing ? 'Actualizar' : 'Crear'}
-          </CButton>
-        </CCol>
-        {isEditing && (
-          <CCol xs="auto">
-            <CButton color="secondary" variant="outline" onClick={onCancel} disabled={loading}>
-              <CIcon icon={cilX} className="me-2" />
-              Cancelar
+        <CCol md="4">
+          <div className="d-flex gap-2">
+            <CButton
+              className="text-white fw-semibold"
+              color="success"
+              onClick={onSubmit}
+              disabled={loading}
+            >
+              <CIcon icon={isEditing ? cilPencil : cilPlus} className="me-2" />
+              {loading ? 'Guardando...' : isEditing ? 'Actualizar' : 'Crear Lote'}
             </CButton>
-          </CCol>
-        )}
+
+            {isEditing && (
+              <CButton color="secondary" variant="ghost" onClick={onCancel} disabled={loading}>
+                <CIcon icon={cilX} className="me-2" />
+                Cancelar
+              </CButton>
+            )}
+          </div>
+        </CCol>
       </CRow>
-    </CForm>
+    </div>
   )
 }
 

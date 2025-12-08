@@ -12,7 +12,6 @@ import {
   CModalTitle,
   CRow,
   CForm,
-  CAlert,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilSave } from '@coreui/icons'
@@ -51,8 +50,8 @@ const EditClientModal = ({
         toast.error('El nombre de la empresa es requerido.')
         return false
       }
-      if (!currentClient.Rif || !/^\d{10}$/.test(currentClient.Rif)) {
-        toast.error('El RIF debe tener 10 dígitos numéricos.')
+      if (!currentClient.Rif || !/^\d{9,10}$/.test(currentClient.Rif)) {
+        toast.error('El RIF no es válido.')
         return false
       }
     } else if (clientTypeSelected === 'Person') {
@@ -64,8 +63,8 @@ const EditClientModal = ({
         toast.error('El apellido es requerido.')
         return false
       }
-      if (!currentClient.Document_Number || !/^\d{10}$/.test(currentClient.Document_Number)) {
-        toast.error('El número de documento debe tener 10 dígitos numéricos.')
+      if (!currentClient.Document_Number || !/^\d{7,10}$/.test(currentClient.Document_Number)) {
+        toast.error('El documento no es válido.')
         return false
       }
     }
@@ -107,15 +106,14 @@ const EditClientModal = ({
       </CModalHeader>
       <CForm onSubmit={handleSubmit}>
         <CModalBody style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-          {/* Tipo de Cliente */}
+          {/* Tipo de Cliente (Select simple o deshabilitado si no se puede cambiar) */}
           <CRow className="mb-3">
             <CCol md={12}>
-              <CFormLabel>Tipo de Cliente *</CFormLabel>
+              <CFormLabel>Tipo de Cliente</CFormLabel>
               <CFormSelect
                 value={clientTypeSelected || ''}
                 onChange={(e) => handleClientTypeChange(e.target.value)}
                 disabled={!!currentClient?.client_type}
-                required
               >
                 <option value="">Seleccione el tipo de cliente</option>
                 <option value="Company">Jurídico (Empresa)</option>
@@ -169,7 +167,6 @@ const EditClientModal = ({
                     maxLength={10}
                     required
                   />
-                  <small className="text-muted">Debe tener 10 dígitos</small>
                 </CCol>
               </CRow>
             </>
@@ -204,7 +201,6 @@ const EditClientModal = ({
                     maxLength={10}
                     required
                   />
-                  <small className="text-muted">Debe tener 10 dígitos</small>
                 </CCol>
               </CRow>
             </>
