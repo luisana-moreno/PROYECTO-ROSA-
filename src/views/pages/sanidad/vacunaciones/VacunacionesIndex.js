@@ -24,21 +24,20 @@ import {
   CFormSelect,
   CFormTextarea,
   CAlert,
-  CPagination,
-  CPaginationItem,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilPlus, cilTrash, cilPencil, cilFilter, cilSearch } from '@coreui/icons'
+import { cilPlus, cilTrash, cilFilter, cilSearch } from '@coreui/icons'
 import {
   getVacunaciones,
   getVacunacionesProximas,
   getVacunacionesVencidas,
   createVacunacion,
   deleteVacunacion,
+  getTiposVacuna,
 } from '../../../../api/sanidadService'
 import { cattleService } from '../../../../api/cattleService'
-import { regmedicosService } from '../../../../api/regmedicosService'
 import { employeeService } from '../../../../api/employeeService'
+import CustomTableModal from '../../../../components/CustomTableModal' // Componente para selección múltiple
 
 const VacunacionesIndex = () => {
   const [vacunaciones, setVacunaciones] = useState([])
@@ -46,11 +45,13 @@ const VacunacionesIndex = () => {
   const [tiposVacuna, setTiposVacuna] = useState([])
   const [empleados, setEmpleados] = useState([])
   const [showModal, setShowModal] = useState(false)
+  const [showBovinoModal, setShowBovinoModal] = useState(false) // Estado para modal de selección bovina
   const [loading, setLoading] = useState(false)
   const [filter, setFilter] = useState('todas') // todas, proximas, vencidas
 
   const [formData, setFormData] = useState({
-    idBovino: '',
+    idBovino: '', // Puede ser una cadena de IDs separados por coma si es múltiple, o un array. Vamos a manejarlo como array de IDs.
+    selectedBovinos: [], // Array de objetos bovino seleccionados
     idTipoVacuna: '',
     fechaAplicacion: new Date().toISOString().split('T')[0],
     numDosis: 1,
@@ -78,7 +79,7 @@ const VacunacionesIndex = () => {
 
       const [bovinosData, tiposData, empleadosData] = await Promise.all([
         cattleService.getAllCattle(),
-        regmedicosService.getAllTiposVacuna(),
+        getTiposVacuna(), // Usamos la nueva función del sanidadService
         employeeService.getAllEmployees(),
       ])
 
@@ -96,7 +97,23 @@ const VacunacionesIndex = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      await createVacunacion(formData)
+      // Si hay múltiples bovinos seleccionados
+      if (formData.selectedBovinos.length > 0) {
+        // Enviar una petición por cada bovino (o crear un endpoint bulk en backend si se prefiere, por ahora iteramos)
+        for (const bovino of formData.selectedBovinos) {
+          await createVacunacion({
+            ...formData,
+            idBovino: bovino.ttrIdbovino,
+          })
+        }
+      } else if (formData.idBovino) {
+        // Caso simple, un solo bovino seleccionado manualmente sin el modal (legacy support)
+        await createVacunacion(formData)
+      } else {
+        alert('Debe seleccionar al menos un bovino.')
+        return
+      }
+
       setShowModal(false)
       loadData()
       resetForm()
@@ -119,6 +136,7 @@ const VacunacionesIndex = () => {
   const resetForm = () => {
     setFormData({
       idBovino: '',
+      selectedBovinos: [],
       idTipoVacuna: '',
       fechaAplicacion: new Date().toISOString().split('T')[0],
       numDosis: 1,
@@ -126,6 +144,17 @@ const VacunacionesIndex = () => {
       lote: '',
       observaciones: '',
     })
+  }
+
+  const handleBovinosSelection = (selected) => {
+    // selected es un array de objetos o IDs según implementación de CustomTableModal
+    // Asumimos que CustomTableModal devuelve los items seleccionados
+    setFormData({
+      ...formData,
+      selectedBovinos: selected,
+      idBovino: selected.length > 0 ? selected[0].ttrIdbovino : '', // Mantener compatibilidad simple
+    })
+    setShowBovinoModal(false)
   }
 
   const formatDate = (dateString) => {
@@ -140,6 +169,13 @@ const VacunacionesIndex = () => {
     const diff = Math.ceil((fechaObj - hoy) / (1000 * 60 * 60 * 24))
     return diff
   }
+
+  // Columnas para el modal de selección de bovinos
+  const bovinosColumns = [
+    { header: 'Número', key: 'ttrNumerobv' },
+    { header: 'Raza', key: 'raza_nombre' }, // Asegurarse que el objeto bovino trae estos campos
+    { header: 'Sexo', key: 'ttrSexo' },
+  ]
 
   return (
     <>
@@ -260,21 +296,33 @@ const VacunacionesIndex = () => {
         <CForm onSubmit={handleSubmit}>
           <CModalBody>
             <CRow className="mb-3">
-              <CCol md={6}>
-                <CFormLabel>Bovino *</CFormLabel>
-                <CFormSelect
-                  value={formData.idBovino}
-                  onChange={(e) => setFormData({ ...formData, idBovino: e.target.value })}
-                  required
-                >
-                  <option value="">Seleccione un bovino</option>
-                  {bovinos.map((b) => (
-                    <option key={b.ttrIdbovino} value={b.ttrIdbovino}>
-                      #{b.ttrNumerobv}
-                    </option>
-                  ))}
-                </CFormSelect>
+              <CCol md={12}>
+                <CFormLabel>Bovinos *</CFormLabel>
+                <div className="d-flex gap-2">
+                  <CFormInput
+                    readOnly
+                    value={
+                      formData.selectedBovinos.map((b) => b.ttrNumerobv).join(', ') ||
+                      'Ningún bovino seleccionado'
+                    }
+                    onClick={() => setShowBovinoModal(true)}
+                    style={{ cursor: 'pointer' }}
+                  />
+                  <CButton color="primary" onClick={() => setShowBovinoModal(true)}>
+                    Seleccionar
+                  </CButton>
+                </div>
+                {formData.selectedBovinos.length > 0 && (
+                  <div className="mt-2">
+                    <small className="text-muted">
+                      Se registrará la vacunación para {formData.selectedBovinos.length} animales.
+                    </small>
+                  </div>
+                )}
               </CCol>
+            </CRow>
+
+            <CRow className="mb-3">
               <CCol md={6}>
                 <CFormLabel>Tipo de Vacuna *</CFormLabel>
                 <CFormSelect
@@ -290,9 +338,6 @@ const VacunacionesIndex = () => {
                   ))}
                 </CFormSelect>
               </CCol>
-            </CRow>
-
-            <CRow className="mb-3">
               <CCol md={6}>
                 <CFormLabel>Fecha de Aplicación *</CFormLabel>
                 <CFormInput
@@ -302,6 +347,9 @@ const VacunacionesIndex = () => {
                   required
                 />
               </CCol>
+            </CRow>
+
+            <CRow className="mb-3">
               <CCol md={6}>
                 <CFormLabel>Número de Dosis</CFormLabel>
                 <CFormInput
@@ -309,6 +357,15 @@ const VacunacionesIndex = () => {
                   min="1"
                   value={formData.numDosis}
                   onChange={(e) => setFormData({ ...formData, numDosis: parseInt(e.target.value) })}
+                />
+              </CCol>
+              <CCol md={6}>
+                <CFormLabel>Lote de Vacuna</CFormLabel>
+                <CFormInput
+                  type="text"
+                  value={formData.lote}
+                  onChange={(e) => setFormData({ ...formData, lote: e.target.value })}
+                  placeholder="Ej: LOT-2024-001"
                 />
               </CCol>
             </CRow>
@@ -327,15 +384,6 @@ const VacunacionesIndex = () => {
                     </option>
                   ))}
                 </CFormSelect>
-              </CCol>
-              <CCol md={6}>
-                <CFormLabel>Lote de Vacuna</CFormLabel>
-                <CFormInput
-                  type="text"
-                  value={formData.lote}
-                  onChange={(e) => setFormData({ ...formData, lote: e.target.value })}
-                  placeholder="Ej: LOT-2024-001"
-                />
               </CCol>
             </CRow>
             <CRow className="mb-3">
@@ -367,6 +415,17 @@ const VacunacionesIndex = () => {
           </CModalFooter>
         </CForm>
       </CModal>
+
+      {/* Modal de Selección Bovina */}
+      <CustomTableModal
+        visible={showBovinoModal}
+        onClose={() => setShowBovinoModal(false)}
+        data={bovinos}
+        columns={bovinosColumns}
+        onSelect={handleBovinosSelection}
+        title="Seleccionar Bovinos para Vacunación"
+        multiSelect={true}
+      />
     </>
   )
 }

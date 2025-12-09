@@ -2,60 +2,48 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { toast } from 'react-toastify'
-
-// Mock service - reemplazar con llamadas API reales
-const pastureActivityService = {
-  getAllPastures: async () => [
-    { id: 1, codigo: 'POT-001', estado: 'Activo' },
-    { id: 2, codigo: 'POT-002', estado: 'Activo' },
-    { id: 3, codigo: 'POT-003', estado: 'Inactivo' },
-  ],
-  getAllLots: async () => [
-    { id: 1, nombre: 'Lote A', bovinos: 5 },
-    { id: 2, nombre: 'Lote B', bovinos: 8 },
-  ],
-  getAllBovines: async () => [
-    { id: 1, numero: 101 },
-    { id: 2, numero: 102 },
-    { id: 3, numero: 103 },
-  ],
-  getAllPastureStates: async () => [
-    { id: 1, nombre: 'Disponible' },
-    { id: 2, nombre: 'Ocupado' },
-    { id: 3, nombre: 'Mantenimiento' },
-  ],
-  assignLotToPasture: async (data) => data,
-  getPastureHistory: async (pastureId) => [
-    { id: 1, lote: 'Lote A', fechaInicio: '2024-01-01', fechaFin: '2024-01-15', bovinos: 5 },
-  ],
-}
+import { pastureService } from 'src/api/pastureService'
+import { lotService } from 'src/api/lotService'
 
 const usePastureActivity = () => {
   const [pastures, setPastures] = useState([])
   const [lots, setLots] = useState([])
   const [bovines, setBovines] = useState([])
-  const [pastureStates, setPastureStates] = useState([])
+  const [pastureStates, setPastureStates] = useState([]) // Estados de TMAESTPOTRE
   const [selectedPasture, setSelectedPasture] = useState(null)
   const [selectedLot, setSelectedLot] = useState(null)
-  const [startDate, setStartDate] = useState('')
-  const [selectedBovines, setSelectedBovines] = useState([])
+
+  // Variables form asignación
+  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0])
+  const [turno, setTurno] = useState('AM')
+  const [observaciones, setObservaciones] = useState('')
+
   const [loading, setLoading] = useState(false)
   const [pastureHistory, setPastureHistory] = useState([])
+
+  // Estado Dashboard (Heatmap Data)
   const [pastureStatus, setPastureStatus] = useState({})
 
   const fetchInitialData = useCallback(async () => {
     setLoading(true)
     try {
-      const [pasturesData, lotsData, bovinesData, statesData] = await Promise.all([
-        pastureActivityService.getAllPastures(),
-        pastureActivityService.getAllLots(),
-        pastureActivityService.getAllBovines(),
-        pastureActivityService.getAllPastureStates(),
+      const [pasturesData, lotsData, statesData, dashboardStats] = await Promise.all([
+        pastureService.getAllPotreros(),
+        lotService.getAllLots(),
+        pastureService.getAllEstadosPotrero(),
+        pastureService.getDashboardStats(),
       ])
+
       setPastures(pasturesData)
       setLots(lotsData)
-      setBovines(bovinesData)
       setPastureStates(statesData)
+
+      // Transformar dashboardStats a mapa por ID para acceso rápido
+      const statusMap = {}
+      dashboardStats.forEach((p) => {
+        statusMap[p.ttr_idpotrer] = p
+      })
+      setPastureStatus(statusMap)
     } catch (error) {
       console.error('Error cargando datos:', error)
       toast.error('Error al cargar datos iniciales')
@@ -68,73 +56,84 @@ const usePastureActivity = () => {
     fetchInitialData()
   }, [fetchInitialData])
 
+  // Registrar Rotación (Asignar Lote a Potrero)
   const handleAssignLotToPasture = useCallback(async () => {
-    if (!selectedPasture || !selectedLot || !startDate || selectedBovines.length === 0) {
-      toast.warning('Por favor complete todos los campos')
+    if (!selectedPasture || !selectedLot || !startDate) {
+      toast.warning('Por favor complete los campos obligatorios (Potrero, Lote, Fecha)')
       return
     }
 
     setLoading(true)
     try {
-      await pastureActivityService.assignLotToPasture({
-        idPotrero: selectedPasture.id,
-        idLote: selectedLot.id,
-        fechaInicio: startDate,
-        idBovinos: selectedBovines.map((b) => b.id),
+      // Usar endpoint real de rotación
+      await pastureService.createRotacion({
+        idPotrero: selectedPasture.ttrIdpotrer || selectedPasture.ttr_idpotrer,
+        idLote: selectedLot.id || selectedLot.tmaIdlote || selectedLot.tma_idlote,
+        fecha: startDate,
+        turno: turno,
+        observaciones: observaciones,
       })
-      toast.success('Lote asignado exitosamente')
-      setSelectedPasture(null)
+
+      toast.success('Rotación registrada exitosamente')
+
+      // Limpiar foormulario
       setSelectedLot(null)
-      setStartDate('')
-      setSelectedBovines([])
-      fetchPastureHistory(selectedPasture.id)
+      setStartDate(new Date().toISOString().split('T')[0])
+      setObservaciones('')
+
+      // Recargar datos para ver cambio de estado
+      fetchInitialData()
+
+      // Si estamos viendo historial, recargarlo
+      if (selectedPasture) {
+        fetchPastureHistory(selectedPasture.id || selectedPasture.ttr_idpotrer)
+      }
     } catch (error) {
-      toast.error('Error al asignar lote')
+      console.error(error)
+      toast.error('Error al asignar lote: ' + error.message)
     } finally {
       setLoading(false)
     }
-  }, [selectedPasture, selectedLot, startDate, selectedBovines])
+  }, [selectedPasture, selectedLot, startDate, turno, observaciones, fetchInitialData])
 
   const fetchPastureHistory = useCallback(async (pastureId) => {
+    if (!pastureId) return
     setLoading(true)
     try {
-      const history = await pastureActivityService.getPastureHistory(pastureId)
-      setPastureHistory(history)
+      // Obtener tanto historial de rotación como de mantenimiento
+      const [rotaciones, mantenimientos] = await Promise.all([
+        pastureService.getHistorialRotacion(pastureId),
+        pastureService.getHistorialMantenimiento(pastureId),
+      ])
+
+      // Combinar y ordenar cronológicamente
+      const combined = [
+        ...rotaciones.map((r) => ({ ...r, type: 'ROTACION', date: r.ttr_fecha })),
+        ...mantenimientos.map((m) => ({ ...m, type: 'MANTENIMIENTO', date: m.ttr_fechamant })),
+      ].sort((a, b) => new Date(b.date) - new Date(a.date))
+
+      setPastureHistory(combined)
     } catch (error) {
+      console.error(error)
       toast.error('Error al cargar historial')
     } finally {
       setLoading(false)
     }
   }, [])
 
-  const handleMarkExit = useCallback(async (pastureId) => {
+  // Función para obtener bovinos históricos de una rotación específica
+  const fetchHistoricalBovines = async (idLote, fecha) => {
     try {
-      setPastureStatus((prev) => ({
-        ...prev,
-        [pastureId]: { ...prev[pastureId], exitDate: new Date().toISOString().split('T')[0] },
-      }))
-      toast.success('Salida registrada')
-    } catch (error) {
-      toast.error('Error al registrar salida')
+      return await lotService.getHistoricalBovinesInLot(idLote, fecha)
+    } catch (err) {
+      console.error('Error fetching historical bovines', err)
+      return []
     }
-  }, [])
-
-  const handleUpdatePastureState = useCallback(async (pastureId, stateId) => {
-    try {
-      setPastureStatus((prev) => ({
-        ...prev,
-        [pastureId]: { ...prev[pastureId], stateId },
-      }))
-      toast.success('Estado actualizado')
-    } catch (error) {
-      toast.error('Error al actualizar estado')
-    }
-  }, [])
+  }
 
   return {
     pastures,
     lots,
-    bovines,
     pastureStates,
     selectedPasture,
     setSelectedPasture,
@@ -142,15 +141,16 @@ const usePastureActivity = () => {
     setSelectedLot,
     startDate,
     setStartDate,
-    selectedBovines,
-    setSelectedBovines,
+    turno,
+    setTurno,
+    observaciones,
+    setObservaciones,
     loading,
     pastureHistory,
     fetchPastureHistory,
     handleAssignLotToPasture,
-    handleMarkExit,
-    handleUpdatePastureState,
     pastureStatus,
+    fetchHistoricalBovines, // Exponemos para que el Modal pueda usarlo
   }
 }
 

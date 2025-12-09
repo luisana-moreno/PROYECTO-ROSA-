@@ -201,4 +201,62 @@ export const pastureService = {
     }
     return true
   },
+
+  // --- NUEVOS SERVICIOS (Agregados para Gestión Avanzada) ---
+
+  getDashboardStats: async () => {
+    const response = await fetch(`${API_URL}/potreros/dashboard-stats`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    })
+    if (!response.ok) throw new Error('Error al obtener estadísticas del dashboard')
+    return response.json()
+  },
+
+  getSugerenciaPotrero: async () => {
+    const response = await fetch(`${API_URL}/potreros/sugerencia`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    })
+    if (!response.ok) throw new Error('Error al obtener sugerencias')
+    return response.json()
+  },
+
+  createRotacion: async (rotacionData) => {
+    const response = await fetch(`${API_URL}/potreros/rotacion`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(rotacionData),
+    })
+    if (!response.ok) throw new Error('Error al registrar rotación')
+    return response.json()
+  },
+
+  getHistorialRotacion: async (idPotrero) => {
+    const response = await fetch(`${API_URL}/potreros/rotacion/potrero/${idPotrero}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    })
+    if (!response.ok) throw new Error('Error al obtener historial de rotación')
+    return response.json()
+  },
+
+  createMantenimiento: async (mantenimientoData) => {
+    const response = await fetch(`${API_URL}/potreros/mantenimiento`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(mantenimientoData),
+    })
+    if (!response.ok) throw new Error('Error al registrar mantenimiento')
+    return response.json()
+  },
+
+  getHistorialMantenimiento: async (idPotrero) => {
+    const response = await fetch(`${API_URL}/potreros/mantenimiento/potrero/${idPotrero}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    })
+    if (!response.ok) throw new Error('Error al obtener historial de mantenimiento')
+    return response.json()
+  },
 }

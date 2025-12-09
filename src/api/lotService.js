@@ -358,4 +358,19 @@ export const lotService = {
       throw error
     }
   },
+
+  getHistoricalBovinesInLot: async (idLote, fecha) => {
+    try {
+      const response = await fetch(`${LOTES_API_URL}/${idLote}/bovinos/historico?fecha=${fecha}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      if (!response.ok) throw new Error('Error al obtener historial de bovinos')
+      const data = await response.json()
+      return mapKeysToCamelCase(data)
+    } catch (error) {
+      console.error('Error en getHistoricalBovinesInLot:', error)
+      throw error
+    }
+  },
 }

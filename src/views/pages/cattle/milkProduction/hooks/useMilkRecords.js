@@ -19,6 +19,8 @@ export const useMilkRecords = () => {
   const [lots, setLots] = useState([])
   const [selectedLotId, setSelectedLotId] = useState('')
   const [productionDate, setProductionDate] = useState('')
+  const [jornada, setJornada] = useState('AM')
+  const [observacion, setObservacion] = useState('')
   const [bovinesInSelectedLot, setBovinesInSelectedLot] = useState([]) // Bovinos activos en el lote seleccionado
   const [individualBovineProduction, setIndividualBovineProduction] = useState({}) // {bovinoId: liters, ...}
   const [milkProductionLots, setMilkProductionLots] = useState([]) // Producción total por lote
@@ -123,6 +125,8 @@ export const useMilkRecords = () => {
         idLote: parseInt(selectedLotId),
         fechaProduccion: productionDate,
         bovinosProduccion,
+        jornada,
+        observacion,
       })
       // La función createProduccionLechePorLote ya retorna el resultado directamente, no response.data
       if (response) {
@@ -131,6 +135,8 @@ export const useMilkRecords = () => {
         setSelectedLotId('')
         setProductionDate('')
         setIndividualBovineProduction({})
+        setJornada('AM')
+        setObservacion('')
         fetchMilkProductionByLot() // Recargar datos
       }
     } catch (error) {
@@ -220,6 +226,10 @@ export const useMilkRecords = () => {
     setSelectedLotId,
     productionDate,
     setProductionDate,
+    jornada,
+    setJornada,
+    observacion,
+    setObservacion,
     bovinesInSelectedLot,
     individualBovineProduction,
     setIndividualBovineProduction,

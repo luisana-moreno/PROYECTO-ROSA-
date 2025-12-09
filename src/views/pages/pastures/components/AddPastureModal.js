@@ -13,7 +13,7 @@ import {
   CFormLabel,
 } from '@coreui/react'
 
-const SectionOne = ({ addPasture, setAddPasture, estadosPotrero, tiposMantenimiento }) => (
+const SectionOne = ({ addPasture, setAddPasture, estadosPotrero }) => (
   <div>
     <h6 className="text-success mb-3 fw-bold">Información General</h6>
     <CRow className="g-3">
@@ -43,33 +43,6 @@ const SectionOne = ({ addPasture, setAddPasture, estadosPotrero, tiposMantenimie
       </CCol>
     </CRow>
 
-    <h6 className="text-success mb-3 mt-4 fw-bold">Detalles de Mantenimiento</h6>
-    <CRow className="g-3">
-      <CCol md={6}>
-        <CFormLabel>Tipo de Mantenimiento</CFormLabel>
-        <CFormSelect
-          value={addPasture.ttr_idtipman || ''}
-          onChange={(e) => {
-            setAddPasture({ ...addPasture, ttr_idtipman: parseInt(e.target.value) || null })
-          }}
-        >
-          <option value="">Seleccione el tipo</option>
-          {tiposMantenimiento.map((tipo) => (
-            <option key={tipo.tma_idtipma} value={tipo.tma_idtipma}>
-              {tipo.tma_nomtipm}
-            </option>
-          ))}
-        </CFormSelect>
-      </CCol>
-      <CCol md={6}>
-        <CFormLabel>Fecha de Mantenimiento</CFormLabel>
-        <CFormInput
-          type="date"
-          value={addPasture.ttr_fechamnt || ''}
-          onChange={(e) => setAddPasture({ ...addPasture, ttr_fechamnt: e.target.value })}
-        />
-      </CCol>
-    </CRow>
     <CRow className="g-3 mt-3">
       <CCol md={12}>
         <CFormLabel>Descripción</CFormLabel>
@@ -109,7 +82,6 @@ const AddPastureModal = ({
           addPasture={addPasture}
           setAddPasture={setAddPasture}
           estadosPotrero={estadosPotrero}
-          tiposMantenimiento={tiposMantenimiento}
         />
       </CModalBody>
       <CModalFooter>

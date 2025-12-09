@@ -83,7 +83,12 @@ export const deleteVacunacion = async (id) => {
   return response.data
 }
 
-// ==================== PREÑEZ ====================
+export const getTiposVacuna = async () => {
+  const response = await axios.get(`${API_URL}/sanidad/vacunaciones/tipos`)
+  return response.data
+}
+
+// ==================== PRREÑEZ ====================
 
 export const getPreneces = async () => {
   const response = await axios.get(`${API_URL}/sanidad/prenez`)
@@ -92,6 +97,7 @@ export const getPreneces = async () => {
 
 export const getPrenecesActivas = async () => {
   const response = await axios.get(`${API_URL}/sanidad/prenez/activas`)
+  // console.log(response.data)
   return response.data
 }
 
@@ -135,6 +141,23 @@ export const getTratamientosPrenez = async (idPrenez) => {
 
 export const deleteTratamientoPrenez = async (idTratamiento) => {
   const response = await axios.delete(`${API_URL}/sanidad/prenez/tratamientos/${idTratamiento}`)
+  return response.data
+}
+
+// Tratamientos automáticos
+export const agregarTratamientoMastitisAutomatico = async (idPrenez, fechaInicio) => {
+  const response = await axios.post(
+    `${API_URL}/sanidad/prenez/${idPrenez}/tratamientos/mastitis-auto`,
+    { fechaInicio },
+  )
+  return response.data
+}
+
+export const agregarTratamientosPostParto = async (idPrenez, fechaParto) => {
+  const response = await axios.post(
+    `${API_URL}/sanidad/prenez/${idPrenez}/tratamientos/postparto-auto`,
+    { fechaParto },
+  )
   return response.data
 }
 
@@ -187,6 +210,7 @@ export const addBovinoVisita = async (idVisita, bovinoData) => {
 
 export const getDashboardSanidad = async () => {
   const response = await axios.get(`${API_URL}/sanidad/reportes/dashboard`)
+  // console.log(response.data)
   return response.data
 }
 
@@ -229,6 +253,7 @@ export default {
   createVacunacion,
   updateVacunacion,
   deleteVacunacion,
+  getTiposVacuna,
 
   // Preñez
   getPreneces,
@@ -241,6 +266,8 @@ export default {
   addTratamientoPrenez,
   getTratamientosPrenez,
   deleteTratamientoPrenez,
+  agregarTratamientoMastitisAutomatico,
+  agregarTratamientosPostParto,
 
   // Visitas Veterinarias
   getVisitasVeterinarias,

@@ -8,6 +8,7 @@ import {
   CTableDataCell,
   CButton,
   CCollapse,
+  CBadge,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilCaretBottom, cilCaretTop, cilPencil, cilTrash } from '@coreui/icons'
@@ -36,8 +37,10 @@ export const MilkProductionLotTable = ({
     <CTable striped hover responsive>
       <CTableHead>
         <CTableRow>
+          <CTableHeaderCell>ID</CTableHeaderCell>
           <CTableHeaderCell>Lote</CTableHeaderCell>
           <CTableHeaderCell>Fecha</CTableHeaderCell>
+          <CTableHeaderCell>Jornada</CTableHeaderCell>
           <CTableHeaderCell>Total Litros</CTableHeaderCell>
           <CTableHeaderCell>Acciones</CTableHeaderCell>
         </CTableRow>
@@ -47,10 +50,24 @@ export const MilkProductionLotTable = ({
           <React.Fragment key={lotProduction.idProduccionLecheLote || lotProduction.ttrIdprolot}>
             <CTableRow>
               <CTableDataCell>
+                {lotProduction.idProduccionLecheLote || lotProduction.ttrIdprolot}
+              </CTableDataCell>
+              <CTableDataCell>
                 <strong> {lotProduction.nombreLote || lotProduction.nombre_lote}</strong>
               </CTableDataCell>
               <CTableDataCell>
                 {formatDateToDDMMYYYY(lotProduction.fechaProduccion || lotProduction.ttr_fechapro)}
+              </CTableDataCell>
+              <CTableDataCell>
+                <CBadge
+                  color={
+                    (lotProduction.jornada || lotProduction.ttr_jornada) === 'AM'
+                      ? 'warning'
+                      : 'dark'
+                  }
+                >
+                  {lotProduction.jornada || lotProduction.ttr_jornada || 'AM'}
+                </CBadge>
               </CTableDataCell>
               <CTableDataCell>
                 {lotProduction.ttrTotlitrs.toFixed(2) || lotProduction.ttr_totlitrs.toFixed(2)}
@@ -79,7 +96,7 @@ export const MilkProductionLotTable = ({
               </CTableDataCell>
             </CTableRow>
             <CTableRow>
-              <CTableDataCell colSpan={4} className="p-0">
+              <CTableDataCell colSpan={5} className="p-0">
                 <CCollapse
                   visible={
                     visibleDetail[lotProduction.idProduccionLecheLote || lotProduction.ttrIdprolot]
@@ -94,6 +111,14 @@ export const MilkProductionLotTable = ({
                       )}
                       )
                     </h6>
+                    {(lotProduction.observacion || lotProduction.ttr_observacion) && (
+                      <div className="alert alert-info py-1 mb-2">
+                        <small>
+                          <strong>Nota:</strong>{' '}
+                          {lotProduction.observacion || lotProduction.ttr_observacion}
+                        </small>
+                      </div>
+                    )}
                     <CTable striped hover small className="mb-0">
                       <CTableHead>
                         <CTableRow>
@@ -156,7 +181,7 @@ export const MilkProductionLotTable = ({
         ))}
         {milkProductionLots.length === 0 && (
           <CTableRow>
-            <CTableDataCell colSpan="4" className="text-center">
+            <CTableDataCell colSpan="5" className="text-center">
               No hay registros de producción de leche por lote disponibles.
             </CTableDataCell>
           </CTableRow>

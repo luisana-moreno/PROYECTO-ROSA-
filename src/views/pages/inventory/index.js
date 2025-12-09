@@ -1,108 +1,113 @@
 import React from 'react'
+import { CCard, CCardBody, CCardHeader, CCol, CRow, CButton } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilPlus } from '@coreui/icons'
-import { CCard, CCardBody, CCardHeader, CButton, CAlert, CSpinner } from '@coreui/react'
-import useInventory from './hooks/useInventory'
+import { cilCart, cilPlus } from '@coreui/icons'
+
+import { useInventory } from './hooks/useInventory'
 import InventoryTable from './components/InventoryTable'
+import InventoryFilters from './components/InventoryFilters'
+import InventoryStats from './components/InventoryStats'
 import AddInventoryModal from './components/AddInventoryModal'
 import EditInventoryModal from './components/EditInventoryModal'
 import DeleteInventoryModal from './components/DeleteInventoryModal'
 
 const Inventory = () => {
   const {
-    visibleInventory,
-    setVisibleInventory,
-    editVisibleInventory,
-    setEditVisibleInventory,
-    deleteVisibleInventory,
-    setDeleteVisibleInventory,
-    currentInventory,
-    setCurrentInventory,
-    deleteConfirmationInventory,
-    setDeleteConfirmationInventory,
-    addInventory,
-    setAddInventory,
-    insumoType,
-    setInsumoType,
-    activeKey,
-    setActiveKey,
-    filters,
-    setFilters,
-    handleAddInventory,
-    handleEditInventory,
-    handleDeleteInventory,
-    filteredInventory,
+    items,
+    categories,
     loading,
-    error,
-    categoriasInsumo,
-    newCategoryName,
-    setNewCategoryName,
+    searchTerm,
+    setSearchTerm,
+    filterCategory,
+    setFilterCategory,
+    filteredItems,
+    visible,
+    setVisible,
+    editVisible,
+    setEditVisible,
+    deleteVisible,
+    setDeleteVisible,
+    currentRecord,
+    setCurrentRecord,
+    deleteConfirmation,
+    setDeleteConfirmation,
+    handleAddItem,
+    handleEditItem,
+    handleDeleteItem,
   } = useInventory()
 
   return (
-    <CCard>
-      <CCardHeader>
-        <h4 className="typography-color-title  mb-0 d-flex justify-content-between align-items-center">
-          Registro de Inventario
-          <CButton
-            className="button-no-hover-green text-white"
-            onClick={() => setVisibleInventory(true)}
-          >
-            <CIcon icon={cilPlus} className="me-2" />
-            Agregar Registro
-          </CButton>
-        </h4>
-      </CCardHeader>
-      <CCardBody>
-        {loading && (
-          <div className="d-flex justify-content-center">
-            <CSpinner color="primary" />
-          </div>
-        )}
-        {error && <CAlert color="danger">{error}</CAlert>}
-        {!loading && !error && (
-          <InventoryTable
-            filters={filters}
-            setFilters={setFilters}
-            activeKey={activeKey}
-            setActiveKey={setActiveKey}
-            filteredInventory={filteredInventory}
-            setCurrentInventory={setCurrentInventory}
-            setEditVisibleInventory={setEditVisibleInventory}
-            setDeleteVisibleInventory={setDeleteVisibleInventory}
-          />
-        )}
-      </CCardBody>
+    <>
+      {/* Header & Stats */}
+      <CRow>
+        <CCol xs={12}>
+          <CCard className="mb-4">
+            <CCardHeader>
+              <div className="d-flex align-items-center">
+                <CIcon icon={cilCart} className="me-2" size="lg" style={{ color: '#28a745' }} />
+                <strong>Gestión de Inventario</strong>
+              </div>
+            </CCardHeader>
+            <CCardBody>
+              <InventoryStats items={items} />
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+
+      {/* Main Content */}
+      <CRow>
+        <CCol xs={12}>
+          <CCard className="mb-4">
+            <CCardHeader className="d-flex justify-content-between align-items-center">
+              <strong>Lista de Insumos</strong>
+              <CButton color="success" className="text-white" onClick={() => setVisible(true)}>
+                <CIcon icon={cilPlus} className="me-2" />
+                Nuevo Insumo
+              </CButton>
+            </CCardHeader>
+            <CCardBody>
+              <InventoryFilters
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                filterCategory={filterCategory}
+                setFilterCategory={setFilterCategory}
+                categories={categories}
+              />
+              <InventoryTable
+                items={filteredItems}
+                setCurrentRecord={setCurrentRecord}
+                setEditVisible={setEditVisible}
+                setDeleteVisible={setDeleteVisible}
+              />
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+
+      {/* Modals */}
       <AddInventoryModal
-        visible={visibleInventory}
-        onClose={() => setVisibleInventory(false)}
-        addInventory={addInventory}
-        setAddInventory={setAddInventory}
-        insumoType={insumoType}
-        setInsumoType={setInsumoType}
-        onSave={handleAddInventory}
-        categoriasInsumo={categoriasInsumo}
-        newCategoryName={newCategoryName}
-        setNewCategoryName={setNewCategoryName}
+        visible={visible}
+        setVisible={setVisible}
+        handleAddItem={handleAddItem}
+        categories={categories}
       />
       <EditInventoryModal
-        visible={editVisibleInventory}
-        onClose={() => setEditVisibleInventory(false)}
-        currentInventory={currentInventory}
-        setCurrentInventory={setCurrentInventory}
-        onSave={handleEditInventory}
-        categoriasInsumo={categoriasInsumo}
-        newCategoryName={newCategoryName}
-        setNewCategoryName={setNewCategoryName}
+        editVisible={editVisible}
+        setEditVisible={setEditVisible}
+        currentRecord={currentRecord}
+        handleEditItem={handleEditItem}
+        categories={categories}
       />
       <DeleteInventoryModal
-        visible={deleteVisibleInventory}
-        onClose={() => setDeleteVisibleInventory(false)}
-        deleteConfirmationInventory={deleteConfirmationInventory}
-        setDeleteConfirmationInventory={setDeleteConfirmationInventory}
-        onDelete={handleDeleteInventory}
+        deleteVisible={deleteVisible}
+        setDeleteVisible={setDeleteVisible}
+        deleteConfirmation={deleteConfirmation}
+        setDeleteConfirmation={setDeleteConfirmation}
+        handleDeleteItem={handleDeleteItem}
+        currentRecord={currentRecord}
       />
-    </CCard>
+    </>
   )
 }
 

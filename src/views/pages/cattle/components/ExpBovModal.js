@@ -25,6 +25,9 @@ import {
   CDropdownToggle,
   CDropdownMenu,
   CDropdownItem,
+  CCard,
+  CCardBody,
+  CWidgetStatsF,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -36,8 +39,11 @@ import {
   cilBeaker, // Vacunas
   cilHeart, // Preñez
   cilClipboard, // Visita Vet
-  cilMedicalCross, // Icono reusado para exportar pdf sanitario
+  cilMedicalCross,
+  cilChartLine,
+  cilLocationPin,
 } from '@coreui/icons'
+import { CChartLine } from '@coreui/react-chartjs'
 import PropTypes from 'prop-types'
 import { toast } from 'react-toastify'
 import { pdfService } from '../../../../api/pdfService'
@@ -47,7 +53,7 @@ import { formatDateToDDMMYYYY } from 'src/utils/dateFormatter'
 const { get } = helpFetch()
 
 const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
-  const [activeTab, setActiveTab] = useState('infoBasica')
+  const [activeTab, setActiveTab] = useState('resumen') // Default to summary
   const [milkProduction, setMilkProduction] = useState([])
   const [pastureHistory, setPastureHistory] = useState([])
 
@@ -59,6 +65,21 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
   const [loading, setLoading] = useState(false)
   const [exporting, setExporting] = useState(false)
 
+  // Helper para edad
+  const calculateAge = (dobString) => {
+    if (!dobString) return 'N/A'
+    const dob = new Date(dobString)
+    if (isNaN(dob.getTime())) return 'N/A'
+
+    const diffMs = Date.now() - dob.getTime()
+    const ageDt = new Date(diffMs)
+    const years = Math.abs(ageDt.getUTCFullYear() - 1970)
+    const months = ageDt.getUTCMonth()
+
+    if (years > 0) return `${years} años, ${months} meses`
+    return `${months} meses`
+  }
+
   useEffect(() => {
     const loadCattleDetails = async () => {
       if (expBovVisible && currentCattle && currentCattle.ttrIdbovino) {
@@ -66,30 +87,27 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
         try {
           const id = currentCattle.ttrIdbovino
 
-          // Ejecutar peticiones en paralelo para optimizar carga
-          // Eliminada la carga de registros medicos legacy
+          // Usamos catch individualmente para que un error 404 (ej: sin historial de leche) no rompa todo el Promise.all
           const [production, history, vacs, pren, visits] = await Promise.all([
-            get(`prodleche/bovino/${id}`),
-            get(`lotepotreros/bovino/${id}`),
-            get(`sanidad/vacunaciones/bovino/${id}`),
-            get(`sanidad/prenez/bovino/${id}`),
+            get(`prodleche/bovino/${id}`).catch((err) => {
+              console.warn('Info produccion no encontrada o vacia', err)
+              return []
+            }),
+            get(`lotepotreros/bovino/${id}`).catch(() => []),
+            get(`sanidad/vacunaciones/bovino/${id}`).catch(() => []),
+            get(`sanidad/prenez/bovino/${id}`).catch(() => []),
             get(`sanidad/visitas-veterinarias/bovino-visitas/${id}`).catch(() => []),
           ])
 
-          setMilkProduction(production || [])
-          setPastureHistory(history || [])
-          setVacunaciones(vacs || [])
-          setPreneces(pren || [])
-          setVisitasVet(visits || [])
+          setMilkProduction(Array.isArray(production) ? production : [])
+          setPastureHistory(Array.isArray(history) ? history : [])
+          setVacunaciones(Array.isArray(vacs) ? vacs : [])
+          setPreneces(Array.isArray(pren) ? pren : [])
+          setVisitasVet(Array.isArray(visits) ? visits : [])
         } catch (error) {
           console.error('Error al cargar detalles del bovino:', error)
-          toast.error('Error al cargar detalles completos del bovino.')
-          // Limpiar estados en error
-          setMilkProduction([])
-          setPastureHistory([])
-          setVacunaciones([])
-          setPreneces([])
-          setVisitasVet([])
+          toast.error('Ocurrió un error cargando algunos datos del expediente.')
+          // No limpiamos todo, dejamos lo que se haya podido cargar o estados previos si es necesario
         } finally {
           setLoading(false)
         }
@@ -100,7 +118,7 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
         setVacunaciones([])
         setPreneces([])
         setVisitasVet([])
-        setActiveTab('infoBasica')
+        setActiveTab('resumen')
       }
     }
     loadCattleDetails()
@@ -143,13 +161,30 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
   }
 
   const InfoRow = ({ label, value }) => (
-    <CRow className="mb-2 py-2 border-bottom">
-      <CCol xs={5} className="text-medium-emphasis">
-        <strong>{label}</strong>
-      </CCol>
-      <CCol xs={7}>{value || 'N/A'}</CCol>
-    </CRow>
+    <div className="d-flex justify-content-between border-bottom py-2">
+      <span className="text-muted fw-semibold">{label}</span>
+      <span className="fw-bold text-dark">{value || 'N/A'}</span>
+    </div>
   )
+
+  // Chart Logic
+  const milkChartData = {
+    labels: Array.isArray(milkProduction)
+      ? milkProduction.map((r) => formatDateToDDMMYYYY(r.ttr_fechapro)).reverse()
+      : [],
+    datasets: [
+      {
+        label: 'Producción (Litros)',
+        backgroundColor: 'rgba(75,192,192,0.2)',
+        borderColor: 'rgba(75,192,192,1)',
+        pointBackgroundColor: 'rgba(75,192,192,1)',
+        pointBorderColor: '#fff',
+        data: Array.isArray(milkProduction)
+          ? milkProduction.map((r) => r.ttr_litrsprd).reverse()
+          : [],
+      },
+    ],
+  }
 
   return (
     <CModal
@@ -160,22 +195,67 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
       size="xl"
       backdrop="static"
     >
-      <CModalHeader style={{ backgroundColor: '#28a745', color: 'white' }}>
-        <CModalTitle>
-          <CIcon icon={cilAnimal} className="me-2" />
-          Expediente Bovino #{currentCattle?.ttrNumerobv || currentCattle?.ttr_numerobv}
+      <CModalHeader className="bg-success text-white">
+        <CModalTitle className="d-flex align-items-center gap-2">
+          <CIcon icon={cilAnimal} size="lg" />
+          <span>
+            Expediente Bovino #{currentCattle?.ttrNumerobv || currentCattle?.ttr_numerobv}
+          </span>
         </CModalTitle>
       </CModalHeader>
-      <CModalBody>
-        <CNav variant="tabs" role="tablist" className="mb-3">
+      <CModalBody className="bg-light">
+        {/* Header Profile Card */}
+        <CCard className="mb-4 shadow-sm border-top-success border-top-3">
+          <CCardBody>
+            <CRow>
+              <CCol md={3} className="text-center border-end">
+                <div className="display-4 fw-bold text-success">{currentCattle?.ttrNumerobv}</div>
+                <div className="text-muted small">Número Identificador</div>
+                <CBadge
+                  color={currentCattle?.estadoNombre === 'Activo' ? 'success' : 'danger'}
+                  className="mt-2"
+                >
+                  {currentCattle?.estadoNombre || 'Desconocido'}
+                </CBadge>
+              </CCol>
+              <CCol md={9}>
+                <CRow>
+                  <CCol md={4}>
+                    <InfoRow label="Raza" value={currentCattle?.razaNombre} />
+                  </CCol>
+                  <CCol md={4}>
+                    <InfoRow label="Peso" value={`${currentCattle?.ttrPesokilo} Kg`} />
+                  </CCol>
+                  <CCol md={4}>
+                    <InfoRow label="Color" value={currentCattle?.colorNombre} />
+                  </CCol>
+                  <CCol md={4}>
+                    <InfoRow
+                      label="Fecha Nac."
+                      value={formatDateToDDMMYYYY(currentCattle?.ttrFecnacim)}
+                    />
+                  </CCol>
+                  <CCol md={4}>
+                    <InfoRow label="Etapa" value={currentCattle?.etapaNombre} />
+                  </CCol>
+                  <CCol md={4}>
+                    <InfoRow label="Edad" value={calculateAge(currentCattle?.ttrFecnacim)} />
+                  </CCol>
+                </CRow>
+              </CCol>
+            </CRow>
+          </CCardBody>
+        </CCard>
+
+        <CNav variant="pills" role="tablist" className="mb-3 bg-white p-2 rounded shadow-sm">
           <CNavItem>
             <CNavLink
-              active={activeTab === 'infoBasica'}
-              onClick={() => setActiveTab('infoBasica')}
+              active={activeTab === 'resumen'}
+              onClick={() => setActiveTab('resumen')}
               style={{ cursor: 'pointer' }}
             >
               <CIcon icon={cilInfo} className="me-2" />
-              Básica
+              Resumen
             </CNavLink>
           </CNavItem>
           <CNavItem>
@@ -185,10 +265,12 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
               style={{ cursor: 'pointer' }}
             >
               <CIcon icon={cilBeaker} className="me-2" />
-              Vacunación
-              <CBadge color="success" className="ms-1">
-                {vacunaciones.length}
-              </CBadge>
+              Sanidad
+              {vacunaciones.length > 0 && (
+                <CBadge color="danger" shape="rounded-pill" className="ms-2">
+                  {vacunaciones.length}
+                </CBadge>
+              )}
             </CNavLink>
           </CNavItem>
           <CNavItem>
@@ -199,22 +281,6 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
             >
               <CIcon icon={cilHeart} className="me-2" />
               Reproducción
-              <CBadge color="danger" className="ms-1">
-                {preneces.length}
-              </CBadge>
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink
-              active={activeTab === 'visitas'}
-              onClick={() => setActiveTab('visitas')}
-              style={{ cursor: 'pointer' }}
-            >
-              <CIcon icon={cilClipboard} className="me-2" />
-              Visitas
-              <CBadge color="info" className="ms-1">
-                {visitasVet.length}
-              </CBadge>
             </CNavLink>
           </CNavItem>
           <CNavItem>
@@ -223,7 +289,7 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
               onClick={() => setActiveTab('produccionLeche')}
               style={{ cursor: 'pointer' }}
             >
-              <CIcon icon={cilList} className="me-2" />
+              <CIcon icon={cilChartLine} className="me-2" />
               Producción
             </CNavLink>
           </CNavItem>
@@ -233,220 +299,286 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
               onClick={() => setActiveTab('historialPotreros')}
               style={{ cursor: 'pointer' }}
             >
-              <CIcon icon={cilList} className="me-2" />
+              <CIcon icon={cilLocationPin} className="me-2" />
               Ubicación
             </CNavLink>
           </CNavItem>
         </CNav>
 
-        <CTabContent>
-          {/* Tab Información Básica */}
-          <CTabPane role="tabpanel" visible={activeTab === 'infoBasica'}>
+        <CTabContent className="p-2">
+          {/* RESUMEN */}
+          <CTabPane role="tabpanel" visible={activeTab === 'resumen'}>
+            <CRow className="g-3">
+              <CCol md={4}>
+                <CWidgetStatsF
+                  className="mb-3"
+                  color="primary"
+                  icon={<CIcon icon={cilChartLine} height={24} />}
+                  title="Producción Total"
+                  value={`${
+                    Array.isArray(milkProduction)
+                      ? milkProduction
+                          .reduce((acc, curr) => acc + parseFloat(curr.ttr_litrsprd), 0)
+                          .toFixed(1)
+                      : '0.0'
+                  } L`}
+                />
+              </CCol>
+              <CCol md={4}>
+                <CWidgetStatsF
+                  className="mb-3"
+                  color="warning"
+                  icon={<CIcon icon={cilBeaker} height={24} />}
+                  title="Vacunas"
+                  value={`${vacunaciones.length} Registradas`}
+                />
+              </CCol>
+              <CCol md={4}>
+                <CWidgetStatsF
+                  className="mb-3"
+                  color="danger"
+                  icon={<CIcon icon={cilHeart} height={24} />}
+                  title="Preñeces"
+                  value={`${preneces.length} Ciclos`}
+                />
+              </CCol>
+            </CRow>
             <CRow>
               <CCol md={6}>
-                <h6 className="text-success mb-3">
-                  <strong>Datos Generales</strong>
-                </h6>
-                <InfoRow label="Número de Bovino" value={currentCattle?.ttrNumerobv} />
-                <InfoRow label="Raza" value={currentCattle?.razaNombre} />
-                <InfoRow
-                  label="Fecha de Nacimiento"
-                  value={formatDateToDDMMYYYY(currentCattle?.ttrFecnacim)}
-                />
-                <InfoRow label="Color" value={currentCattle?.colorNombre} />
-              </CCol>
-              <CCol md={6}>
-                <h6 className="text-success mb-3">
-                  <strong>Estado Actual</strong>
-                </h6>
-                <InfoRow label="Peso (kg)" value={currentCattle?.ttrPesokilo} />
-                <InfoRow label="Etapa" value={currentCattle?.etapaNombre} />
-                <InfoRow label="Estado" value={currentCattle?.estadoNombre} />
+                <CCard>
+                  <CCardBody>
+                    <h5>Última Ubicación</h5>
+                    {pastureHistory.length > 0 ? (
+                      <div>
+                        <h2 className="text-primary">{pastureHistory[0].ttr_codpotre}</h2>
+                        <p className="mb-0">Lote: {pastureHistory[0].tma_nomlote}</p>
+                        <small className="text-muted">
+                          Desde: {formatDateToDDMMYYYY(pastureHistory[0].ttr_fechaini)}
+                        </small>
+                      </div>
+                    ) : (
+                      <p>Sin registros de ubicación.</p>
+                    )}
+                  </CCardBody>
+                </CCard>
               </CCol>
             </CRow>
           </CTabPane>
 
-          {/* Tab Vacunaciones */}
+          {/* SANIDAD */}
           <CTabPane role="tabpanel" visible={activeTab === 'vacunacion'}>
-            {vacunaciones.length > 0 ? (
-              <CTable striped hover responsive small>
-                <CTableHead>
-                  <CTableRow>
-                    <CTableHeaderCell>Fecha</CTableHeaderCell>
-                    <CTableHeaderCell>Vacuna</CTableHeaderCell>
-                    <CTableHeaderCell>Plan</CTableHeaderCell>
-                    <CTableHeaderCell>Próxima Dosis</CTableHeaderCell>
-                  </CTableRow>
-                </CTableHead>
-                <CTableBody>
-                  {vacunaciones.map((vac) => (
-                    <CTableRow key={vac.ttr_idvacuna}>
-                      <CTableDataCell>{formatDateToDDMMYYYY(vac.ttr_fechaapl)}</CTableDataCell>
-                      <CTableDataCell>{vac.nombre_vacuna}</CTableDataCell>
-                      <CTableDataCell>{vac.nombre_plan || 'Extraordinaria'}</CTableDataCell>
-                      <CTableDataCell>
-                        {vac.ttr_proxfech ? (
-                          <span
-                            className={
-                              new Date(vac.ttr_proxfech) < new Date() ? 'text-danger fw-bold' : ''
-                            }
-                          >
-                            {formatDateToDDMMYYYY(vac.ttr_proxfech)}
-                          </span>
-                        ) : (
-                          'N/A'
-                        )}
-                      </CTableDataCell>
-                    </CTableRow>
-                  ))}
-                </CTableBody>
-              </CTable>
-            ) : (
-              <CAlert color="success" variant="solid" className="text-white">
-                Este bovino no tiene registros de vacunación en el nuevo sistema.
-              </CAlert>
-            )}
+            <CCard className="shadow-sm">
+              <CCardBody>
+                <h5>Historial de Vacunación</h5>
+                {vacunaciones.length > 0 ? (
+                  <CTable hover responsive small>
+                    <CTableHead color="light">
+                      <CTableRow>
+                        <CTableHeaderCell>Fecha</CTableHeaderCell>
+                        <CTableHeaderCell>Vacuna</CTableHeaderCell>
+                        <CTableHeaderCell>Plan</CTableHeaderCell>
+                        <CTableHeaderCell>Próxima Dosis</CTableHeaderCell>
+                      </CTableRow>
+                    </CTableHead>
+                    <CTableBody>
+                      {vacunaciones.map((vac) => (
+                        <CTableRow key={vac.ttr_idvacuna}>
+                          <CTableDataCell>{formatDateToDDMMYYYY(vac.ttr_fechaapl)}</CTableDataCell>
+                          <CTableDataCell className="fw-bold text-primary">
+                            {vac.nombre_vacuna}
+                          </CTableDataCell>
+                          <CTableDataCell>{vac.nombre_plan || 'Extraordinaria'}</CTableDataCell>
+                          <CTableDataCell>
+                            {vac.ttr_proxfech ? (
+                              <CBadge
+                                color={new Date(vac.ttr_proxfech) < new Date() ? 'danger' : 'info'}
+                              >
+                                {formatDateToDDMMYYYY(vac.ttr_proxfech)}
+                              </CBadge>
+                            ) : (
+                              '-'
+                            )}
+                          </CTableDataCell>
+                        </CTableRow>
+                      ))}
+                    </CTableBody>
+                  </CTable>
+                ) : (
+                  <CAlert color="info">Sin registros de vacunación.</CAlert>
+                )}
+                <hr />
+                <h5>Visitas Veterinarias</h5>
+                {visitasVet.length > 0 ? (
+                  <CTable hover responsive small>
+                    <CTableHead color="light">
+                      <CTableRow>
+                        <CTableHeaderCell>Fecha</CTableHeaderCell>
+                        <CTableHeaderCell>Diagnóstico</CTableHeaderCell>
+                        <CTableHeaderCell>Tratamiento</CTableHeaderCell>
+                      </CTableRow>
+                    </CTableHead>
+                    <CTableBody>
+                      {visitasVet.map((v) => (
+                        <CTableRow key={v.ttr_idvisbov}>
+                          <CTableDataCell>{formatDateToDDMMYYYY(v.fecha_visita)}</CTableDataCell>
+                          <CTableDataCell>{v.ttr_diagnos}</CTableDataCell>
+                          <CTableDataCell>{v.ttr_tratamie || '-'}</CTableDataCell>
+                        </CTableRow>
+                      ))}
+                    </CTableBody>
+                  </CTable>
+                ) : (
+                  <p className="text-muted">No hay visitas recientes.</p>
+                )}
+              </CCardBody>
+            </CCard>
           </CTabPane>
 
-          {/* Tab Reproducción (Preñez) */}
+          {/* REPRODUCCION */}
           <CTabPane role="tabpanel" visible={activeTab === 'reproduccion'}>
-            {preneces.length > 0 ? (
-              <CTable striped hover responsive small>
-                <CTableHead>
-                  <CTableRow>
-                    <CTableHeaderCell>Inicio Gestación</CTableHeaderCell>
-                    <CTableHeaderCell>Parto Estimado</CTableHeaderCell>
-                    <CTableHeaderCell>Estado</CTableHeaderCell>
-                    <CTableHeaderCell>Observaciones</CTableHeaderCell>
-                  </CTableRow>
-                </CTableHead>
-                <CTableBody>
-                  {preneces.map((pren) => (
-                    <CTableRow key={pren.ttr_idprenez}>
-                      <CTableDataCell>{formatDateToDDMMYYYY(pren.ttr_fechaini)}</CTableDataCell>
-                      <CTableDataCell>
-                        <strong>{formatDateToDDMMYYYY(pren.ttr_fechaestp)}</strong>
-                      </CTableDataCell>
-                      <CTableDataCell>
-                        <CBadge
-                          color={pren.ttr_estadopre === 'Finalizada' ? 'secondary' : 'primary'}
-                        >
-                          {pren.ttr_estadopre}
-                        </CBadge>
-                      </CTableDataCell>
-                      <CTableDataCell>{pren.ttr_observa || '-'}</CTableDataCell>
-                    </CTableRow>
-                  ))}
-                </CTableBody>
-              </CTable>
-            ) : (
-              <CAlert color="info">No hay registros de ciclos reproductivos.</CAlert>
-            )}
+            <CCard className="shadow-sm">
+              <CCardBody>
+                {preneces.length > 0 ? (
+                  <CTable striped hover responsive>
+                    <CTableHead color="light">
+                      <CTableRow>
+                        <CTableHeaderCell>Inicio Gestación</CTableHeaderCell>
+                        <CTableHeaderCell>Parto Estimado</CTableHeaderCell>
+                        <CTableHeaderCell>Estado</CTableHeaderCell>
+                        <CTableHeaderCell>Observaciones</CTableHeaderCell>
+                      </CTableRow>
+                    </CTableHead>
+                    <CTableBody>
+                      {preneces.map((pren) => (
+                        <CTableRow key={pren.ttr_idprenez}>
+                          <CTableDataCell>{formatDateToDDMMYYYY(pren.ttr_fechaini)}</CTableDataCell>
+                          <CTableDataCell className="fw-bold">
+                            {formatDateToDDMMYYYY(pren.ttr_fechaestp)}
+                          </CTableDataCell>
+                          <CTableDataCell>
+                            <CBadge
+                              color={pren.ttr_estadopre === 'Finalizada' ? 'secondary' : 'success'}
+                            >
+                              {pren.ttr_estadopre}
+                            </CBadge>
+                          </CTableDataCell>
+                          <CTableDataCell>{pren.ttr_observa || '-'}</CTableDataCell>
+                        </CTableRow>
+                      ))}
+                    </CTableBody>
+                  </CTable>
+                ) : (
+                  <CAlert color="success">No hay registros de ciclos reproductivos.</CAlert>
+                )}
+              </CCardBody>
+            </CCard>
           </CTabPane>
 
-          {/* Tab Visitas Veterinarias */}
-          <CTabPane role="tabpanel" visible={activeTab === 'visitas'}>
-            {visitasVet.length > 0 ? (
-              <CTable striped hover responsive small>
-                <CTableHead>
-                  <CTableRow>
-                    <CTableHeaderCell>Fecha</CTableHeaderCell>
-                    <CTableHeaderCell>Veterinario</CTableHeaderCell>
-                    <CTableHeaderCell>Diagnóstico</CTableHeaderCell>
-                    <CTableHeaderCell>Tratamiento Ind.</CTableHeaderCell>
-                  </CTableRow>
-                </CTableHead>
-                <CTableBody>
-                  {visitasVet.map((visita) => (
-                    <CTableRow key={visita.ttr_idvisbov}>
-                      <CTableDataCell>{formatDateToDDMMYYYY(visita.fecha_visita)}</CTableDataCell>
-                      <CTableDataCell>{visita.veterinario}</CTableDataCell>
-                      <CTableDataCell>{visita.ttr_diagnos}</CTableDataCell>
-                      <CTableDataCell>{visita.ttr_tratamie || '-'}</CTableDataCell>
-                    </CTableRow>
-                  ))}
-                </CTableBody>
-              </CTable>
-            ) : (
-              <CAlert color="info">No hay registros de visitas veterinarias específicas.</CAlert>
-            )}
-          </CTabPane>
-
-          {/* Tab Producción de Leche */}
+          {/* PRODUCCION */}
           <CTabPane role="tabpanel" visible={activeTab === 'produccionLeche'}>
-            {milkProduction.length > 0 ? (
-              <CTable striped hover responsive>
-                <CTableHead>
-                  <CTableRow>
-                    <CTableHeaderCell>Fecha</CTableHeaderCell>
-                    <CTableHeaderCell>Litros Producidos</CTableHeaderCell>
-                  </CTableRow>
-                </CTableHead>
-                <CTableBody>
-                  {milkProduction.map((record) => (
-                    <CTableRow key={record.ttr_idprodlc}>
-                      <CTableDataCell>{formatDateToDDMMYYYY(record.ttr_fechapro)}</CTableDataCell>
-                      <CTableDataCell>
-                        <strong>{record.ttr_litrsprd} L</strong>
-                      </CTableDataCell>
-                    </CTableRow>
-                  ))}
-                </CTableBody>
-              </CTable>
-            ) : (
-              <CAlert color="info">
-                No hay registros de producción de leche para este bovino.
-              </CAlert>
-            )}
+            <CCard className="mb-3 shadow-sm">
+              <CCardBody>
+                <h5>Curva de Producción</h5>
+                {milkProduction.length > 0 ? (
+                  <CChartLine
+                    data={milkChartData}
+                    options={{ maintainAspectRatio: false }}
+                    height={300}
+                  />
+                ) : (
+                  <p className="text-muted text-center py-5">
+                    No hay suficientes datos para graficar.
+                  </p>
+                )}
+              </CCardBody>
+            </CCard>
+            <CCard className="shadow-sm">
+              <CCardBody>
+                <h5>Registros Detallados</h5>
+                <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                  <CTable striped hover small>
+                    <CTableHead>
+                      <CTableRow>
+                        <CTableHeaderCell>Fecha</CTableHeaderCell>
+                        <CTableHeaderCell>Litros</CTableHeaderCell>
+                      </CTableRow>
+                    </CTableHead>
+                    <CTableBody>
+                      {Array.isArray(milkProduction) &&
+                        milkProduction.map((p) => (
+                          <CTableRow key={p.ttr_idprodlc}>
+                            <CTableDataCell>{formatDateToDDMMYYYY(p.ttr_fechapro)}</CTableDataCell>
+                            <CTableDataCell>
+                              <strong>{p.ttr_litrsprd} L</strong>
+                            </CTableDataCell>
+                          </CTableRow>
+                        ))}
+                    </CTableBody>
+                  </CTable>
+                </div>
+              </CCardBody>
+            </CCard>
           </CTabPane>
 
-          {/* Tab Historial Potreros */}
+          {/* HISTORIAL UBICACION */}
           <CTabPane role="tabpanel" visible={activeTab === 'historialPotreros'}>
-            {pastureHistory.length > 0 ? (
-              <CTable striped hover responsive>
-                <CTableHead>
-                  <CTableRow>
-                    <CTableHeaderCell>Lote</CTableHeaderCell>
-                    <CTableHeaderCell>Potrero</CTableHeaderCell>
-                    <CTableHeaderCell>Fecha Inicio</CTableHeaderCell>
-                    <CTableHeaderCell>Fecha Fin</CTableHeaderCell>
-                  </CTableRow>
-                </CTableHead>
-                <CTableBody>
-                  {pastureHistory.map((record) => (
-                    <CTableRow key={record.ttr_idbovlotpot}>
-                      <CTableDataCell>{record.tma_nomlote || 'N/A'}</CTableDataCell>
-                      <CTableDataCell>{record.ttr_codpotre || 'N/A'}</CTableDataCell>
-                      <CTableDataCell>{formatDateToDDMMYYYY(record.ttr_fechaini)}</CTableDataCell>
-                      <CTableDataCell>{formatDateToDDMMYYYY(record.ttr_fechafin)}</CTableDataCell>
-                    </CTableRow>
-                  ))}
-                </CTableBody>
-              </CTable>
-            ) : (
-              <CAlert color="info">No hay historial de lotes/potreros para este bovino.</CAlert>
-            )}
+            <CCard className="shadow-sm">
+              <CCardBody>
+                {pastureHistory.length > 0 ? (
+                  <CTable striped hover responsive>
+                    <CTableHead color="light">
+                      <CTableRow>
+                        <CTableHeaderCell>Lote</CTableHeaderCell>
+                        <CTableHeaderCell>Potrero</CTableHeaderCell>
+                        <CTableHeaderCell>Desde</CTableHeaderCell>
+                        <CTableHeaderCell>Hasta</CTableHeaderCell>
+                      </CTableRow>
+                    </CTableHead>
+                    <CTableBody>
+                      {pastureHistory.map((record) => (
+                        <CTableRow key={record.ttr_idbovlotpot}>
+                          <CTableDataCell>{record.tma_nomlote || 'N/A'}</CTableDataCell>
+                          <CTableDataCell className="fw-bold">
+                            {record.ttr_codpotre || 'N/A'}
+                          </CTableDataCell>
+                          <CTableDataCell>
+                            {formatDateToDDMMYYYY(record.ttr_fechaini)}
+                          </CTableDataCell>
+                          <CTableDataCell>
+                            {formatDateToDDMMYYYY(record.ttr_fechafin) || (
+                              <CBadge color="success">Actual</CBadge>
+                            )}
+                          </CTableDataCell>
+                        </CTableRow>
+                      ))}
+                    </CTableBody>
+                  </CTable>
+                ) : (
+                  <CAlert color="info">No hay historial de movimientos.</CAlert>
+                )}
+              </CCardBody>
+            </CCard>
           </CTabPane>
         </CTabContent>
       </CModalBody>
-      <CModalFooter>
-        <CButton color="secondary" onClick={() => setExpBovVisible(false)}>
+      <CModalFooter className="bg-white">
+        <CButton color="secondary" variant="ghost" onClick={() => setExpBovVisible(false)}>
           Cerrar
         </CButton>
 
         <CDropdown variant="btn-group" direction="up">
-          <CDropdownToggle color="success" disabled={exporting}>
+          <CDropdownToggle color="primary">
             <CIcon icon={cilCloudDownload} className="me-2" />
-            {exporting ? 'Generando...' : 'Exportar Expediente'}
+            {exporting ? 'Generando...' : 'Descargar Expediente'}
           </CDropdownToggle>
           <CDropdownMenu>
             <CDropdownItem onClick={() => handleExportPdf('completo')}>
               <CIcon icon={cilFile} className="me-2" />
-              Expediente Completo
+              Completo (PDF)
             </CDropdownItem>
             <CDropdownItem onClick={() => handleExportPdf('sanitario')}>
               <CIcon icon={cilMedicalCross} className="me-2 text-danger" />
-              Hoja Clínica (Sanitario)
+              Sanitario (PDF)
             </CDropdownItem>
           </CDropdownMenu>
         </CDropdown>

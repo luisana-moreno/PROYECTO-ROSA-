@@ -30,6 +30,10 @@ export const AddMilkRecordModal = ({
   setSelectedLotId,
   productionDate,
   setProductionDate,
+  jornada,
+  setJornada,
+  observacion,
+  setObservacion,
   bovinesInSelectedLot,
   individualBovineProduction,
   setIndividualBovineProduction,
@@ -62,7 +66,7 @@ export const AddMilkRecordModal = ({
       </CModalHeader>
       <CModalBody>
         <CRow className="g-3 mb-4">
-          <CCol md={6}>
+          <CCol md={4}>
             <CFormLabel htmlFor="selectLot" className="fw-bold">
               Seleccionar Lote
             </CFormLabel>
@@ -79,7 +83,7 @@ export const AddMilkRecordModal = ({
               ))}
             </CFormSelect>
           </CCol>
-          <CCol md={6}>
+          <CCol md={4}>
             <CFormLabel htmlFor="productionDate" className="fw-bold">
               Fecha de Producción
             </CFormLabel>
@@ -89,6 +93,33 @@ export const AddMilkRecordModal = ({
               value={productionDate}
               onChange={(e) => setProductionDate(e.target.value)}
               max={today}
+            />
+          </CCol>
+          <CCol md={4}>
+            <CFormLabel htmlFor="selectJornada" className="fw-bold">
+              Jornada
+            </CFormLabel>
+            <CFormSelect
+              id="selectJornada"
+              value={jornada}
+              onChange={(e) => setJornada(e.target.value)}
+            >
+              <option value="AM">Mañana (AM)</option>
+              <option value="PM">Tarde (PM)</option>
+            </CFormSelect>
+          </CCol>
+        </CRow>
+
+        <CRow className="mb-4">
+          <CCol>
+            <CFormLabel htmlFor="observacion">Observaciones Generales</CFormLabel>
+            <CFormInput
+              component="textarea"
+              id="observacion"
+              rows={2}
+              placeholder="Incidencias, clima, etc..."
+              value={observacion}
+              onChange={(e) => setObservacion(e.target.value)}
             />
           </CCol>
         </CRow>

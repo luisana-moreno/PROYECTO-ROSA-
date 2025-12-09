@@ -108,6 +108,9 @@ const LotDetailsModal = ({
     { key: 'etapaNombre', label: 'Etapa' },
     { key: 'estadoNombre', label: 'Estado' },
   ]
+  console.log(lot)
+  console.log(activeBovinesInLot)
+  console.log(bovinesInLot)
 
   return (
     <>
@@ -163,9 +166,9 @@ const LotDetailsModal = ({
                   </CTableHead>
                   <CTableBody>
                     {activeBovinesInLot.map((bovine) => (
-                      <CTableRow key={bovine.idbovino}>
+                      <CTableRow key={bovine.idBovino}>
                         <CTableDataCell>
-                          <strong>{bovine.numerobovino}</strong>
+                          <strong>{bovine.numeroBovino}</strong>
                         </CTableDataCell>
                         <CTableDataCell>{bovine.codpotrero || 'Sin Potrero'}</CTableDataCell>
                         <CTableDataCell>{formatDateToDDMMYYYY(bovine.fechainicio)}</CTableDataCell>

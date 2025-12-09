@@ -66,6 +66,9 @@ const LotRegistration = () => {
     }
   }
 
+  // console.log(lots)
+  // console.log(allBovines)
+
   return (
     <CCard className="mb-4">
       <CCardHeader>
@@ -114,11 +117,11 @@ const LotRegistration = () => {
         onClose={() => setBovinesModalVisible(false)}
         data={activeBovinesInLot}
         columns={[
-          { key: 'numerobovino', label: 'Número' },
-          { key: 'razanombre', label: 'Raza' },
+          { key: 'numeroBovino', label: 'Número' },
+          { key: 'razaNombre', label: 'Raza' },
           { key: 'pesokilo', label: 'Peso (Kg)' },
           { key: 'etapanombre', label: 'Etapa' },
-          { key: 'codpotrero', label: 'Potrero' },
+          { key: 'codPotrero' || 'n/a', label: 'Potrero' },
         ]}
         onSelect={() => {}}
         title="Bovinos en el Lote"

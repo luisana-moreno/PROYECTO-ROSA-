@@ -396,18 +396,18 @@ const VisitasIndex = () => {
               {bovinosVisita.map((bv, index) => (
                 <CTableRow key={index}>
                   <CTableDataCell className="fw-bold">#{bv.numero_bovino}</CTableDataCell>
-                  <CTableDataCell>{bv.ttr_diagnost || '-'}</CTableDataCell>
+                  <CTableDataCell>{bv.ttr_diagnos || '-'}</CTableDataCell>
                   <CTableDataCell>
                     <CBadge
                       color={
-                        bv.ttr_estarepro === 'Preñada'
+                        bv.ttr_estadore === 'Preñada'
                           ? 'success'
-                          : bv.ttr_estarepro === 'En tratamiento'
+                          : bv.ttr_estadore === 'En tratamiento'
                             ? 'warning'
                             : 'info'
                       }
                     >
-                      {bv.ttr_estarepro}
+                      {bv.ttr_estadore}
                     </CBadge>
                   </CTableDataCell>
                   <CTableDataCell>{bv.ttr_tratamie || '-'}</CTableDataCell>

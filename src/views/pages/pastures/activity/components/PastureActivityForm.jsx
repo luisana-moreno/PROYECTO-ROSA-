@@ -9,95 +9,87 @@ const PastureActivityForm = ({
   setSelectedLot,
   startDate,
   setStartDate,
-  selectedBovines,
-  setSelectedBovines,
+  turno,
+  setTurno,
+  observaciones,
+  setObservaciones,
   lots,
-  bovines,
   onAssign,
-  onMarkExit,
   loading,
 }) => {
+  // Helpers para props pasadas
+  const onTurnoChange = setTurno
+  const onObservacionesChange = setObservaciones
   return (
     <CForm className="mb-4">
       <div className="mb-3">
         <CFormLabel>Potrero Seleccionado</CFormLabel>
         <CFormInput
           type="text"
-          value={selectedPasture ? selectedPasture.codigo : 'Seleccione un potrero'}
+          value={
+            selectedPasture
+              ? selectedPasture.codigo || selectedPasture.ttr_codpotre
+              : 'Seleccione un potrero del mapa'
+          }
           disabled
           readOnly
         />
       </div>
 
       <div className="mb-3">
-        <CFormLabel htmlFor="selectLot">Lote</CFormLabel>
+        <CFormLabel htmlFor="selectLot">Lote a Rotar</CFormLabel>
         <CFormSelect
           id="selectLot"
-          value={selectedLot ? selectedLot.id : ''}
-          onChange={(e) =>
-            setSelectedLot(lots.find((l) => l.id === Number.parseInt(e.target.value)))
-          }
+          value={selectedLot ? selectedLot.id || selectedLot.tmaIdlote : ''}
+          onChange={(e) => {
+            const val = Number(e.target.value)
+            setSelectedLot(lots.find((l) => (l.id || l.tmaIdlote) === val))
+          }}
           disabled={!selectedPasture || loading}
         >
           <option value="">Seleccione un lote</option>
           {lots.map((l) => (
-            <option key={l.id} value={l.id}>
-              {l.nombre} ({l.bovinos} bovinos)
+            <option key={l.id || l.tmaIdlote} value={l.id || l.tmaIdlote}>
+              {l.nombre || l.tmaNomlote} {l.bovinos ? `(${l.bovinos} actuales)` : ''}
             </option>
           ))}
         </CFormSelect>
       </div>
 
-      <div className="mb-3">
-        <CFormLabel htmlFor="startDate">Fecha de Inicio</CFormLabel>
-        <CFormInput
-          type="date"
-          id="startDate"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          disabled={!selectedPasture || loading}
-        />
-      </div>
+      <CRow className="mb-3">
+        <CCol md={6}>
+          <CFormLabel htmlFor="startDate">Fecha de Rotación</CFormLabel>
+          <CFormInput
+            type="date"
+            id="startDate"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            disabled={!selectedPasture || loading}
+          />
+        </CCol>
+        <CCol md={6}>
+          <CFormLabel htmlFor="turno">Turno</CFormLabel>
+          <CFormSelect
+            id="turno"
+            value={turno}
+            onChange={(e) => onTurnoChange && onTurnoChange(e.target.value)}
+            disabled={!selectedPasture || loading}
+          >
+            <option value="AM">Mañana (AM)</option>
+            <option value="PM">Tarde (PM)</option>
+            <option value="DIA_COMPLETO">Día Completo</option>
+          </CFormSelect>
+        </CCol>
+      </CRow>
 
       <div className="mb-3">
-        <CFormLabel>Bovinos Seleccionados</CFormLabel>
-        <div
-          className="mb-2"
-          style={{
-            maxHeight: '150px',
-            overflowY: 'auto',
-            border: '1px solid #ddd',
-            padding: '0.5rem',
-            borderRadius: '4px',
-          }}
-        >
-          {bovines.length > 0 ? (
-            bovines.map((bovine) => (
-              <div key={bovine.id} className="form-check mb-2">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id={`bovine-${bovine.id}`}
-                  checked={selectedBovines.some((b) => b.id === bovine.id)}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setSelectedBovines([...selectedBovines, bovine])
-                    } else {
-                      setSelectedBovines(selectedBovines.filter((b) => b.id !== bovine.id))
-                    }
-                  }}
-                  disabled={!selectedPasture || loading}
-                />
-                <label className="form-check-label" htmlFor={`bovine-${bovine.id}`}>
-                  Bovino {bovine.numero}
-                </label>
-              </div>
-            ))
-          ) : (
-            <p className="text-muted mb-0">No hay bovinos disponibles</p>
-          )}
-        </div>
-        <small className="text-muted">{selectedBovines.length} bovinos seleccionados</small>
+        <CFormLabel>Observaciones</CFormLabel>
+        <CFormInput
+          component="textarea"
+          rows={2}
+          value={observaciones}
+          onChange={(e) => onObservacionesChange && onObservacionesChange(e.target.value)}
+        />
       </div>
 
       <CRow className="g-2">
@@ -105,27 +97,10 @@ const PastureActivityForm = ({
           <CButton
             className="button-no-hover-green text-white"
             onClick={onAssign}
-            disabled={
-              !selectedPasture ||
-              !selectedLot ||
-              !startDate ||
-              selectedBovines.length === 0 ||
-              loading
-            }
+            disabled={!selectedPasture || !selectedLot || !startDate || loading}
           >
             <CIcon icon={cilCheckAlt} className="me-2" />
-            {loading ? 'Asignando...' : 'Asignar'}
-          </CButton>
-        </CCol>
-        <CCol xs="auto">
-          <CButton
-            color="danger"
-            variant="outline"
-            onClick={() => onMarkExit(selectedPasture?.id)}
-            disabled={!selectedPasture || loading}
-          >
-            <CIcon icon={cilX} className="me-2" />
-            Marcar Salida
+            {loading ? 'Registrando...' : 'Registrar Rotación'}
           </CButton>
         </CCol>
       </CRow>

@@ -76,6 +76,8 @@ const DashboardSanidad = () => {
     return diff
   }
 
+  console.log(dashboard)
+
   return (
     <>
       <CRow>

@@ -25,6 +25,10 @@ const MilkProduction = () => {
     setSelectedLotId,
     productionDate,
     setProductionDate,
+    jornada,
+    setJornada,
+    observacion,
+    setObservacion,
     bovinesInSelectedLot,
     individualBovineProduction,
     setIndividualBovineProduction,
@@ -88,6 +92,10 @@ const MilkProduction = () => {
         setSelectedLotId={setSelectedLotId}
         productionDate={productionDate}
         setProductionDate={setProductionDate}
+        jornada={jornada}
+        setJornada={setJornada}
+        observacion={observacion}
+        setObservacion={setObservacion}
         bovinesInSelectedLot={bovinesInSelectedLot}
         individualBovineProduction={individualBovineProduction}
         setIndividualBovineProduction={setIndividualBovineProduction}

@@ -70,7 +70,7 @@ const Login = () => {
                   <CForm onSubmit={handleSubmit}>
                     <div className="text-center mb-4">
                       <div
-                        className="bg-green d-inline-flex align-items-center justify-content-center  rounded-circle mb-3 p-3 shadow-sm"
+                        className="bg-white border-success border-4 d-inline-flex align-items-center justify-content-center  rounded-circle mb-3 p-3 shadow-sm"
                         style={{ width: '150px', height: '150px' }}
                       >
                         <CImage
@@ -79,14 +79,14 @@ const Login = () => {
                           style={{ maxHeight: '100px', width: '100px', height: '100px' }}
                         />
                       </div>
-                      <h2 className="text-green fw-bold">S.I.G.</h2>
+                      <h2 className="text-success fw-bold">Finca La LAGUNA.</h2>
                       <p className="text-medium-emphasis small">Sistema de Gestión Ganadera</p>
                     </div>
 
                     <h4 className="mb-3 text-center">Iniciar Sesión</h4>
 
                     <CInputGroup className="mb-3">
-                      <CInputGroupText className="bg-light border-end-0 text-green">
+                      <CInputGroupText className="bg-light border-end-0 text-success">
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
                       <CFormInput
@@ -100,7 +100,7 @@ const Login = () => {
                     </CInputGroup>
 
                     <CInputGroup className="mb-4">
-                      <CInputGroupText className="bg-light border-end-0 text-green">
+                      <CInputGroupText className="bg-light border-end-0 text-success">
                         <CIcon icon={cilLockLocked} />
                       </CInputGroupText>
                       <CFormInput
@@ -127,15 +127,10 @@ const Login = () => {
                       </CCol>
                     </CRow>
 
-                    <div className="mt-4 text-center">
-                      <small className="text-medium-emphasis">
-                        &copy; 2025 UNEFA. Todos los derechos reservados.
-                      </small>
-                    </div>
+                    <div className="mt-4 text-center"></div>
                   </CForm>
                 </CCardBody>
               </CCard>
-              {/* Opción alternativa: Tarjeta lateral decorativa si se desea, por ahora diseño limpio de una sola tarjeta centrada es más moderno para login */}
             </CCardGroup>
           </CCol>
         </CRow>
