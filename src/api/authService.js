@@ -14,7 +14,7 @@ export const login = async (correo, contrasena) => {
   }
 
   const data = await response.json()
-  return data // Ahora el backend devuelve { token, user } directamente
+  return data // Ahora el backend solo devuelve { token }
 }
 
 // La función getProfile ya no es necesaria en el flujo de login del frontend
@@ -33,5 +33,6 @@ export const getProfile = async (token) => {
   }
 
   const data = await response.json()
+
   return data.user // Asume que devuelve { user: userProfile }
 }

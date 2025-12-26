@@ -24,6 +24,7 @@ const MilkProduction = React.lazy(() => import('./views/pages/cattle/milkProduct
 const Asisten = React.lazy(() => import('./views/pages/employees/asisten'))
 const Expbov = React.lazy(() => import('./views/pages/cattle/expbov'))
 const Settings = React.lazy(() => import('./views/pages/settings/Settings')) // Añadido para el módulo de configuración
+const Profile = React.lazy(() => import('./views/pages/profile')) // Añadido para el perfil de usuario
 
 const routes = [
   { path: '/login', exact: true, name: 'Login', element: Login }, // La ruta '/' ahora redirige en App.js
@@ -162,6 +163,13 @@ const routes = [
     name: 'Settings',
     element: Settings,
     roles: [1], // ID de rol: 1=administrador
+  },
+  {
+    path: '/profile',
+    exact: true,
+    name: 'Profile',
+    element: Profile,
+    roles: [1, 2, 3, 4, 5], // Todos los roles pueden acceder a su perfil
   },
 ]
 

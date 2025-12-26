@@ -221,3 +221,59 @@ body.login-page {
   background-color: #f8f9fa;
   border-top: 1px solid #e1e1e1;
 }
+
+// ==========================================
+// HEADER STYLES (PROFESSIONAL)
+// ==========================================
+
+// Header hover effects
+.header-toggler:hover .menu-icon {
+  color: $primary-green !important;
+  transform: scale(1.1);
+}
+
+.bell-icon {
+  &:hover {
+    color: $primary-green !important;
+    transform: scale(1.1);
+  }
+}
+
+// Avatar hover effect
+.avatar-hover:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3) !important;
+  border-color: $dark-green !important;
+}
+
+// Dropdown items hover
+.dropdown-item-hover {
+  &:hover {
+    background-color: rgba($primary-green, 0.08) !important;
+
+    .cicon {
+      transform: translateX(3px);
+    }
+  }
+}
+
+// Hover effect for bell notification link
+.nav-link:has(.bell-icon):hover {
+  background-color: rgba($primary-green, 0.05) !important;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .header {
+    .container-fluid {
+      padding-left: 0.75rem !important;
+      padding-right: 0.75rem !important;
+    }
+  }
+
+  .avatar-hover {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 0.85rem !important;
+  }
+}

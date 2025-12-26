@@ -52,11 +52,11 @@ const Pastures = () => {
     <CCard className="mb-4 shadow-sm border-0">
       <CCardHeader className="d-flex justify-content-between align-items-center bg-white border-bottom pb-3 pt-3">
         <div>
-          <h4 className="mb-0 text-primary">Gestión de Potreros</h4>
+          <h4 className="mb-0 text-primary-green">Gestión de Potreros</h4>
           <p className="text-muted small mb-0">Administración de inventario de pasturas</p>
         </div>
         <div>
-          <CButton color="primary" variant="outline" className="me-2" href="#/pastures/activity">
+          <CButton color="primary" variant="outline" className="me-2" href="/pastures/activity">
             <CIcon icon={cilList} className="me-2" />
             Control de Actividad y Rotación
           </CButton>

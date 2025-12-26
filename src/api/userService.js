@@ -62,4 +62,57 @@ export const userService = {
     // No esperamos un JSON de vuelta para una eliminación exitosa, solo el status
     return true
   },
+
+  // Obtener perfil del usuario autenticado
+  getProfile: async (token) => {
+    const response = await fetch(`${API_URL}/usuarios/profile`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al obtener perfil')
+    }
+    const data = await response.json()
+    return data
+  },
+
+  // Actualizar perfil del usuario autenticado
+  updateProfile: async (token, profileData) => {
+    const response = await fetch(`${API_URL}/usuarios/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(profileData),
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al actualizar perfil')
+    }
+    const data = await response.json()
+    return data
+  },
+
+  // Cambiar contraseña del usuario autenticado
+  changePassword: async (token, passwordData) => {
+    const response = await fetch(`${API_URL}/usuarios/profile/password`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(passwordData),
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al cambiar contraseña')
+    }
+    const data = await response.json()
+    return data
+  },
 }

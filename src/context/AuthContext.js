@@ -34,14 +34,25 @@ export const AuthProvider = ({ children }) => {
         if (storedUser && storedUser.token) {
           if (isTokenExpired(storedUser.token)) {
             console.log('Token expirado. Cerrando sesión automáticamente.')
-            logout() // Cierra la sesión si el token ha expirado
+            logout()
           } else {
-            setUser(storedUser)
+            // Decodificar el token para obtener toda la información del usuario
+            const decoded = jwtDecode(storedUser.token)
+
+            // Reconstruir el objeto user con la información del token
+            setUser({
+              token: storedUser.token,
+              id: decoded.id,
+              roleId: decoded.roleId,
+              email: decoded.email,
+              name: decoded.name,
+              roleName: decoded.roleName,
+            })
           }
         }
       } catch (error) {
         console.error('Error loading user from localStorage', error)
-        logout() // En caso de error, también cierra la sesión
+        logout()
       } finally {
         setLoading(false)
       }
@@ -52,24 +63,28 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     setLoading(true)
     try {
-      console.log(credentials)
+      const { token } = await authLogin(credentials.correo, credentials.contrasena)
 
-      const { token, user: userProfile } = await authLogin(
-        credentials.correo,
-        credentials.contrasena,
-      ) // Obtiene token y user del login
+      // Decodificar el token para obtener la información del usuario
+      const decoded = jwtDecode(token)
 
+      // Guardar solo datos esenciales en localStorage
       const userData = {
         token: token,
-        roleId: userProfile.ttr_idrolus, // Almacenar el ID del rol
-        roleName: userProfile.rol_nombre, // Asegúrate de que 'rol_nombre' es el campo correcto para el rol
-        name: userProfile.ttr_nombrel + ' ' + userProfile.ttr_apellid,
-        id: userProfile.ttr_idusuar,
-        email: userProfile.ttr_correoe,
-        telefono: userProfile.ttr_telefon,
+        id: decoded.id,
+        roleId: decoded.roleId,
       }
+
       localStorage.setItem('user', JSON.stringify(userData))
-      setUser(userData)
+
+      // En el estado del contexto, incluir toda la información decodificada
+      setUser({
+        ...userData,
+        email: decoded.email,
+        name: decoded.name,
+        roleName: decoded.roleName,
+      })
+
       return true
     } catch (error) {
       console.error('Login failed', error)
