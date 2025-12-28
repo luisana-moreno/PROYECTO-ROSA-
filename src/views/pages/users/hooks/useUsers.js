@@ -115,7 +115,9 @@ export const useUsers = () => {
       return
     }
     try {
-      const updated = await userService.updateUser(currentUser.ttr_idusuar, currentUser)
+      // Excluir el campo de contraseña ya que no está en el formulario de edición
+      const { contrasena, ...userDataWithoutPassword } = currentUser
+      const updated = await userService.updateUser(currentUser.ttr_idusuar, userDataWithoutPassword)
       if (updated) {
         fetchUsers() // Recargar la lista de usuarios
         setEditVisible(false)

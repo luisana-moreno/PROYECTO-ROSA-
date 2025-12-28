@@ -35,74 +35,115 @@ const CattleTable = ({
 
   return (
     <>
-      <CTable striped hover responsive>
-        <CTableHead>
-          <CTableRow>
-            <CTableHeaderCell>N° Bovino</CTableHeaderCell>
-            <CTableHeaderCell>Raza</CTableHeaderCell>
-            <CTableHeaderCell>Fecha Nacimiento</CTableHeaderCell>
-            <CTableHeaderCell>Color</CTableHeaderCell>
-            <CTableHeaderCell>Peso (Kg)</CTableHeaderCell>
-            <CTableHeaderCell>Etapa</CTableHeaderCell>
-            <CTableHeaderCell>Estado</CTableHeaderCell>
-            <CTableHeaderCell>Acciones</CTableHeaderCell>
-          </CTableRow>
-        </CTableHead>
-        <CTableBody>
-          {cattle.map((cattleItem) => (
-            <CTableRow key={cattleItem.ttrIdbovino}>
-              <CTableDataCell>
-                <strong>{cattleItem?.ttrNumerobv || '-'}</strong>
-              </CTableDataCell>
-              <CTableDataCell>{cattleItem?.razaNombre || '-'}</CTableDataCell>
-              <CTableDataCell>
-                {formatDateToDDMMYYYY(cattleItem?.ttrFecnacim) || '-'}
-              </CTableDataCell>
-              <CTableDataCell>{cattleItem?.colorNombre || '-'}</CTableDataCell>
-              <CTableDataCell>{cattleItem?.ttrPesokilo || '-'}</CTableDataCell>
-              <CTableDataCell>{cattleItem?.etapaNombre || '-'}</CTableDataCell>
-              <CTableDataCell>
-                <CBadge color={getEstadoBadgeColor(cattleItem?.estadoNombre)}>
-                  {cattleItem?.estadoNombre || 'Sin estado'}
-                </CBadge>
-              </CTableDataCell>
-              <CTableDataCell>
-                <CButton
-                  color="warning"
-                  size="sm"
-                  className="me-2"
-                  onClick={() => {
-                    setCurrentCattle(cattleItem)
-                    setEditVisible(true)
-                  }}
-                >
-                  <CIcon icon={cilPencil} size="sm" className="me-1" />
-                  Editar
-                </CButton>
-                <CButton
-                  color="danger"
-                  size="sm"
-                  className="me-2"
-                  onClick={() => {
-                    setCurrentCattle(cattleItem)
-                    setDeleteVisible(true)
-                  }}
-                >
-                  <CIcon icon={cilTrash} size="sm" className="me-1" />
-                  Eliminar
-                </CButton>
-                <CButton color="success" size="sm" onClick={() => handleViewExpBov(cattleItem)}>
-                  <CIcon icon={cilFolder} size="sm" className="me-1" />
-                  Expediente
-                </CButton>
-              </CTableDataCell>
+      <div className="table-responsive">
+        <CTable striped hover className="align-middle mb-0">
+          <CTableHead>
+            <CTableRow>
+              <CTableHeaderCell className="text-center">N° Bovino</CTableHeaderCell>
+              <CTableHeaderCell>Raza</CTableHeaderCell>
+              <CTableHeaderCell className="d-none d-md-table-cell">Fecha Nac.</CTableHeaderCell>
+              <CTableHeaderCell className="d-none d-lg-table-cell">Color</CTableHeaderCell>
+              <CTableHeaderCell className="d-none d-lg-table-cell text-center">
+                Peso (Kg)
+              </CTableHeaderCell>
+              <CTableHeaderCell className="d-none d-md-table-cell">Etapa</CTableHeaderCell>
+              <CTableHeaderCell className="text-center">Estado</CTableHeaderCell>
+              <CTableHeaderCell className="text-center">Acciones</CTableHeaderCell>
             </CTableRow>
-          ))}
-        </CTableBody>
-      </CTable>
+          </CTableHead>
+          <CTableBody>
+            {cattle.map((cattleItem) => (
+              <CTableRow key={cattleItem.ttrIdbovino}>
+                <CTableDataCell className="text-center">
+                  <strong className="text-black">{cattleItem?.ttrNumerobv || '-'}</strong>
+                </CTableDataCell>
+                <CTableDataCell>
+                  <span className="fw-semibold">{cattleItem?.razaNombre || '-'}</span>
+                </CTableDataCell>
+                <CTableDataCell className="d-none d-md-table-cell">
+                  <small>{formatDateToDDMMYYYY(cattleItem?.ttrFecnacim) || '-'}</small>
+                </CTableDataCell>
+                <CTableDataCell className="d-none d-lg-table-cell">
+                  {cattleItem?.colorNombre || '-'}
+                </CTableDataCell>
+                <CTableDataCell className="d-none d-lg-table-cell text-center">
+                  <span className="badge bg-light text-dark border">
+                    {cattleItem?.ttrPesokilo || '-'} kg
+                  </span>
+                </CTableDataCell>
+                <CTableDataCell className="d-none d-md-table-cell">
+                  {cattleItem?.etapaNombre || '-'}
+                </CTableDataCell>
+                <CTableDataCell className="text-center">
+                  <CBadge color={getEstadoBadgeColor(cattleItem?.estadoNombre)}>
+                    {cattleItem?.estadoNombre || 'Sin estado'}
+                  </CBadge>
+                </CTableDataCell>
+                <CTableDataCell>
+                  <div className="d-flex flex-wrap gap-1 justify-content-center">
+                    {/* Botón Editar */}
+                    <CButton
+                      color="warning"
+                      size="sm"
+                      className="text-white"
+                      onClick={() => {
+                        setCurrentCattle(cattleItem)
+                        setEditVisible(true)
+                      }}
+                      title="Editar bovino"
+                    >
+                      <CIcon icon={cilPencil} size="sm" className="d-md-none" />
+                      <span className="d-none d-md-inline">
+                        <CIcon icon={cilPencil} size="sm" className="me-1" />
+                        Editar
+                      </span>
+                    </CButton>
+
+                    {/* Botón Eliminar */}
+                    <CButton
+                      color="danger"
+                      size="sm"
+                      onClick={() => {
+                        setCurrentCattle(cattleItem)
+                        setDeleteVisible(true)
+                      }}
+                      title="Eliminar bovino"
+                    >
+                      <CIcon icon={cilTrash} size="sm" className="d-md-none" />
+                      <span className="d-none d-md-inline">
+                        <CIcon icon={cilTrash} size="sm" className="me-1" />
+                        Eliminar
+                      </span>
+                    </CButton>
+
+                    {/* Botón Expediente */}
+                    <CButton
+                      color="success"
+                      size="sm"
+                      onClick={() => handleViewExpBov(cattleItem)}
+                      title="Ver expediente"
+                    >
+                      <CIcon icon={cilFolder} size="sm" className="d-md-none" />
+                      <span className="d-none d-md-inline">
+                        <CIcon icon={cilFolder} size="sm" className="me-1" />
+                        Expediente
+                      </span>
+                    </CButton>
+                  </div>
+                </CTableDataCell>
+              </CTableRow>
+            ))}
+          </CTableBody>
+        </CTable>
+      </div>
 
       {cattle.length === 0 && (
-        <CAlert color="info">No hay bovinos registrados en el sistema.</CAlert>
+        <CAlert color="info" className="mt-3">
+          <div className="d-flex align-items-center">
+            <CIcon icon={cilFolder} size="lg" className="me-2" />
+            <span>No hay bovinos registrados en el sistema.</span>
+          </div>
+        </CAlert>
       )}
     </>
   )

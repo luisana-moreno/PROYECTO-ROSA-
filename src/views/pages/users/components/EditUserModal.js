@@ -49,11 +49,6 @@ const EditUserModal = ({
       toast.error('El teléfono debe tener exactamente 11 dígitos.')
       return false
     }
-    // La contraseña es opcional en edición
-    if (currentUser.contrasena && currentUser.contrasena.length > 255) {
-      toast.error('La contraseña no puede exceder los 255 caracteres.')
-      return false
-    }
 
     return true
   }

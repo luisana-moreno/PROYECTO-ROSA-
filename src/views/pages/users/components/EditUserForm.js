@@ -3,19 +3,8 @@ import { CCol, CFormInput, CFormSelect, CFormLabel, CRow, CAlert } from '@coreui
 import { useAuth } from 'src/context/AuthContext'
 
 const EditUserForm = ({ currentUser, setCurrentUser, roles }) => {
-  const { canChangePassword } = useAuth()
-
-  // Verificar si se puede cambiar la contraseña del usuario actual
-  const canEditPassword = currentUser
-    ? canChangePassword(currentUser.ttr_idusuar, currentUser.idRol || currentUser.ttr_idrolus)
-    : true
   return (
     <div>
-      <CAlert color="warning" className="mb-4">
-        <strong>Nota:</strong> La contraseña solo se actualizará si ingresa una nueva. Déjela en
-        blanco para mantener la actual.
-      </CAlert>
-
       <CRow className="mb-3">
         <CCol md={6}>
           <CFormLabel>Nombre *</CFormLabel>
@@ -80,7 +69,7 @@ const EditUserForm = ({ currentUser, setCurrentUser, roles }) => {
       </CRow>
 
       <CRow className="mb-3">
-        <CCol md={6}>
+        <CCol md={12}>
           <CFormLabel>Rol *</CFormLabel>
           <CFormSelect
             value={currentUser?.idRol || ''}
@@ -96,35 +85,12 @@ const EditUserForm = ({ currentUser, setCurrentUser, roles }) => {
           </CFormSelect>
           <small className="text-muted">Define los permisos del usuario</small>
         </CCol>
-        <CCol md={6}>
-          <CFormLabel>Nueva Contraseña (opcional)</CFormLabel>
-          <CFormInput
-            type="password"
-            placeholder={
-              canEditPassword
-                ? 'Dejar en blanco para no cambiar'
-                : 'No puede cambiar esta contraseña'
-            }
-            onChange={(e) => setCurrentUser({ ...currentUser, contrasena: e.target.value })}
-            maxLength={255}
-            disabled={!canEditPassword}
-          />
-          {canEditPassword ? (
-            <small className="text-muted">Solo si desea cambiarla</small>
-          ) : (
-            <small className="text-danger">
-              Solo el superadmin puede cambiar su propia contraseña
-            </small>
-          )}
-        </CCol>
       </CRow>
 
-      {!canEditPassword && (
-        <CAlert color="info" className="mt-3">
-          <strong>Información:</strong> Este usuario es un superadmin. Por seguridad, solo puede
-          cambiar su propia contraseña.
-        </CAlert>
-      )}
+      <CAlert color="info" className="mt-3">
+        <strong>Nota:</strong> Para cambiar la contraseña de un usuario, debe hacerlo desde su
+        página de perfil.
+      </CAlert>
     </div>
   )
 }
