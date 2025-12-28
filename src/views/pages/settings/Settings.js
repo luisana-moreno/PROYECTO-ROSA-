@@ -52,7 +52,7 @@ const Settings = () => {
   return (
     <CCard>
       <CCardHeader>
-        <h4 className="typography-color-title mb-0">Configuración de la Aplicación</h4>
+        <h4 className="mb-0 text-black">Configuración de la Aplicación</h4>
       </CCardHeader>
       <CCardBody>
         <CNav variant="tabs" className="mb-4">

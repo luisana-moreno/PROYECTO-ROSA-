@@ -82,7 +82,7 @@ export const prodlecheService = {
 
   getMilkProductionByBovinoId: async (idBovino) => {
     try {
-      const data = await get(`prodleche/bovino/${idBovino}`) // Cambio aquí, ya era relativo
+      const data = await get(`prodleche/bovino/animal/${idBovino}`)
       return mapKeysToCamelCase(data)
     } catch (error) {
       console.error('Error en getMilkProductionByBovinoId:', error)

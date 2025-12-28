@@ -89,7 +89,7 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
 
           // Usamos catch individualmente para que un error 404 (ej: sin historial de leche) no rompa todo el Promise.all
           const [production, history, vacs, pren, visits] = await Promise.all([
-            get(`prodleche/bovino/${id}`).catch((err) => {
+            get(`prodleche/bovino/animal/${id}`).catch((err) => {
               console.warn('Info produccion no encontrada o vacia', err)
               return []
             }),

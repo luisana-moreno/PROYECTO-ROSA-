@@ -33,22 +33,22 @@ const routes = [
     exact: true,
     name: 'Dashboard',
     element: Dashboard,
-    roles: [1, 2, 3, 4], // IDs de roles: 1=administrador, 2=veterinario, 3=empleado, 4=cliente
+    roles: [1, 2, 3, 4, 5], // IDs de roles: 1=administrador, 2=empleado, 3=superadmin, 4=veterinario, 5=cliente
   },
   {
     path: '/employee',
     exact: true,
     name: 'Employee',
     element: Employee,
-    roles: [1, 3], // IDs de roles: 1=administrador, 3=empleado
+    roles: [1, 2, 3], // IDs de roles: 1=administrador, 2=empleado, 3=superadmin
   },
-  { path: '/users', exact: true, name: 'Users', element: Users, roles: [1] }, // ID de rol: 1=administrador
+  { path: '/users', exact: true, name: 'Users', element: Users, roles: [1, 3] }, // IDs de roles: 1=administrador, 3=superadmin
   {
     path: '/cattle',
     exact: true,
     name: 'Cattle',
     element: Cattle,
-    roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
+    roles: [1, 3, 4], // IDs de roles: 1=administrador, 3=superadmin, 4=veterinario
   },
   // Control de Sanidad - Rutas del módulo completo
   {
@@ -56,113 +56,113 @@ const routes = [
     exact: true,
     name: 'Control de Sanidad',
     element: DashboardSanidad,
-    roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
+    roles: [1, 3, 4], // IDs de roles: 1=administrador, 3=superadmin, 4=veterinario
   },
   {
     path: '/sanidad/dashboard',
     exact: true,
     name: 'Dashboard Sanidad',
     element: DashboardSanidad,
-    roles: [1, 2],
+    roles: [1, 3, 4],
   },
   {
     path: '/sanidad/vacunaciones',
     exact: true,
     name: 'Vacunaciones',
     element: VacunacionesIndex,
-    roles: [1, 2],
+    roles: [1, 3, 4],
   },
   {
     path: '/sanidad/prenez',
     exact: true,
     name: 'Gestión de Preñez',
     element: PrenezIndex,
-    roles: [1, 2],
+    roles: [1, 3, 4],
   },
   {
     path: '/sanidad/visitas-veterinarias',
     exact: true,
     name: 'Visitas Veterinarias',
     element: VisitasIndex,
-    roles: [1, 2],
+    roles: [1, 3, 4],
   },
   {
     path: '/sanidad/planes-vacunacion',
     exact: true,
     name: 'Planes de Vacunación',
     element: PlanesIndex,
-    roles: [1, 2],
+    roles: [1, 3, 4],
   },
   {
     path: '/sanidad/reportes',
     exact: true,
     name: 'Reportes de Sanidad',
     element: ReportesIndex,
-    roles: [1, 2],
+    roles: [1, 3, 4],
   },
   {
     path: '/client',
     exact: true,
     name: 'Client',
     element: Client,
-    roles: [1, 4], // IDs de roles: 1=administrador, 4=cliente
+    roles: [1, 3, 5], // IDs de roles: 1=administrador, 3=superadmin, 5=cliente
   },
-  { path: '/finances', exact: true, name: 'Finances', element: Finances, roles: [1] }, // ID de rol: 1=administrador
+  { path: '/finances', exact: true, name: 'Finances', element: Finances, roles: [1, 3] }, // IDs de roles: 1=administrador, 3=superadmin
   {
     path: '/inventory',
     exact: true,
     name: 'Inventory',
     element: Inventory,
-    roles: [1, 3], // IDs de roles: 1=administrador, 3=empleado
+    roles: [1, 2, 3], // IDs de roles: 1=administrador, 2=empleado, 3=superadmin
   },
   {
     path: '/pastures',
     exact: true,
     name: 'Pastures',
     element: Pastures,
-    roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
+    roles: [1, 3, 4], // IDs de roles: 1=administrador, 3=superadmin, 4=veterinario
   },
   {
     path: '/pastures/activity',
     exact: true,
     name: 'PastureActivityModule',
     element: PastureActivityModule,
-    roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
+    roles: [1, 3, 4], // IDs de roles: 1=administrador, 3=superadmin, 4=veterinario
   },
   {
     path: '/lots',
     exact: true,
     name: 'LotRegistration',
     element: LotRegistration,
-    roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
+    roles: [1, 3, 4], // IDs de roles: 1=administrador, 3=superadmin, 4=veterinario
   },
   {
     path: '/milkProduction',
     exact: true,
     name: 'MilkProduction',
     element: MilkProduction,
-    roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
+    roles: [1, 3, 4], // IDs de roles: 1=administrador, 3=superadmin, 4=veterinario
   },
   {
     path: '/asisten',
     exact: true,
     name: 'Asisten',
     element: Asisten,
-    roles: [1, 3], // IDs de roles: 1=administrador, 3=empleado
+    roles: [1, 2, 3], // IDs de roles: 1=administrador, 2=empleado, 3=superadmin
   },
   {
     path: '/expbov',
     exact: true,
     name: 'Expbov',
     element: React.lazy(() => import('./views/pages/cattle/expbov')),
-    roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
+    roles: [1, 3, 4], // IDs de roles: 1=administrador, 3=superadmin, 4=veterinario
   },
   {
     path: '/settings',
     exact: true,
     name: 'Settings',
     element: Settings,
-    roles: [1], // ID de rol: 1=administrador
+    roles: [1, 3], // IDs de roles: 1=administrador, 3=superadmin
   },
   {
     path: '/profile',

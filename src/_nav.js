@@ -28,7 +28,7 @@ const _nav = [
     name: 'Panel de Control',
     to: '/dashboard',
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
-    roles: [1, 2, 3, 4], // IDs de roles: 1=administrador, 2=veterinario, 3=empleado, 4=cliente
+    roles: [1, 2, 3, 4, 5], // IDs de roles: 1=administrador, 2=empleado, 3=superadmin, 4=veterinario, 5=cliente
   },
   {
     component: CNavTitle,
@@ -38,14 +38,14 @@ const _nav = [
     component: CNavGroup,
     name: 'Gestion de Usuarios',
     icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
-    roles: [1], // ID de rol: 1=administrador
+    roles: [1, 3], // IDs de roles: 1=administrador, 3=superadmin
     items: [
       {
         component: CNavItem,
         name: 'Registro de Usuarios',
         to: '/users',
         icon: <CIcon icon={cilUserFollow} customClassName="nav-icon" />,
-        roles: [1], // ID de rol: 1=administrador
+        roles: [1, 3], // IDs de roles: 1=administrador, 3=superadmin
       },
     ],
   },
@@ -53,21 +53,21 @@ const _nav = [
     component: CNavGroup,
     name: 'Gestion de Empleados',
     icon: <CIcon icon={cilPeople} customClassName="nav-icon" />,
-    roles: [1, 3], // IDs de roles: 1=administrador, 3=empleado
+    roles: [1, 2, 3], // IDs de roles: 1=administrador, 2=empleado, 3=superadmin
     items: [
       {
         component: CNavItem,
         name: 'Registro de Empleados',
         to: '/employee',
         icon: <CIcon icon={cilUserFollow} customClassName="nav-icon" />,
-        roles: [1, 3], // IDs de roles: 1=administrador, 3=empleado
+        roles: [1, 2, 3], // IDs de roles: 1=administrador, 2=empleado, 3=superadmin
       },
       {
         component: CNavItem,
         name: 'Control de Asistencia',
         to: '/asisten',
         icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
-        roles: [1, 3], // IDs de roles: 1=administrador, 3=empleado
+        roles: [1, 2, 3], // IDs de roles: 1=administrador, 2=empleado, 3=superadmin
       },
     ],
   },
@@ -76,14 +76,14 @@ const _nav = [
     component: CNavGroup,
     name: 'Gestion de Clientes',
     icon: <CIcon icon={cilAddressBook} customClassName="nav-icon" />,
-    roles: [1, 4], // IDs de roles: 1=administrador, 4=cliente
+    roles: [1, 3, 5], // IDs de roles: 1=administrador, 3=superadmin, 5=cliente
     items: [
       {
         component: CNavItem,
         name: 'Registro de Clientes',
         to: '/client',
         icon: <CIcon icon={cilUserFollow} customClassName="nav-icon" />,
-        roles: [1, 4], // IDs de roles: 1=administrador, 4=cliente
+        roles: [1, 3, 5], // IDs de roles: 1=administrador, 3=superadmin, 5=cliente
       },
     ],
   },
@@ -91,56 +91,56 @@ const _nav = [
     component: CNavGroup,
     name: 'Control de Ganado',
     icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
-    roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
+    roles: [1, 3, 4], // IDs de roles: 1=administrador, 3=superadmin, 4=veterinario
     items: [
       {
         component: CNavItem,
         name: 'Registro de Ganado',
         to: '/cattle',
         icon: <CIcon icon={cilAnimal} customClassName="nav-icon" />,
-        roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
+        roles: [1, 3, 4], // IDs de roles: 1=administrador, 3=superadmin, 4=veterinario
       },
       {
         component: CNavGroup,
         name: 'Control de Sanidad',
         icon: <CIcon icon={cilMedicalCross} customClassName="nav-icon" />,
-        roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
+        roles: [1, 3, 4], // IDs de roles: 1=administrador, 3=superadmin, 4=veterinario
         items: [
           {
             component: CNavItem,
             name: 'Dashboard',
             to: '/sanidad/dashboard',
-            roles: [1, 2],
+            roles: [1, 3, 4],
           },
           {
             component: CNavItem,
             name: 'Vacunaciones',
             to: '/sanidad/vacunaciones',
-            roles: [1, 2],
+            roles: [1, 3, 4],
           },
           {
             component: CNavItem,
             name: 'Gestión de Preñez',
             to: '/sanidad/prenez',
-            roles: [1, 2],
+            roles: [1, 3, 4],
           },
           {
             component: CNavItem,
             name: 'Visitas Veterinarias',
             to: '/sanidad/visitas-veterinarias',
-            roles: [1, 2],
+            roles: [1, 3, 4],
           },
           {
             component: CNavItem,
             name: 'Planes de Vacunación',
             to: '/sanidad/planes-vacunacion',
-            roles: [1, 2],
+            roles: [1, 3, 4],
           },
           {
             component: CNavItem,
             name: 'Reportes',
             to: '/sanidad/reportes',
-            roles: [1, 2],
+            roles: [1, 3, 4],
           },
         ],
       },
@@ -149,14 +149,14 @@ const _nav = [
         name: 'Registro de Lotes',
         to: '/lots',
         icon: <CIcon icon={cilAnimal} customClassName="nav-icon" />,
-        roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
+        roles: [1, 3, 4], // IDs de roles: 1=administrador, 3=superadmin, 4=veterinario
       },
       {
         component: CNavItem,
         name: 'Produccion de Leche',
         to: '/milkProduction',
         icon: <CIcon icon={cilGraph} customClassName="nav-icon" />,
-        roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
+        roles: [1, 3, 4], // IDs de roles: 1=administrador, 3=superadmin, 4=veterinario
       },
     ],
   },
@@ -164,21 +164,21 @@ const _nav = [
     component: CNavGroup,
     name: 'Gestion de Potreros',
     icon: <CIcon icon={cilChart} customClassName="nav-icon" />,
-    roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
+    roles: [1, 3, 4], // IDs de roles: 1=administrador, 3=superadmin, 4=veterinario
     items: [
       {
         component: CNavItem,
         name: 'Registro de Potreros',
         to: '/pastures',
         icon: <CIcon icon={cilTerrain} customClassName="nav-icon" />,
-        roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
+        roles: [1, 3, 4], // IDs de roles: 1=administrador, 3=superadmin, 4=veterinario
       },
       {
         component: CNavItem,
         name: 'Actividad de Potreros',
         to: '/pastures/activity',
         icon: <CIcon icon={cilRain} customClassName="nav-icon" />,
-        roles: [1, 2], // IDs de roles: 1=administrador, 2=veterinario
+        roles: [1, 3, 4], // IDs de roles: 1=administrador, 3=superadmin, 4=veterinario
       },
     ],
   },
@@ -187,14 +187,14 @@ const _nav = [
     component: CNavGroup,
     name: 'Gestion de Inventario',
     icon: <CIcon icon={cibCodesandbox} customClassName="nav-icon" />,
-    roles: [1, 3], // IDs de roles: 1=administrador, 3=empleado
+    roles: [1, 2, 3], // IDs de roles: 1=administrador, 2=empleado, 3=superadmin
     items: [
       {
         component: CNavItem,
         name: 'Registro de Productos',
         to: '/inventory',
         icon: <CIcon icon={cilClipboard} customClassName="nav-icon" />,
-        roles: [1, 3], // IDs de roles: 1=administrador, 3=empleado
+        roles: [1, 2, 3], // IDs de roles: 1=administrador, 2=empleado, 3=superadmin
       },
     ],
   },
@@ -202,14 +202,14 @@ const _nav = [
     component: CNavGroup,
     name: 'Gestion de Ventas',
     icon: <CIcon icon={cilChart} customClassName="nav-icon" />,
-    roles: [1], // ID de rol: 1=administrador
+    roles: [1, 3], // IDs de roles: 1=administrador, 3=superadmin
     items: [
       {
         component: CNavItem,
         name: 'Registro de Ventas',
         to: '/finances',
         icon: <CIcon icon={cilCash} customClassName="nav-icon" />,
-        roles: [1], // ID de rol: 1=administrador
+        roles: [1, 3], // IDs de roles: 1=administrador, 3=superadmin
       },
     ],
   },
@@ -217,14 +217,14 @@ const _nav = [
     component: CNavGroup,
     name: 'Configuración',
     icon: <CIcon icon={cilSettings} customClassName="nav-icon" />,
-    roles: [1], // Asumo que solo el administrador puede acceder a la configuración
+    roles: [1, 3], // IDs de roles: 1=administrador, 3=superadmin
     items: [
       {
         component: CNavItem,
         name: 'Configuración de la Aplicación',
         to: '/settings',
         icon: <CIcon icon={cilSettings} customClassName="nav-icon" />,
-        roles: [1],
+        roles: [1, 3],
       },
     ],
   },

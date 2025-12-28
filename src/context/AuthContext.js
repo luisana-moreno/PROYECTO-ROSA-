@@ -105,12 +105,29 @@ export const AuthProvider = ({ children }) => {
     return userRoleId === requiredRoleIds
   }
 
+  // Función para verificar si el usuario actual puede cambiar la contraseña de otro usuario
+  // Los superadmins (roleId 3) solo pueden cambiar su propia contraseña
+  const canChangePassword = (targetUserId, targetUserRoleId) => {
+    if (!user) return false
+
+    // Si el usuario objetivo es un superadmin (roleId 3)
+    if (targetUserRoleId === 3) {
+      // Solo puede cambiar la contraseña si es el mismo usuario
+      return user.id === targetUserId
+    }
+
+    // Para otros tipos de usuario, permitir el cambio si el usuario actual tiene permisos
+    // (esto se maneja por los permisos de rol existentes)
+    return true
+  }
+
   const value = {
     user,
     loading,
     login,
     logout,
     hasRole,
+    canChangePassword,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

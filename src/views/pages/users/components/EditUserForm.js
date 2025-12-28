@@ -1,7 +1,14 @@
 import React from 'react'
 import { CCol, CFormInput, CFormSelect, CFormLabel, CRow, CAlert } from '@coreui/react'
+import { useAuth } from 'src/context/AuthContext'
 
 const EditUserForm = ({ currentUser, setCurrentUser, roles }) => {
+  const { canChangePassword } = useAuth()
+
+  // Verificar si se puede cambiar la contraseña del usuario actual
+  const canEditPassword = currentUser
+    ? canChangePassword(currentUser.ttr_idusuar, currentUser.idRol || currentUser.ttr_idrolus)
+    : true
   return (
     <div>
       <CAlert color="warning" className="mb-4">
@@ -93,13 +100,31 @@ const EditUserForm = ({ currentUser, setCurrentUser, roles }) => {
           <CFormLabel>Nueva Contraseña (opcional)</CFormLabel>
           <CFormInput
             type="password"
-            placeholder="Dejar en blanco para no cambiar"
+            placeholder={
+              canEditPassword
+                ? 'Dejar en blanco para no cambiar'
+                : 'No puede cambiar esta contraseña'
+            }
             onChange={(e) => setCurrentUser({ ...currentUser, contrasena: e.target.value })}
             maxLength={255}
+            disabled={!canEditPassword}
           />
-          <small className="text-muted">Solo si desea cambiarla</small>
+          {canEditPassword ? (
+            <small className="text-muted">Solo si desea cambiarla</small>
+          ) : (
+            <small className="text-danger">
+              Solo el superadmin puede cambiar su propia contraseña
+            </small>
+          )}
         </CCol>
       </CRow>
+
+      {!canEditPassword && (
+        <CAlert color="info" className="mt-3">
+          <strong>Información:</strong> Este usuario es un superadmin. Por seguridad, solo puede
+          cambiar su propia contraseña.
+        </CAlert>
+      )}
     </div>
   )
 }
