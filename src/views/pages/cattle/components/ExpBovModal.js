@@ -68,13 +68,37 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
   // Helper para edad
   const calculateAge = (dobString) => {
     if (!dobString) return 'N/A'
-    const dob = new Date(dobString)
+
+    // Parsear fecha en formato DD/MM/YYYY
+    // Ejemplo: '24/11/2025'
+    const parts = dobString.split('/')
+    if (parts.length !== 3) return 'N/A'
+
+    const day = parseInt(parts[0], 10)
+    const month = parseInt(parts[1], 10) - 1 // Meses en JS son 0-indexed
+    const year = parseInt(parts[2], 10)
+
+    const dob = new Date(year, month, day)
     if (isNaN(dob.getTime())) return 'N/A'
 
-    const diffMs = Date.now() - dob.getTime()
-    const ageDt = new Date(diffMs)
-    const years = Math.abs(ageDt.getUTCFullYear() - 1970)
-    const months = ageDt.getUTCMonth()
+    const today = new Date()
+    let years = today.getFullYear() - dob.getFullYear()
+    let months = today.getMonth() - dob.getMonth()
+
+    // Ajustar si el mes actual es menor o si es el mismo mes pero el día es menor
+    if (months < 0 || (months === 0 && today.getDate() < dob.getDate())) {
+      years--
+      months += 12
+    }
+
+    // Ajustar meses si el día actual es menor que el día de nacimiento
+    if (today.getDate() < dob.getDate()) {
+      months--
+      if (months < 0) {
+        months += 12
+        years--
+      }
+    }
 
     if (years > 0) return `${years} años, ${months} meses`
     return `${months} meses`
@@ -123,6 +147,8 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
     }
     loadCattleDetails()
   }, [expBovVisible, currentCattle])
+
+  console.log(currentCattle)
 
   const handleExportPdf = async (type) => {
     if (!currentCattle || !currentCattle.ttrIdbovino) {
@@ -230,10 +256,7 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
                     <InfoRow label="Color" value={currentCattle?.colorNombre} />
                   </CCol>
                   <CCol md={4}>
-                    <InfoRow
-                      label="Fecha Nac."
-                      value={formatDateToDDMMYYYY(currentCattle?.ttrFecnacim)}
-                    />
+                    <InfoRow label="Fecha Nac." value={currentCattle?.ttrFecnacim} />
                   </CCol>
                   <CCol md={4}>
                     <InfoRow label="Etapa" value={currentCattle?.etapaNombre} />
