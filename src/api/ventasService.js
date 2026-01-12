@@ -111,3 +111,9 @@ export const clientesService = {
     return data
   },
 }
+
+// Export default para facilitar importación
+export default {
+  ...ventasService,
+  clientesService,
+}

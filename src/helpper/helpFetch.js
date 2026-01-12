@@ -3,12 +3,23 @@ const baseUrl = import.meta.env.VITE_API_URL
 export const helpFetch = () => {
   const customFetch = async (endpoint, method, body = null) => {
     try {
+      // Leer el token del objeto user en localStorage
+      const userStr = localStorage.getItem('user')
+      const user = userStr ? JSON.parse(userStr) : null
+      const token = user?.token
+
       const options = {
         method,
         headers: {
           'Content-Type': 'application/json',
         },
       }
+
+      // Agregar token si existe
+      if (token) {
+        options.headers['Authorization'] = `Bearer ${token}`
+      }
+
       if (body) {
         options.body = JSON.stringify(body)
       }
