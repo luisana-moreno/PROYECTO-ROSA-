@@ -165,8 +165,8 @@ const LotDetailsModal = ({
                     </CTableRow>
                   </CTableHead>
                   <CTableBody>
-                    {activeBovinesInLot.map((bovine) => (
-                      <CTableRow key={bovine.idBovino}>
+                    {activeBovinesInLot.map((bovine, index) => (
+                      <CTableRow key={`${bovine.idBovino}-${index}`}>
                         <CTableDataCell>
                           <strong>{bovine.numeroBovino}</strong>
                         </CTableDataCell>
@@ -176,7 +176,7 @@ const LotDetailsModal = ({
                           <CButton
                             color="danger"
                             size="sm"
-                            onClick={() => handleRemoveBovine(bovine.idbovino)}
+                            onClick={() => handleRemoveBovine(bovine.idBovino)}
                             disabled={loading}
                           >
                             <CIcon icon={cilTrash} className="me-1" />
@@ -290,12 +290,13 @@ const LotDetailsModal = ({
                     </CTableRow>
                   </CTableHead>
                   <CTableBody>
-                    {bovinesInLot.map((item) => (
-                      <CTableRow key={item.idbovlotpot}>
+                    {console.log(bovinesInLot)}
+                    {bovinesInLot.map((item, index) => (
+                      <CTableRow key={`${item.idbovlotpot}-${index}`}>
                         <CTableDataCell>
-                          <strong>{item.numerobovino}</strong>
+                          <strong>{item.numeroBovino}</strong>
                         </CTableDataCell>
-                        <CTableDataCell>{item.razanombre}</CTableDataCell>
+                        <CTableDataCell>{item.razaNombre}</CTableDataCell>
                         <CTableDataCell>{item.codpotrero || 'Sin Potrero'}</CTableDataCell>
                         <CTableDataCell>{formatDateToDDMMYYYY(item.fechainicio)}</CTableDataCell>
                         <CTableDataCell>

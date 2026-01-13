@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import sanidadService from '../../../../api/sanidadService'
 import {
   CModal,
   CModalHeader,
@@ -58,9 +59,8 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
   const [pastureHistory, setPastureHistory] = useState([])
 
   // Nuevos estados para Módulos de Sanidad
-  const [vacunaciones, setVacunaciones] = useState([])
+  const [controlesSanitarios, setControlesSanitarios] = useState([])
   const [preneces, setPreneces] = useState([])
-  const [visitasVet, setVisitasVet] = useState([])
 
   const [loading, setLoading] = useState(false)
   const [exporting, setExporting] = useState(false)
@@ -112,22 +112,20 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
           const id = currentCattle.ttrIdbovino
 
           // Usamos catch individualmente para que un error 404 (ej: sin historial de leche) no rompa todo el Promise.all
-          const [production, history, vacs, pren, visits] = await Promise.all([
+          const [production, history, controles, pren] = await Promise.all([
             get(`prodleche/bovino/animal/${id}`).catch((err) => {
               console.warn('Info produccion no encontrada o vacia', err)
               return []
             }),
             get(`lotepotreros/bovino/${id}`).catch(() => []),
-            get(`sanidad/vacunaciones/bovino/${id}`).catch(() => []),
+            sanidadService.getControlesSanitariosByBovino(id).catch(() => []),
             get(`sanidad/prenez/bovino/${id}`).catch(() => []),
-            get(`sanidad/visitas-veterinarias/bovino-visitas/${id}`).catch(() => []),
           ])
 
           setMilkProduction(Array.isArray(production) ? production : [])
           setPastureHistory(Array.isArray(history) ? history : [])
-          setVacunaciones(Array.isArray(vacs) ? vacs : [])
+          setControlesSanitarios(Array.isArray(controles) ? controles : [])
           setPreneces(Array.isArray(pren) ? pren : [])
-          setVisitasVet(Array.isArray(visits) ? visits : [])
         } catch (error) {
           console.error('Error al cargar detalles del bovino:', error)
           toast.error('Ocurrió un error cargando algunos datos del expediente.')
@@ -139,9 +137,8 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
         // Reset states
         setMilkProduction([])
         setPastureHistory([])
-        setVacunaciones([])
+        setControlesSanitarios([])
         setPreneces([])
-        setVisitasVet([])
         setActiveTab('resumen')
       }
     }
@@ -283,15 +280,15 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
           </CNavItem>
           <CNavItem>
             <CNavLink
-              active={activeTab === 'vacunacion'}
-              onClick={() => setActiveTab('vacunacion')}
+              active={activeTab === 'sanidad'}
+              onClick={() => setActiveTab('sanidad')}
               style={{ cursor: 'pointer' }}
             >
-              <CIcon icon={cilBeaker} className="me-2" />
+              <CIcon icon={cilMedicalCross} className="me-2" />
               Sanidad
-              {vacunaciones.length > 0 && (
+              {controlesSanitarios.length > 0 && (
                 <CBadge color="danger" shape="rounded-pill" className="ms-2">
-                  {vacunaciones.length}
+                  {controlesSanitarios.length}
                 </CBadge>
               )}
             </CNavLink>
@@ -353,7 +350,7 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
                   color="warning"
                   icon={<CIcon icon={cilBeaker} height={24} />}
                   title="Vacunas"
-                  value={`${vacunaciones.length} Registradas`}
+                  value={`${controlesSanitarios.filter((c) => c.tipo_codigo === 'VACUNACION').length} Registradas`}
                 />
               </CCol>
               <CCol md={4}>
@@ -388,35 +385,79 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
             </CRow>
           </CTabPane>
 
-          {/* SANIDAD */}
-          <CTabPane role="tabpanel" visible={activeTab === 'vacunacion'}>
+          {/* SANIDAD UNIFICADA */}
+          <CTabPane role="tabpanel" visible={activeTab === 'sanidad'}>
             <CCard className="shadow-sm">
               <CCardBody>
-                <h5>Historial de Vacunación</h5>
-                {vacunaciones.length > 0 ? (
-                  <CTable hover responsive small>
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                  <h5 className="mb-0">Historial Sanitario Completo</h5>
+                  <CBadge color="primary">Unificado</CBadge>
+                </div>
+
+                {controlesSanitarios.length > 0 ? (
+                  <CTable hover responsive small striped className="align-middle">
                     <CTableHead color="light">
                       <CTableRow>
                         <CTableHeaderCell>Fecha</CTableHeaderCell>
-                        <CTableHeaderCell>Vacuna</CTableHeaderCell>
-                        <CTableHeaderCell>Plan</CTableHeaderCell>
-                        <CTableHeaderCell>Próxima Dosis</CTableHeaderCell>
+                        <CTableHeaderCell>Tipo</CTableHeaderCell>
+                        <CTableHeaderCell>Producto / Detalle</CTableHeaderCell>
+                        <CTableHeaderCell>Dosis/Vía</CTableHeaderCell>
+                        <CTableHeaderCell>Responsable</CTableHeaderCell>
+                        <CTableHeaderCell>Próx. Fecha</CTableHeaderCell>
                       </CTableRow>
                     </CTableHead>
                     <CTableBody>
-                      {vacunaciones.map((vac) => (
-                        <CTableRow key={vac.ttr_idvacuna}>
-                          <CTableDataCell>{formatDateToDDMMYYYY(vac.ttr_fechaapl)}</CTableDataCell>
-                          <CTableDataCell className="fw-bold text-primary">
-                            {vac.nombre_vacuna}
-                          </CTableDataCell>
-                          <CTableDataCell>{vac.nombre_plan || 'Extraordinaria'}</CTableDataCell>
+                      {controlesSanitarios.map((control) => (
+                        <CTableRow key={control.ttr_idcontsa}>
                           <CTableDataCell>
-                            {vac.ttr_proxfech ? (
+                            <strong>{formatDateToDDMMYYYY(control.ttr_fechacon)}</strong>
+                          </CTableDataCell>
+                          <CTableDataCell>
+                            <CBadge
+                              color={
+                                control.tipo_codigo === 'VACUNACION'
+                                  ? 'info'
+                                  : control.tipo_codigo === 'DESPARASITACION'
+                                    ? 'success'
+                                    : control.tipo_codigo === 'MASTITIS'
+                                      ? 'warning'
+                                      : control.tipo_codigo === 'TRATAMIENTO'
+                                        ? 'primary'
+                                        : control.tipo_codigo === 'PESAJE'
+                                          ? 'secondary'
+                                          : 'light'
+                              }
+                            >
+                              {control.tipo_nombre}
+                            </CBadge>
+                          </CTableDataCell>
+                          <CTableDataCell>
+                            <div className="fw-bold">
+                              {control.ttr_producto || control.tipo_nombre}
+                            </div>
+                            {control.ttr_resultado && (
+                              <div className="small text-muted">Res: {control.ttr_resultado}</div>
+                            )}
+                            {control.ttr_observa && (
+                              <div className="small text-muted fst-italic">
+                                Obs: {control.ttr_observa}
+                              </div>
+                            )}
+                          </CTableDataCell>
+                          <CTableDataCell>
+                            {control.ttr_dosis ? `${control.ttr_dosis} ` : ''}
+                            {control.ttr_viaadmin && <small>({control.ttr_viaadmin})</small>}
+                          </CTableDataCell>
+                          <CTableDataCell>{control.empleado_nombre || '-'}</CTableDataCell>
+                          <CTableDataCell>
+                            {control.ttr_proxfech ? (
                               <CBadge
-                                color={new Date(vac.ttr_proxfech) < new Date() ? 'danger' : 'info'}
+                                color={
+                                  new Date(control.ttr_proxfech) < new Date() ? 'danger' : 'success'
+                                }
+                                variant="outline"
                               >
-                                {formatDateToDDMMYYYY(vac.ttr_proxfech)}
+                                {formatDateToDDMMYYYY(control.ttr_proxfech)}
                               </CBadge>
                             ) : (
                               '-'
@@ -427,31 +468,10 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
                     </CTableBody>
                   </CTable>
                 ) : (
-                  <CAlert color="info">Sin registros de vacunación.</CAlert>
-                )}
-                <hr />
-                <h5>Visitas Veterinarias</h5>
-                {visitasVet.length > 0 ? (
-                  <CTable hover responsive small>
-                    <CTableHead color="light">
-                      <CTableRow>
-                        <CTableHeaderCell>Fecha</CTableHeaderCell>
-                        <CTableHeaderCell>Diagnóstico</CTableHeaderCell>
-                        <CTableHeaderCell>Tratamiento</CTableHeaderCell>
-                      </CTableRow>
-                    </CTableHead>
-                    <CTableBody>
-                      {visitasVet.map((v) => (
-                        <CTableRow key={v.ttr_idvisbov}>
-                          <CTableDataCell>{formatDateToDDMMYYYY(v.fecha_visita)}</CTableDataCell>
-                          <CTableDataCell>{v.ttr_diagnos}</CTableDataCell>
-                          <CTableDataCell>{v.ttr_tratamie || '-'}</CTableDataCell>
-                        </CTableRow>
-                      ))}
-                    </CTableBody>
-                  </CTable>
-                ) : (
-                  <p className="text-muted">No hay visitas recientes.</p>
+                  <CAlert color="info" className="d-flex align-items-center">
+                    <CIcon icon={cilInfo} className="me-2" />
+                    Este bovino no tiene registros sanitarios (vacunas, tratamientos, etc.).
+                  </CAlert>
                 )}
               </CCardBody>
             </CCard>

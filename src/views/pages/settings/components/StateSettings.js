@@ -31,7 +31,7 @@ const StateSettings = ({ estados, createEstado, updateEstado, deleteEstado }) =>
 
   const handleAddEstado = async () => {
     try {
-      const newEstado = await createEstado({ nombre: newStateName })
+      const newEstado = await createEstado(newStateName)
       setNewStateName('')
       setVisibleAdd(false)
       toast.success('Estado agregado correctamente')
@@ -44,9 +44,7 @@ const StateSettings = ({ estados, createEstado, updateEstado, deleteEstado }) =>
   const handleEditEstado = async () => {
     if (!currentState) return
     try {
-      const updatedEstado = await updateEstado(currentState.tmaIdestbo, {
-        nombre: currentState.tmaNomestb,
-      })
+      const updatedEstado = await updateEstado(currentState.tmaIdestbo, currentState.tmaNomestb)
       setVisibleEdit(false)
       toast.info('Estado editado correctamente')
     } catch (error) {
