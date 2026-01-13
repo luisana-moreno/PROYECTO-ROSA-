@@ -28,16 +28,19 @@ const DeleteCattleModal = ({
     <CModal visible={deleteVisible} onClose={handleClose} backdrop="static" alignment="center">
       <CModalHeader>
         <CModalTitle>
-          <CIcon icon={cilWarning} className="me-2" style={{ color: '#dc3545' }} />
-          Eliminar Bovino
+          <CIcon icon={cilWarning} className="me-2" style={{ color: '#e55353' }} />
+          Desactivar Bovino
         </CModalTitle>
       </CModalHeader>
       <CModalBody>
         <CAlert color="danger">
-          <strong>¡Advertencia!</strong> Esta acción no se puede deshacer.
+          <strong>¡Advertencia!</strong> Esta acción desactivará al bovino.
+          <br />
+          El registro no se eliminará permanentemente de la base de datos, pero no aparecerá en la
+          lista de activos.
         </CAlert>
         <p className="mb-3">
-          Por favor escriba <strong>"confirmar"</strong> para eliminar el registro del bovino
+          Por favor escriba <strong>"confirmar"</strong> para continuar.
         </p>
         <CFormInput
           placeholder="Escriba: confirmar"
@@ -53,10 +56,11 @@ const DeleteCattleModal = ({
         <CButton
           color="danger"
           onClick={handleDeleteCattle}
-          disabled={deleteConfirmation.toLowerCase() !== 'confirmar'}
+          disabled={deleteConfirmation !== 'confirmar'}
+          style={{ color: 'white' }}
         >
           <CIcon icon={cilTrash} className="me-2" />
-          Eliminar Bovino
+          Desactivar Bovino
         </CButton>
       </CModalFooter>
     </CModal>

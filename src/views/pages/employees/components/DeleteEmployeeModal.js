@@ -29,15 +29,18 @@ const DeleteEmployeeModal = ({
       <CModalHeader>
         <CModalTitle>
           <CIcon icon={cilWarning} className="me-2" style={{ color: '#dc3545' }} />
-          Eliminar Empleado
+          Desactivar Empleado
         </CModalTitle>
       </CModalHeader>
       <CModalBody>
-        <CAlert color="danger">
-          <strong>¡Advertencia!</strong> Esta acción no se puede deshacer.
+        <CAlert color="warning">
+          <strong>¡Atención!</strong> Esta acción marcará al empleado como <strong>INACTIVO</strong>
+          .
+          <br />
+          Sus registros históricos (asistencia, pagos) se conservarán.
         </CAlert>
         <p className="mb-3">
-          Por favor escriba <strong>"confirmar"</strong> para eliminar el empleado
+          Por favor escriba <strong>"confirmar"</strong> para desactivar al empleado.
         </p>
         <CFormInput
           placeholder="Escriba: confirmar"
@@ -56,7 +59,7 @@ const DeleteEmployeeModal = ({
           disabled={deleteConfirmation.toLowerCase() !== 'confirmar'}
         >
           <CIcon icon={cilTrash} className="me-2" />
-          Eliminar Empleado
+          Desactivar Empleado
         </CButton>
       </CModalFooter>
     </CModal>

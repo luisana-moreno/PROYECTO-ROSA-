@@ -99,6 +99,21 @@ export const cattleService = {
     return true
   },
 
+  reactivateCattle: async (id) => {
+    const response = await fetch(`${API_URL}/bovinos/${id}/reactivate`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al reactivar bovino')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
   // Servicios para Razas de Bovino (TMARAZABOVI)
   getAllRazas: async () => {
     const response = await fetch(`${API_URL}/bovinos/razas`, {

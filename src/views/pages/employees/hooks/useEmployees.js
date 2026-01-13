@@ -23,15 +23,11 @@ export const useEmployees = () => {
   })
   const [searchTerm, setSearchTerm] = useState('') // Nuevo estado para el término de búsqueda
   const [filterPosition, setFilterPosition] = useState('') // Nuevo estado para el filtro por cargo
+  const [filterStatus, setFilterStatus] = useState('ACTIVO') // Nuevo estado para filtro Activo/Inactivo
   // const [toast, setToast] = useState({ show: false, message: '', color: 'success' }) // Eliminado
   const [currentPage, setCurrentPage] = useState(1)
   const [employeesPerPage] = useState(10)
   const [positions, setPositions] = useState([]) // Almacenará objetos { id: ..., name: ... }
-
-  // const showToast = (message, color = 'success') => { // Eliminado
-  //   setToast({ show: true, message, color })
-  //   setTimeout(() => setToast({ show: false, message: '', color: 'success' }), 2500)
-  // }
 
   // Función de validación
   const validateEmployeeForm = (form) => {
@@ -98,11 +94,6 @@ export const useEmployees = () => {
     return true
   }
 
-  // Get current employees
-  const indexOfLastEmployee = currentPage * employeesPerPage
-  const indexOfFirstEmployee = indexOfLastEmployee - employeesPerPage
-  const currentEmployees = employees.slice(indexOfFirstEmployee, indexOfLastEmployee)
-
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber)
 
@@ -131,6 +122,7 @@ export const useEmployees = () => {
             ttrDirecci: emp.ttrDirecci,
             ttrFeccont: emp.ttrFeccont ? new Date(emp.ttrFeccont).toISOString().split('T')[0] : '',
             ttrIdcargp: emp.ttrIdcargp ? parseInt(emp.ttrIdcargp, 10) : '',
+            ttrEstado: emp.ttrEstado || 'ACTIVO',
           })),
         )
       }
@@ -242,12 +234,37 @@ export const useEmployees = () => {
         await employeeService.deleteEmployee(currentEmployee.id)
         await fetchEmployees() // Refrescar la tabla de empleados
         setDeleteVisible(false)
-        toast.error('Empleado eliminado exitosamente')
+        toast.error('Empleado desactivado exitosamente')
       } catch (error) {
         toast.error(error.message || 'Error al eliminar empleado.')
       }
     } else {
       toast.warning('Debe escribir "confirmar" para eliminar')
+    }
+  }
+
+  // Reactivate Logic
+  const [reactivateVisible, setReactivateVisible] = useState(false)
+  const [reactivateConfirmation, setReactivateConfirmation] = useState('')
+
+  const handleReactivateEmployee = async () => {
+    if (!currentEmployee || !currentEmployee.id) {
+      toast.warning('No employee selected for reactivation.')
+      return
+    }
+    if (reactivateConfirmation === 'reactivar') {
+      try {
+        await employeeService.reactivateEmployee(currentEmployee.id)
+        await fetchEmployees()
+        setReactivateVisible(false)
+        setReactivateConfirmation('')
+        setFilterStatus('ACTIVO') // Switch back to active tab to see the result
+        toast.success('Empleado reactivado exitosamente')
+      } catch (error) {
+        toast.error(error.message || 'Error al reactivar empleado.')
+      }
+    } else {
+      toast.warning('Debe escribir "reactivar" para confirmar')
     }
   }
 
@@ -266,8 +283,15 @@ export const useEmployees = () => {
     const matchesPosition = filterPosition
       ? employee.ttrIdcargp === parseInt(filterPosition, 10)
       : true
-    return matchesSearchTerm && matchesPosition
+    const matchesStatus = filterStatus ? employee.ttrEstado === filterStatus : true
+
+    return matchesSearchTerm && matchesPosition && matchesStatus
   })
+
+  // Get current employees (paginated from filtered list)
+  const indexOfLastEmployee = currentPage * employeesPerPage
+  const indexOfFirstEmployee = indexOfLastEmployee - employeesPerPage
+  const currentEmployees = filteredEmployees.slice(indexOfFirstEmployee, indexOfLastEmployee)
 
   return {
     visible,
@@ -298,9 +322,17 @@ export const useEmployees = () => {
     searchTerm,
     setSearchTerm,
     setFilterPosition,
+    filterStatus,
+    setFilterStatus,
     filteredEmployees,
     originalEmployee,
-    fetchEmployees, // Exportar fetchEmployees para recargar en otros componentes si es necesario
-    fetchPositions, // Exportar fetchPositions para recargar en otros componentes si es necesario
+    fetchEmployees,
+    fetchPositions,
+    // Reactivation
+    reactivateVisible,
+    setReactivateVisible,
+    reactivateConfirmation,
+    setReactivateConfirmation,
+    handleReactivateEmployee,
   }
 }

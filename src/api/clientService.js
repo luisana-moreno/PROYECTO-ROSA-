@@ -1,124 +1,115 @@
-const API_URL = import.meta.env.VITE_API_URL
+import { helpFetch } from '../helpper/helpFetch'
+
+const API_URL = 'clientes'
+const api = helpFetch()
 
 export const clientService = {
   getAllClients: async () => {
-    const response = await fetch(`${API_URL}/clientes`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al obtener clientes')
+    try {
+      const response = await api.get(API_URL)
+      if (response && !response.error) {
+        return response
+      } else {
+        throw new Error(response.statusText || 'Error al obtener clientes')
+      }
+    } catch (error) {
+      throw error
     }
-    const data = await response.json()
-    return data
   },
 
   getClientById: async (id) => {
-    const response = await fetch(`${API_URL}/clientes/${id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al obtener cliente por ID')
+    try {
+      const response = await api.get(`${API_URL}/${id}`)
+      if (response && !response.error) {
+        return response
+      } else {
+        throw new Error(response.statusText || 'Error al obtener cliente por ID')
+      }
+    } catch (error) {
+      throw error
     }
-    const data = await response.json()
-    return data
   },
 
   createClient: async (clientData) => {
-    const response = await fetch(`${API_URL}/clientes`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(clientData),
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al crear cliente')
+    try {
+      const response = await api.post(API_URL, clientData)
+      if (response && !response.error) {
+        return response
+      } else {
+        // Propagate backend errors (like 409 Conflict)
+        const error = new Error(response.message || 'Error al crear cliente')
+        if (response.status) error.response = { status: response.status, data: response }
+        throw error
+      }
+    } catch (error) {
+      throw error
     }
-    const data = await response.json()
-    return data
   },
 
   updateClient: async (id, clientData) => {
-    const response = await fetch(`${API_URL}/clientes/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(clientData),
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al actualizar cliente')
+    try {
+      const response = await api.put(API_URL, id, clientData)
+      if (response && !response.error) {
+        return response
+      } else {
+        const error = new Error(response.message || 'Error al actualizar cliente')
+        if (response.status) error.response = { status: response.status, data: response }
+        throw error
+      }
+    } catch (error) {
+      throw error
     }
-    const data = await response.json()
-    return data
   },
 
   deleteClient: async (id) => {
-    const response = await fetch(`${API_URL}/clientes/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al eliminar cliente')
+    try {
+      const response = await api.del(API_URL, id)
+      if (response && !response.error) {
+        return true
+      } else {
+        throw new Error(response.message || 'Error al eliminar cliente')
+      }
+    } catch (error) {
+      throw error
     }
-    return true
   },
 
   checkClientDocument: async (documento) => {
-    const response = await fetch(`${API_URL}/clientes/check-document/${documento}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al verificar documento')
+    try {
+      const response = await api.get(`${API_URL}/check-document/${documento}`)
+      if (response && !response.error) {
+        return response
+      } else {
+        throw new Error(response.message || 'Error al verificar documento')
+      }
+    } catch (error) {
+      throw error
     }
-    const data = await response.json()
-    return data
   },
 
   getNaturalClients: async () => {
-    const response = await fetch(`${API_URL}/clientes/natural`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al obtener clientes naturales')
+    try {
+      const response = await api.get(`${API_URL}/natural`)
+      if (response && !response.error) {
+        return response
+      } else {
+        throw new Error(response.message || 'Error al obtener clientes naturales')
+      }
+    } catch (error) {
+      throw error
     }
-    const data = await response.json()
-    return data
   },
 
   getCompanyClients: async () => {
-    const response = await fetch(`${API_URL}/clientes/juridico`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al obtener clientes jurídicos')
+    try {
+      const response = await api.get(`${API_URL}/juridico`)
+      if (response && !response.error) {
+        return response
+      } else {
+        throw new Error(response.message || 'Error al obtener clientes jurídicos')
+      }
+    } catch (error) {
+      throw error
     }
-    const data = await response.json()
-    return data
   },
 }

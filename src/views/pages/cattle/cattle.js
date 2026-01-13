@@ -1,7 +1,17 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
 import { cilPlus, cilAnimal } from '@coreui/icons'
-import { CCard, CButton, CCardBody, CCardHeader, CRow, CCol } from '@coreui/react'
+import {
+  CCard,
+  CButton,
+  CCardBody,
+  CCardHeader,
+  CRow,
+  CCol,
+  CNav,
+  CNavItem,
+  CNavLink,
+} from '@coreui/react'
 
 import { useCattle } from './hooks/useCattle'
 import CattleTable from './components/CattleTable'
@@ -11,6 +21,7 @@ import DeleteCattleModal from './components/DeleteCattleModal'
 import ViewCattleModal from './components/ViewCattleModal'
 import ExpBovModal from './components/ExpBovModal'
 import CattleFilters from './components/CattleFilters'
+import ReactivateCattleModal from './components/ReactivateCattleModal'
 
 const Cattle = () => {
   const {
@@ -50,6 +61,14 @@ const Cattle = () => {
     filterEstado,
     setFilterEstado,
     filteredCattle,
+    // Reactivation
+    reactivateVisible,
+    setReactivateVisible,
+    reactivateConfirmation,
+    setReactivateConfirmation,
+    handleReactivateCattle,
+    filterStatus,
+    setFilterStatus,
   } = useCattle()
 
   return (
@@ -86,6 +105,30 @@ const Cattle = () => {
               </CButton>
             </CCardHeader>
             <CCardBody>
+              <CNav variant="tabs" className="mb-3">
+                <CNavItem>
+                  <CNavLink
+                    active={filterStatus === '3'}
+                    onClick={() => setFilterStatus('3')}
+                    style={{ cursor: 'pointer', color: filterStatus === '3' ? '#2eb85c' : '' }}
+                  >
+                    Activos
+                  </CNavLink>
+                </CNavItem>
+                <CNavItem>
+                  <CNavLink
+                    active={filterStatus === '1'}
+                    onClick={() => setFilterStatus('1')}
+                    style={{
+                      cursor: 'pointer',
+                      color: filterStatus === '1' ? '#e55353' : '',
+                    }}
+                  >
+                    Inactivos
+                  </CNavLink>
+                </CNavItem>
+              </CNav>
+
               {/* Filtros de búsqueda */}
               <CattleFilters
                 searchTerm={searchTerm}
@@ -112,6 +155,7 @@ const Cattle = () => {
                 setDeleteVisible={setDeleteVisible}
                 setViewVisible={setViewVisible}
                 handleViewExpBov={handleViewExpBov}
+                setReactivateVisible={setReactivateVisible}
               />
             </CCardBody>
           </CCard>
@@ -157,6 +201,13 @@ const Cattle = () => {
         expBovVisible={expBovVisible}
         setExpBovVisible={setExpBovVisible}
         currentCattle={currentCattle}
+      />
+      <ReactivateCattleModal
+        reactivateVisible={reactivateVisible}
+        setReactivateVisible={setReactivateVisible}
+        reactivateConfirmation={reactivateConfirmation}
+        setReactivateConfirmation={setReactivateConfirmation}
+        handleReactivateCattle={handleReactivateCattle}
       />
     </>
   )

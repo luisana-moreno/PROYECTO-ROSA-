@@ -63,6 +63,21 @@ export const userService = {
     return true
   },
 
+  reactivateUser: async (id) => {
+    const response = await fetch(`${API_URL}/usuarios/${id}/reactivate`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al reactivar usuario')
+    }
+    const data = await response.json()
+    return data
+  },
+
   // Obtener perfil del usuario autenticado
   getProfile: async (token) => {
     const response = await fetch(`${API_URL}/usuarios/profile`, {

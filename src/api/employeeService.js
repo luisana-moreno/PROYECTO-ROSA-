@@ -27,6 +27,7 @@ export const employeeService = {
       ttrDirecci: employee.ttr_direcci,
       ttrFeccont: employee.ttr_feccont,
       ttrIdcargp: employee.ttr_idcargp,
+      ttrEstado: employee.ttr_estado,
     }))
   },
 
@@ -101,6 +102,20 @@ export const employeeService = {
     if (!response.ok) {
       const errorData = await response.json()
       throw new Error(errorData.message || 'Error al eliminar empleado')
+    }
+    return true
+  },
+
+  reactivateEmployee: async (id) => {
+    const response = await fetch(`${API_URL}/empleados/${id}/reactivate`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al reactivar empleado')
     }
     return true
   },

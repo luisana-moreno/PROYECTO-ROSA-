@@ -11,7 +11,7 @@ import {
   CAlert,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilPencil, cilTrash, cilFolder } from '@coreui/icons'
+import { cilPencil, cilTrash, cilFolder, cilCheckCircle } from '@coreui/icons'
 import { formatDateToDDMMYYYY } from 'src/utils/dateFormatter'
 
 const CattleTable = ({
@@ -21,6 +21,7 @@ const CattleTable = ({
   setDeleteVisible,
   setViewVisible,
   handleViewExpBov,
+  setReactivateVisible,
 }) => {
   // Función para obtener el color del badge según el estado
   const getEstadoBadgeColor = (estadoNombre) => {
@@ -99,22 +100,41 @@ const CattleTable = ({
                       </span>
                     </CButton>
 
-                    {/* Botón Eliminar */}
-                    <CButton
-                      color="danger"
-                      size="sm"
-                      onClick={() => {
-                        setCurrentCattle(cattleItem)
-                        setDeleteVisible(true)
-                      }}
-                      title="Eliminar bovino"
-                    >
-                      <CIcon icon={cilTrash} size="sm" className="d-md-none" />
-                      <span className="d-none d-md-inline">
-                        <CIcon icon={cilTrash} size="sm" className="me-1" />
-                        Eliminar
-                      </span>
-                    </CButton>
+                    {/* Botón Reactivar / Desactivar */}
+                    {cattleItem.ttrIdestadb === 1 ? (
+                      <CButton
+                        color="success"
+                        size="sm"
+                        className="text-white"
+                        onClick={() => {
+                          setCurrentCattle(cattleItem)
+                          setReactivateVisible(true)
+                        }}
+                        title="Reactivar bovino"
+                      >
+                        <CIcon icon={cilCheckCircle} size="sm" className="d-md-none" />
+                        <span className="d-none d-md-inline">
+                          <CIcon icon={cilCheckCircle} size="sm" className="me-1" />
+                          Reactivar
+                        </span>
+                      </CButton>
+                    ) : (
+                      <CButton
+                        color="danger"
+                        size="sm"
+                        onClick={() => {
+                          setCurrentCattle(cattleItem)
+                          setDeleteVisible(true)
+                        }}
+                        title="Desactivar bovino"
+                      >
+                        <CIcon icon={cilTrash} size="sm" className="d-md-none" />
+                        <span className="d-none d-md-inline">
+                          <CIcon icon={cilTrash} size="sm" className="me-1" />
+                          Desactivar
+                        </span>
+                      </CButton>
+                    )}
 
                     {/* Botón Expediente */}
                     <CButton

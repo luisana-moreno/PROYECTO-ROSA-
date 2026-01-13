@@ -1,7 +1,17 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
 import { cilPlus, cilUser } from '@coreui/icons'
-import { CCard, CButton, CCardBody, CCardHeader, CRow, CCol } from '@coreui/react'
+import {
+  CCard,
+  CButton,
+  CCardBody,
+  CCardHeader,
+  CRow,
+  CCol,
+  CNav,
+  CNavItem,
+  CNavLink,
+} from '@coreui/react'
 
 import { useUsers } from './hooks/useUsers'
 import UsersTable from './components/UsersTable'
@@ -9,6 +19,7 @@ import AddUserModal from './components/AddUserModal'
 import EditUserModal from './components/EditUserModal'
 import DeleteUserModal from './components/DeleteUserModal'
 import UserFilters from './components/UserFilters'
+import ReactivateUserModal from './components/ReactivateUserModal'
 
 const Users = () => {
   const {
@@ -34,6 +45,14 @@ const Users = () => {
     filterRole,
     setFilterRole,
     filteredUsers,
+    // Reactivación
+    reactivateVisible,
+    setReactivateVisible,
+    reactivateConfirmation,
+    setReactivateConfirmation,
+    handleReactivateUser,
+    filterStatus,
+    setFilterStatus,
   } = useUsers()
 
   return (
@@ -70,6 +89,30 @@ const Users = () => {
               </CButton>
             </CCardHeader>
             <CCardBody>
+              <CNav variant="tabs" className="mb-3">
+                <CNavItem>
+                  <CNavLink
+                    active={filterStatus === 'ACTIVO'}
+                    onClick={() => setFilterStatus('ACTIVO')}
+                    style={{ cursor: 'pointer', color: filterStatus === 'ACTIVO' ? '#2eb85c' : '' }}
+                  >
+                    Activos
+                  </CNavLink>
+                </CNavItem>
+                <CNavItem>
+                  <CNavLink
+                    active={filterStatus === 'INACTIVO'}
+                    onClick={() => setFilterStatus('INACTIVO')}
+                    style={{
+                      cursor: 'pointer',
+                      color: filterStatus === 'INACTIVO' ? '#e55353' : '',
+                    }}
+                  >
+                    Inactivos
+                  </CNavLink>
+                </CNavItem>
+              </CNav>
+
               {/* Filtros de búsqueda */}
               <UserFilters
                 searchTerm={searchTerm}
@@ -85,6 +128,7 @@ const Users = () => {
                 setCurrentUser={setCurrentUser}
                 setEditVisible={setEditVisible}
                 setDeleteVisible={setDeleteVisible}
+                setReactivateVisible={setReactivateVisible}
               />
             </CCardBody>
           </CCard>
@@ -114,6 +158,13 @@ const Users = () => {
         deleteConfirmation={deleteConfirmation}
         setDeleteConfirmation={setDeleteConfirmation}
         handleDeleteUser={handleDeleteUser}
+      />
+      <ReactivateUserModal
+        reactivateVisible={reactivateVisible}
+        setReactivateVisible={setReactivateVisible}
+        reactivateConfirmation={reactivateConfirmation}
+        setReactivateConfirmation={setReactivateConfirmation}
+        handleReactivateUser={handleReactivateUser}
       />
     </>
   )

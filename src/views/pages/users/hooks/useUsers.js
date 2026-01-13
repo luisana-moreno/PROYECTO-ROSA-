@@ -68,7 +68,11 @@ export const useUsers = () => {
   const fetchUsers = async () => {
     try {
       const data = await userService.getUsers()
-      setUsers(data)
+      const mappedUsers = data.map((user) => ({
+        ...user,
+        ttrEstado: user.ttr_estado || 'ACTIVO',
+      }))
+      setUsers(mappedUsers)
     } catch (error) {
       console.error('Error al cargar usuarios:', error)
       toast.error(error.message || 'Error al cargar usuarios.')
@@ -134,6 +138,37 @@ export const useUsers = () => {
     }
   }
 
+  // Reactivate Logic
+  const [reactivateVisible, setReactivateVisible] = useState(false)
+  const [reactivateConfirmation, setReactivateConfirmation] = useState('')
+  const [filterStatus, setFilterStatus] = useState('ACTIVO') // Nuevo estado para filtro Activo/Inactivo
+
+  const handleReactivateUser = async () => {
+    if (!currentUser || !currentUser.ttr_idusuar) {
+      toast.warning('No user selected for reactivation.')
+      return
+    }
+    if (reactivateConfirmation === 'reactivar') {
+      try {
+        await userService.reactivateUser(currentUser.ttr_idusuar)
+        // Actualizar la lista localmente
+        const updatedUsers = users.map((u) =>
+          u.ttr_idusuar === currentUser.ttr_idusuar ? { ...u, ttrEstado: 'ACTIVO' } : u,
+        )
+        setUsers(updatedUsers)
+        setReactivateVisible(false)
+        setReactivateConfirmation('')
+        setFilterStatus('ACTIVO') // Switch back to active tab
+        toast.success('Usuario reactivado exitosamente')
+      } catch (error) {
+        toast.error(error.message || 'Error al reactivar usuario.')
+      }
+    } else {
+      toast.warning('Debe escribir "reactivar" para confirmar')
+    }
+  }
+
+  // Update handleDelete to be local optimistic or re-fetch
   const handleDeleteUser = async () => {
     if (!currentUser || !currentUser.ttr_idusuar) {
       toast.warning('No se ha seleccionado ningún usuario para eliminar.')
@@ -142,12 +177,16 @@ export const useUsers = () => {
     if (deleteConfirmation === 'confirmar') {
       try {
         await userService.deleteUser(currentUser.ttr_idusuar)
-        setUsers(users.filter((u) => u.ttr_idusuar !== currentUser.ttr_idusuar))
+        // Update local state to reflect soft delete
+        const updatedUsers = users.map((u) =>
+          u.ttr_idusuar === currentUser.ttr_idusuar ? { ...u, ttrEstado: 'INACTIVO' } : u,
+        )
+        setUsers(updatedUsers)
         setDeleteVisible(false)
         setDeleteConfirmation('')
-        toast.error('Usuario eliminado exitosamente.')
+        toast.error('Usuario desactivado exitosamente')
       } catch (error) {
-        console.error('Error al eliminar usuario:', error) // Mantener console.error para depuración interna
+        console.error('Error al eliminar usuario:', error)
         toast.error(error.message || 'Error al eliminar usuario.')
       }
     } else {
@@ -179,8 +218,9 @@ export const useUsers = () => {
         userCorreo.includes(lowerCaseSearchTerm)
       : true
     const matchesRole = filterRole ? user.ttr_idrolus === parseInt(filterRole, 10) : true
+    const matchesStatus = filterStatus ? user.ttrEstado === filterStatus : true
 
-    return matchesSearchTerm && matchesRole
+    return matchesSearchTerm && matchesRole && matchesStatus
   })
 
   return {
@@ -195,17 +235,25 @@ export const useUsers = () => {
     deleteConfirmation,
     setDeleteConfirmation,
     users,
-    setUsers, // Podría ser útil para actualizaciones directas si es necesario
+    setUsers,
     addUserForm,
     setAddUserForm,
     handleAddUser,
     handleEditUser,
     handleDeleteUser,
-    roles, // Estado de roles de usuario
+    roles,
     searchTerm,
     setSearchTerm,
     filterRole,
     setFilterRole,
     filteredUsers,
+    // Reactivación
+    reactivateVisible,
+    setReactivateVisible,
+    reactivateConfirmation,
+    setReactivateConfirmation,
+    handleReactivateUser,
+    filterStatus,
+    setFilterStatus,
   }
 }

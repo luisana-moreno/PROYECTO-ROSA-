@@ -13,7 +13,7 @@ import {
   CAlert,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilPencil, cilTrash } from '@coreui/icons'
+import { cilPencil, cilTrash, cilCheckCircle } from '@coreui/icons'
 import { formatDateToDDMMYYYY } from 'src/utils/dateFormatter'
 
 const EmployeesTable = ({
@@ -21,6 +21,7 @@ const EmployeesTable = ({
   indexOfFirstEmployee,
   setEditVisible,
   setDeleteVisible,
+  setReactivateVisible,
   setViewVisible,
   setCurrentEmployee,
   employeesPerPage,
@@ -91,17 +92,32 @@ const EmployeesTable = ({
                   <CIcon icon={cilPencil} size="sm" className="me-1" />
                   Editar
                 </CButton>
-                <CButton
-                  color="danger"
-                  size="sm"
-                  onClick={() => {
-                    setCurrentEmployee(employee)
-                    setDeleteVisible(true)
-                  }}
-                >
-                  <CIcon icon={cilTrash} size="sm" className="me-1" />
-                  Eliminar
-                </CButton>
+                {employee.ttrEstado === 'INACTIVO' ? (
+                  <CButton
+                    color="success"
+                    size="sm"
+                    onClick={() => {
+                      setCurrentEmployee(employee)
+                      setReactivateVisible(true)
+                    }}
+                    style={{ color: 'white' }}
+                  >
+                    <CIcon icon={cilCheckCircle} size="sm" className="me-1" />
+                    Reactivar
+                  </CButton>
+                ) : (
+                  <CButton
+                    color="danger"
+                    size="sm"
+                    onClick={() => {
+                      setCurrentEmployee(employee)
+                      setDeleteVisible(true)
+                    }}
+                  >
+                    <CIcon icon={cilTrash} size="sm" className="me-1" />
+                    Desactivar
+                  </CButton>
+                )}
               </CTableDataCell>
             </CTableRow>
           ))}

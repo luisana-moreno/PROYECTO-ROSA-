@@ -1,7 +1,17 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
 import { cilPlus, cilPeople } from '@coreui/icons'
-import { CCard, CButton, CCardBody, CCardHeader, CRow, CCol } from '@coreui/react'
+import {
+  CCard,
+  CButton,
+  CCardBody,
+  CCardHeader,
+  CRow,
+  CCol,
+  CNav,
+  CNavItem,
+  CNavLink,
+} from '@coreui/react'
 
 import { useEmployees } from './hooks/useEmployees'
 import EmployeesTable from './components/EmployeesTable'
@@ -10,6 +20,7 @@ import EditEmployeeModal from './components/EditEmployeeModal'
 import DeleteEmployeeModal from './components/DeleteEmployeeModal'
 import ViewEmployeeModal from './components/ViewEmployeeModal'
 import EmployeeFilters from './components/EmployeeFilters'
+import ReactivateEmployeeModal from './components/ReactivateEmployeeModal'
 
 const Employees = () => {
   const {
@@ -43,6 +54,14 @@ const Employees = () => {
     setFilterPosition,
     filteredEmployees,
     originalEmployee,
+    filterStatus,
+    setFilterStatus,
+    // Reactivación
+    reactivateVisible,
+    setReactivateVisible,
+    reactivateConfirmation,
+    setReactivateConfirmation,
+    handleReactivateEmployee,
   } = useEmployees()
 
   return (
@@ -79,6 +98,30 @@ const Employees = () => {
               </CButton>
             </CCardHeader>
             <CCardBody>
+              <CNav variant="tabs" className="mb-3">
+                <CNavItem>
+                  <CNavLink
+                    active={filterStatus === 'ACTIVO'}
+                    onClick={() => setFilterStatus('ACTIVO')}
+                    style={{ cursor: 'pointer', color: filterStatus === 'ACTIVO' ? '#2eb85c' : '' }}
+                  >
+                    Activos
+                  </CNavLink>
+                </CNavItem>
+                <CNavItem>
+                  <CNavLink
+                    active={filterStatus === 'INACTIVO'}
+                    onClick={() => setFilterStatus('INACTIVO')}
+                    style={{
+                      cursor: 'pointer',
+                      color: filterStatus === 'INACTIVO' ? '#e55353' : '',
+                    }}
+                  >
+                    Inactivos
+                  </CNavLink>
+                </CNavItem>
+              </CNav>
+
               {/* Filtros de búsqueda */}
               <EmployeeFilters
                 searchTerm={searchTerm}
@@ -90,10 +133,11 @@ const Employees = () => {
 
               {/* Tabla de empleados */}
               <EmployeesTable
-                employees={filteredEmployees}
+                employees={currentEmployees} // Use currentEmployees for pagination
                 indexOfFirstEmployee={indexOfFirstEmployee}
                 setEditVisible={setEditVisible}
                 setDeleteVisible={setDeleteVisible}
+                setReactivateVisible={setReactivateVisible}
                 setViewVisible={setViewVisible}
                 setCurrentEmployee={setCurrentEmployee}
                 employeesPerPage={employeesPerPage}
@@ -129,6 +173,13 @@ const Employees = () => {
         deleteConfirmation={deleteConfirmation}
         setDeleteConfirmation={setDeleteConfirmation}
         handleDeleteEmployee={handleDeleteEmployee}
+      />
+      <ReactivateEmployeeModal
+        reactivateVisible={reactivateVisible}
+        setReactivateVisible={setReactivateVisible}
+        reactivateConfirmation={reactivateConfirmation}
+        setReactivateConfirmation={setReactivateConfirmation}
+        handleReactivateEmployee={handleReactivateEmployee}
       />
       <ViewEmployeeModal
         viewVisible={viewVisible}

@@ -64,20 +64,6 @@ export const useCattle = () => {
     }
   }
 
-  const filteredCattle = cattle.filter((bovino) => {
-    const matchesSearchTerm = searchTerm
-      ? String(bovino.ttrNumerobv)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        String(bovino.ttrNombrbov)?.toLowerCase().includes(searchTerm.toLowerCase())
-      : true
-
-    const matchesRaza = filterRaza ? bovino.ttrIdrazabo === parseInt(filterRaza) : true
-    const matchesColor = filterColor ? bovino.ttrIdcolorb === parseInt(filterColor) : true
-    const matchesEtapa = filterEtapa ? bovino.ttrIdetapav === parseInt(filterEtapa) : true
-    const matchesEstado = filterEstado ? bovino.ttrIdestadb === parseInt(filterEstado) : true
-
-    return matchesSearchTerm && matchesRaza && matchesColor && matchesEtapa && matchesEstado
-  })
-
   const handleAddCattle = async () => {
     try {
       const newCattleResponse = await cattleService.createCattle(addCattleForm)
@@ -164,6 +150,40 @@ export const useCattle = () => {
     }
   }
 
+  // Reactivation Logic
+  const [reactivateVisible, setReactivateVisible] = useState(false)
+  const [reactivateConfirmation, setReactivateConfirmation] = useState('')
+  const [filterStatus, setFilterStatus] = useState('3') // Default to Active (ID 3)
+
+  const handleReactivateCattle = async () => {
+    if (!currentCattle || !currentCattle.ttrIdbovino) {
+      toast.warning('No cattle selected for reactivation.')
+      return
+    }
+    if (reactivateConfirmation === 'reactivar') {
+      try {
+        await cattleService.reactivateCattle(currentCattle.ttrIdbovino)
+        // Update local state
+        setCattle((prevCattle) =>
+          prevCattle.map((c) =>
+            c.ttrIdbovino === currentCattle.ttrIdbovino
+              ? { ...c, ttrIdestadb: 3, estadoNombre: 'Activo' }
+              : c,
+          ),
+        )
+        setReactivateVisible(false)
+        setReactivateConfirmation('')
+        setFilterStatus('3') // Switch back to active tab
+        toast.success('Bovino reactivado exitosamente')
+      } catch (error) {
+        console.error('Error reactivating cattle:', error)
+        toast.error(error.message || 'Error al reactivar bovino')
+      }
+    } else {
+      toast.warning('Debe escribir "reactivar" para confirmar')
+    }
+  }
+
   const handleDeleteCattle = async () => {
     if (!currentCattle || !currentCattle.ttrIdbovino) {
       toast.warning('No cattle selected for deletion.')
@@ -172,11 +192,17 @@ export const useCattle = () => {
     if (deleteConfirmation === 'confirmar') {
       try {
         await cattleService.deleteCattle(currentCattle.ttrIdbovino)
+        // Soft delete update: change status to 1 (Inactive)
         setCattle((prevCattle) =>
-          prevCattle.filter((c) => c.ttrIdbovino !== currentCattle.ttrIdbovino),
+          prevCattle.map((c) =>
+            c.ttrIdbovino === currentCattle.ttrIdbovino
+              ? { ...c, ttrIdestadb: 1, estadoNombre: 'Inactivo' }
+              : c,
+          ),
         )
         setDeleteVisible(false)
-        toast.error('Bovino eliminado exitosamente')
+        setDeleteConfirmation('')
+        toast.error('Bovino desactivado exitosamente')
       } catch (error) {
         console.error('Error al eliminar bovino:', error)
         toast.error(error.message || 'Error al eliminar bovino')
@@ -194,6 +220,30 @@ export const useCattle = () => {
     })
     setExpBovVisible(true)
   }
+
+  const filteredCattle = cattle.filter((bovino) => {
+    const matchesSearchTerm = searchTerm
+      ? String(bovino.ttrNumerobv)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        String(bovino.ttrNombrbov)?.toLowerCase().includes(searchTerm.toLowerCase())
+      : true
+
+    const matchesRaza = filterRaza ? bovino.ttrIdrazabo === parseInt(filterRaza) : true
+    const matchesColor = filterColor ? bovino.ttrIdcolorb === parseInt(filterColor) : true
+    const matchesEtapa = filterEtapa ? bovino.ttrIdetapav === parseInt(filterEtapa) : true
+    const matchesEstado = filterEstado ? bovino.ttrIdestadb === parseInt(filterEstado) : true
+
+    // Status Filter: Check against ttrIdestadb based on filterStatus (1 or 3)
+    const matchesStatus = filterStatus ? bovino.ttrIdestadb === parseInt(filterStatus) : true
+
+    return (
+      matchesSearchTerm &&
+      matchesRaza &&
+      matchesColor &&
+      matchesEtapa &&
+      matchesEstado &&
+      matchesStatus
+    )
+  })
 
   return {
     visible,
@@ -232,5 +282,13 @@ export const useCattle = () => {
     filterEstado,
     setFilterEstado,
     filteredCattle,
+    // Reactivation
+    reactivateVisible,
+    setReactivateVisible,
+    reactivateConfirmation,
+    setReactivateConfirmation,
+    handleReactivateCattle,
+    filterStatus,
+    setFilterStatus,
   }
 }

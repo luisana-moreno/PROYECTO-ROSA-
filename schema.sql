@@ -194,6 +194,7 @@ CREATE TABLE IF NOT EXISTS public.ttrempleado
     ttr_idcargp integer,
     ttr_feccrea timestamp without time zone,
     ttr_fecupda timestamp without time zone,
+    ttr_estado character varying(20) DEFAULT 'ACTIVO',
     CONSTRAINT ttrempleado_pkey PRIMARY KEY (ttr_idemplo)
 );
 
@@ -324,6 +325,7 @@ CREATE TABLE IF NOT EXISTS public.ttrusuarioo
     ttr_telefon character varying(11) COLLATE pg_catalog."default",
     ttr_idrolus integer,
     ttr_token character varying(255) COLLATE pg_catalog."default",
+    ttr_estado character varying(20) DEFAULT 'ACTIVO',
     CONSTRAINT ttrusuarioo_pkey PRIMARY KEY (ttr_idusuar)
 );
 

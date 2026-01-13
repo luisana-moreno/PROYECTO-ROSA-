@@ -13,9 +13,15 @@ import {
   CAlert,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilPencil, cilTrash } from '@coreui/icons'
+import { cilPencil, cilTrash, cilCheckCircle } from '@coreui/icons'
 
-const UsersTable = ({ users, setCurrentUser, setEditVisible, setDeleteVisible }) => {
+const UsersTable = ({
+  users,
+  setCurrentUser,
+  setEditVisible,
+  setDeleteVisible,
+  setReactivateVisible,
+}) => {
   const [currentPage, setCurrentPage] = useState(1)
   const [usersPerPage] = useState(10)
 
@@ -88,17 +94,32 @@ const UsersTable = ({ users, setCurrentUser, setEditVisible, setDeleteVisible })
                   <CIcon icon={cilPencil} size="sm" className="me-1" />
                   Editar
                 </CButton>
-                <CButton
-                  color="danger"
-                  size="sm"
-                  onClick={() => {
-                    setCurrentUser(usr)
-                    setDeleteVisible(true)
-                  }}
-                >
-                  <CIcon icon={cilTrash} size="sm" className="me-1" />
-                  Eliminar
-                </CButton>
+                {usr.ttrEstado === 'INACTIVO' ? (
+                  <CButton
+                    color="success"
+                    size="sm"
+                    onClick={() => {
+                      setCurrentUser(usr)
+                      setReactivateVisible(true)
+                    }}
+                    style={{ color: 'white' }}
+                  >
+                    <CIcon icon={cilCheckCircle} size="sm" className="me-1" />
+                    Reactivar
+                  </CButton>
+                ) : (
+                  <CButton
+                    color="danger"
+                    size="sm"
+                    onClick={() => {
+                      setCurrentUser(usr)
+                      setDeleteVisible(true)
+                    }}
+                  >
+                    <CIcon icon={cilTrash} size="sm" className="me-1" />
+                    Desactivar
+                  </CButton>
+                )}
               </CTableDataCell>
             </CTableRow>
           ))}
