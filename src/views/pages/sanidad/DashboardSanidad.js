@@ -105,7 +105,7 @@ const DashboardSanidad = () => {
             icon={<CIcon icon={cilCalendar} height={24} />}
             title="Vacunas Próximas (15 días)"
             value={dashboard.vacunasProximas}
-            onClick={() => navigate('/sanidad/vacunaciones')}
+            onClick={() => navigate('/sanidad/controles?tab=historial&tipo=VACUNACION')}
             style={{ cursor: 'pointer' }}
           />
         </CCol>
@@ -116,7 +116,7 @@ const DashboardSanidad = () => {
             icon={<CIcon icon={cilWarning} height={24} />}
             title="Vacunas Vencidas"
             value={dashboard.vacunasVencidas}
-            onClick={() => navigate('/sanidad/vacunaciones')}
+            onClick={() => navigate('/sanidad/controles?tab=historial&tipo=VACUNACION')}
             style={{ cursor: 'pointer' }}
           />
         </CCol>
@@ -138,7 +138,7 @@ const DashboardSanidad = () => {
             icon={<CIcon icon={cilMedicalCross} height={24} />}
             title="Tratamientos Próximos"
             value={dashboard.tratamientosProximos}
-            onClick={() => navigate('/sanidad/prenez')}
+            onClick={() => navigate('/sanidad/controles?tab=historial')}
             style={{ cursor: 'pointer' }}
           />
         </CCol>
@@ -191,7 +191,7 @@ const DashboardSanidad = () => {
                   color="success"
                   variant="outline"
                   className="text-start"
-                  onClick={() => navigate('/sanidad/vacunaciones')}
+                  onClick={() => navigate('/sanidad/controles?tipo=VACUNACION')}
                 >
                   <CIcon icon={cilMedicalCross} className="me-2" />
                   Gestionar Vacunación
@@ -264,7 +264,7 @@ const DashboardSanidad = () => {
                     <CButton
                       color="danger"
                       variant="ghost"
-                      onClick={() => navigate('/sanidad/vacunaciones')}
+                      onClick={() => navigate('/sanidad/controles?tab=historial&tipo=VACUNACION')}
                     >
                       Ver todas ({vacunasProximas.length})
                     </CButton>

@@ -6,9 +6,8 @@ const Users = React.lazy(() => import('./views/pages/users/users'))
 const Cattle = React.lazy(() => import('./views/pages/cattle/cattle'))
 // Control de Sanidad - Módulo completo
 const DashboardSanidad = React.lazy(() => import('./views/pages/sanidad/DashboardSanidad'))
-const VacunacionesIndex = React.lazy(
-  () => import('./views/pages/sanidad/vacunaciones/VacunacionesIndex'),
-)
+const ControlesIndex = React.lazy(() => import('./views/pages/sanidad/controles/ControlesIndex'))
+
 const PrenezIndex = React.lazy(() => import('./views/pages/sanidad/prenez/PrenezIndex'))
 const VisitasIndex = React.lazy(() => import('./views/pages/sanidad/visitas/VisitasIndex'))
 const PlanesIndex = React.lazy(() => import('./views/pages/sanidad/planes/PlanesIndex'))
@@ -66,12 +65,13 @@ const routes = [
     roles: [1, 3, 4],
   },
   {
-    path: '/sanidad/vacunaciones',
+    path: '/sanidad/controles',
     exact: true,
-    name: 'Vacunaciones',
-    element: VacunacionesIndex,
+    name: 'Controles Sanitarios',
+    element: ControlesIndex,
     roles: [1, 3, 4],
   },
+
   {
     path: '/sanidad/prenez',
     exact: true,

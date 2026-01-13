@@ -2,7 +2,8 @@ import React from 'react'
 import { Navigate } from 'react-router-dom'
 
 const DashboardSanidad = React.lazy(() => import('./DashboardSanidad'))
-const VacunacionesIndex = React.lazy(() => import('./vacunaciones/VacunacionesIndex'))
+const ControlesIndex = React.lazy(() => import('./controles/ControlesIndex'))
+
 const PrenezIndex = React.lazy(() => import('./prenez/PrenezIndex'))
 const VisitasIndex = React.lazy(() => import('./visitas/VisitasIndex'))
 const PlanesIndex = React.lazy(() => import('./planes/PlanesIndex'))
@@ -16,7 +17,8 @@ const sanidadRoutes = [
     element: <Navigate to="/sanidad/dashboard" replace />,
   },
   { path: '/sanidad/dashboard', name: 'Dashboard Sanidad', element: <DashboardSanidad /> },
-  { path: '/sanidad/vacunaciones', name: 'Vacunaciones', element: <VacunacionesIndex /> },
+  { path: '/sanidad/controles', name: 'Controles Sanitarios', element: <ControlesIndex /> },
+
   { path: '/sanidad/prenez', name: 'Gestión de Preñez', element: <PrenezIndex /> },
   {
     path: '/sanidad/visitas-veterinarias',

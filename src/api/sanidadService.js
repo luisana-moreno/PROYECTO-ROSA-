@@ -2,6 +2,21 @@ import axios from 'axios'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
+// Configurar interceptor para agregar token automáticamente
+axios.interceptors.request.use(
+  (config) => {
+    const user = JSON.parse(localStorage.getItem('user') || '{}')
+    const token = user.token
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  },
+)
+
 // ==================== PLANES DE VACUNACIÓN ====================
 
 export const getPlanesVacunacion = async () => {
@@ -234,6 +249,53 @@ export const getBovinosAtencionRequerida = async () => {
   return response.data
 }
 
+// ==================== CONTROLES SANITARIOS ====================
+
+export const getTiposControl = async () => {
+  const response = await axios.get(`${API_URL}/sanidad/tipos-control`)
+  return response.data
+}
+
+export const getControlesSanitarios = async () => {
+  const response = await axios.get(`${API_URL}/sanidad/controles`)
+  return response.data
+}
+
+export const getControlSanitarioById = async (id) => {
+  const response = await axios.get(`${API_URL}/sanidad/controles/${id}`)
+  return response.data
+}
+
+export const getControlesSanitariosByBovino = async (idBovino) => {
+  const response = await axios.get(`${API_URL}/sanidad/controles/bovino/${idBovino}`)
+  return response.data
+}
+
+export const createControlSanitario = async (controlData) => {
+  const response = await axios.post(`${API_URL}/sanidad/controles`, controlData)
+  return response.data
+}
+
+export const updateControlSanitario = async (id, controlData) => {
+  const response = await axios.put(`${API_URL}/sanidad/controles/${id}`, controlData)
+  return response.data
+}
+
+export const deleteControlSanitario = async (id) => {
+  const response = await axios.delete(`${API_URL}/sanidad/controles/${id}`)
+  return response.data
+}
+
+export const getLotes = async () => {
+  const response = await axios.get(`${API_URL}/sanidad/lotes-selector`)
+  return response.data
+}
+
+export const getControlesPorLote = async (idLote) => {
+  const response = await axios.get(`${API_URL}/sanidad/controles/lote/${idLote}`)
+  return response.data
+}
+
 export default {
   // Planes de Vacunación
   getPlanesVacunacion,
@@ -285,4 +347,15 @@ export default {
   getHistorialBovinoCompleto,
   getCumplimientoVacunacion,
   getBovinosAtencionRequerida,
+
+  // Controles Sanitarios
+  getTiposControl,
+  getControlesSanitarios,
+  getControlSanitarioById,
+  getControlesSanitariosByBovino,
+  createControlSanitario,
+  updateControlSanitario,
+  deleteControlSanitario,
+  getLotes,
+  getControlesPorLote,
 }

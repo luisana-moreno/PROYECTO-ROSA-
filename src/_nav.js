@@ -114,10 +114,11 @@ const _nav = [
           },
           {
             component: CNavItem,
-            name: 'Vacunaciones',
-            to: '/sanidad/vacunaciones',
+            name: 'Controles Sanitarios',
+            to: '/sanidad/controles',
             roles: [1, 3, 4],
           },
+
           {
             component: CNavItem,
             name: 'Gestión de Preñez',
