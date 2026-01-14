@@ -23,7 +23,7 @@ import { cattleService } from '../../../api/cattleService'
 import * as sanidadService from '../../../api/sanidadService' // Usar servicio unificado
 import { prodlecheService } from '../../../api/prodlecheService'
 import { lotService } from '../../../api/lotService'
-import { getIconByCode, getColorByCode } from '../../sanidad/controles/utils' // Reutilizar utils si es posible, o duplicar lógica simple
+import { getIconByCode, getColorByCode } from '../sanidad/controles/utils' // Reutilizar utils si es posible, o duplicar lógica simple
 
 const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
   const [sanitaryControls, setSanitaryControls] = useState([])
