@@ -39,11 +39,13 @@ const EditSectionOne = ({
           }}
         >
           <option value="">Seleccione el estado</option>
-          {estadosPotrero.map((estado) => (
-            <option key={estado.tma_idestpo} value={estado.tma_idestpo}>
-              {estado.tma_nomestp}
-            </option>
-          ))}
+          {estadosPotrero
+            .filter((estado) => estado.tma_nomestp !== 'Mantenimiento')
+            .map((estado) => (
+              <option key={estado.tma_idestpo} value={estado.tma_idestpo}>
+                {estado.tma_nomestp}
+              </option>
+            ))}
         </CFormSelect>
       </CCol>
     </CRow>
@@ -66,6 +68,31 @@ const EditSectionOne = ({
           ))}
         </CFormSelect>
       </CCol>
+
+      {/* Nuevo Campo: Duración del Mantenimiento */}
+      {currentPasture?.ttr_idestpot ===
+        estadosPotrero.find((e) => e.tma_nomestp === 'Mantenimiento')?.tma_idestpo && (
+        <CCol md={6}>
+          <CFormLabel>Duración (Días)</CFormLabel>
+          <CFormInput
+            type="number"
+            min="1"
+            placeholder="Ej. 15"
+            value={currentPasture?.duracion || ''}
+            onChange={(e) =>
+              setCurrentPasture({ ...currentPasture, duracion: parseInt(e.target.value) })
+            }
+          />
+          {currentPasture?.duracion > 0 && (
+            <small className="text-muted">
+              Hasta:{' '}
+              {new Date(
+                new Date().setDate(new Date().getDate() + (currentPasture.duracion || 0)),
+              ).toLocaleDateString()}
+            </small>
+          )}
+        </CCol>
+      )}
       <CCol md={6}>
         <CFormLabel>Fecha de Mantenimiento</CFormLabel>
         <CFormInput

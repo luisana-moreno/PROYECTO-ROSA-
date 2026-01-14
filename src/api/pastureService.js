@@ -259,4 +259,23 @@ export const pastureService = {
     if (!response.ok) throw new Error('Error al obtener historial de mantenimiento')
     return response.json()
   },
+
+  finalizarRotacion: async (data) => {
+    const response = await fetch(`${API_URL}/potreros/rotacion/finalizar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+    if (!response.ok) throw new Error('Error al finalizar rotación')
+    return response.json()
+  },
+
+  liberarPotrero: async (idPotrero) => {
+    const response = await fetch(`${API_URL}/potreros/liberar/${idPotrero}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    })
+    if (!response.ok) throw new Error('Error al liberar potrero')
+    return response.json()
+  },
 }

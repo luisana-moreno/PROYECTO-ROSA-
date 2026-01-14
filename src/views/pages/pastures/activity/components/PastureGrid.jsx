@@ -7,26 +7,33 @@ const PastureGrid = ({ pastures, selectedPasture, onSelectPasture, pastureStatus
     const status = pastureStatus[potreroId]
     if (!status) return 'secondary'
 
-    if (status.ocupado_hoy) return 'danger' // Ocupado
-    if (status.tma_nomestp === 'Mantenimiento') return 'info' // Mantenimiento
+    const nombreEstado = status.estado_nombre || status.tma_nomestp || ''
 
-    // Calcular descanso si hay última rotación
-    if (status.ultima_rotacion) {
-      const ag = new Date(status.ultima_rotacion)
-      const now = new Date()
-      const diff = Math.ceil(Math.abs(now - ag) / (1000 * 60 * 60 * 24))
-      if (diff >= 30) return 'success' // Descansado
-      return 'warning' // En recuperación
-    }
+    // Estados explícitos de la BD
+    if (nombreEstado === 'Ocupado' || nombreEstado === 'En uso') return 'danger'
+    if (nombreEstado === 'Mantenimiento') return 'info'
+    if (nombreEstado === 'En Recuperación') return 'warning'
+    if (nombreEstado === 'Disponible') return 'success'
 
-    return 'success' // Nunca usado -> Disponible
+    // Fallback por si el nombre no coincide exactamente o es calculado
+    if (status.ocupado_hoy) return 'danger'
+
+    return 'success'
   }
 
   const getStatusText = (potreroId) => {
     const status = pastureStatus[potreroId]
     if (!status) return 'Desconocido'
+
+    const nombreEstado = status.estado_nombre || status.tma_nomestp || ''
+
+    if (nombreEstado === 'Ocupado' || nombreEstado === 'En uso') return 'OCUPADO'
+    if (nombreEstado === 'Mantenimiento') return 'MANTENIMIENTO'
+    if (nombreEstado === 'En Recuperación') return 'EN RECUPERACIÓN'
+    if (nombreEstado === 'Disponible') return 'DISPONIBLE'
+
     if (status.ocupado_hoy) return 'OCUPADO'
-    if (status.tma_nomestp === 'Mantenimiento') return 'MANTENIMIENTO'
+
     return 'DISPONIBLE'
   }
 

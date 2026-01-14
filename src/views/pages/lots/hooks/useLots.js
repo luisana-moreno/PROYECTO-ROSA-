@@ -17,6 +17,7 @@ const useLots = () => {
   const [editingLot, setEditingLot] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedBovines, setSelectedBovines] = useState([]) // IDs de bovinos seleccionados para añadir
+  const [currentLot, setCurrentLot] = useState(null) // Moved here to avoid reference error
   // selectedPasture ya no es necesario aquí, ya que la selección se maneja en otro módulo
 
   const fetchAllLots = useCallback(async () => {
@@ -112,22 +113,21 @@ const useLots = () => {
     }
   }, [formData, editingLot])
 
-  const handleDeleteLot = useCallback(
-    async (lotId) => {
-      setLoading(true)
-      try {
-        await lotService.deleteLot(lotId)
-        setLots((prevLots) => prevLots.filter((lot) => lot.id !== lotId)) // Usar lot.id
-        toast.success('Lote eliminado exitosamente')
-        await fetchAllBovines() // Refrescar bovinos si la eliminación de un lote implica desasignaciones
-      } catch (error) {
-        toast.error(error.message || 'Error al eliminar el lote')
-      } finally {
-        setLoading(false)
-      }
-    },
-    [fetchAllBovines], // Añadir fetchAllBovines
-  )
+  const handleDeleteLot = useCallback(async (lotId) => {
+    setLoading(true)
+    try {
+      await lotService.deleteLot(lotId)
+      // Soft Delete: Update state instead of filtering out
+      setLots((prevLots) =>
+        prevLots.map((lot) => (lot.id === lotId ? { ...lot, estado: 'INACTIVO' } : lot)),
+      )
+      // await fetchAllBovines()
+    } catch (error) {
+      // toast.error is handled in service
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
   const fetchBovinesInLot = useCallback(async (lotId) => {
     setLoading(true)
@@ -208,14 +208,75 @@ const useLots = () => {
     [fetchAllLots, fetchActiveBovinesInLot, fetchAllBovines],
   )
 
+  // Delete Logic
+  const [deleteVisible, setDeleteVisible] = useState(false)
+  const [deleteConfirmation, setDeleteConfirmation] = useState('')
+
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!currentLot) return
+    if (deleteConfirmation !== 'confirmar') {
+      toast.warning('Debe escribir "confirmar" para eliminar')
+      return
+    }
+
+    setLoading(true)
+    try {
+      await lotService.deleteLot(currentLot.id)
+      setLots((prevLots) =>
+        prevLots.map((lot) => (lot.id === currentLot.id ? { ...lot, estado: 'INACTIVO' } : lot)),
+      )
+      setDeleteVisible(false)
+      setDeleteConfirmation('')
+      setCurrentLot(null)
+    } catch (error) {
+      // toast handled in service
+    } finally {
+      setLoading(false)
+    }
+  }, [currentLot, deleteConfirmation])
+
+  // Reactivation Logic
+  const [reactivateVisible, setReactivateVisible] = useState(false)
+  const [reactivateConfirmation, setReactivateConfirmation] = useState('')
+  const [filterStatus, setFilterStatus] = useState('ACTIVO') // Default to Active
+
+  const handleReactivateLot = useCallback(async () => {
+    if (!currentLot) return
+    if (reactivateConfirmation !== 'reactivar') {
+      toast.warning('Debe escribir "reactivar" para confirmar')
+      return
+    }
+
+    setLoading(true)
+    try {
+      await lotService.reactivateLot(currentLot.id)
+      setLots((prevLots) =>
+        prevLots.map((lot) => (lot.id === currentLot.id ? { ...lot, estado: 'ACTIVO' } : lot)),
+      )
+      setReactivateVisible(false)
+      setReactivateConfirmation('')
+      setFilterStatus('ACTIVO')
+      setCurrentLot(null)
+    } catch (error) {
+      // Toast already handled in service
+    } finally {
+      setLoading(false)
+    }
+  }, [currentLot, reactivateConfirmation])
+
   // Filtrar los bovinos que NO están asignados activamente al lote actual
   const unassignedBovines = allBovines.filter(
     (bovine) => !activeBovinesInLot.some((activeBovine) => activeBovine.idBovino === bovine.id), // Comparar idBovino con el id mapeado
   )
 
-  const filteredLots = lots.filter(
-    (lot) => lot.nombre && lot.nombre.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+  const filteredLots = lots.filter((lot) => {
+    const matchesSearch = lot.nombre && lot.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesStatus = filterStatus ? lot.estado === filterStatus : true
+    // Si no tiene estado (legacy), asumir ACTIVO
+    if (!lot.estado && filterStatus === 'ACTIVO') return matchesSearch
+
+    return matchesSearch && matchesStatus
+  })
 
   return {
     lots: filteredLots,
@@ -245,7 +306,22 @@ const useLots = () => {
     fetchAllLots,
     fetchAllBovines,
     fetchAllPastures,
-    unassignedBovines, // Exportar los bovinos no asignados
+    unassignedBovines,
+    // Soft Delete / Reactivate props
+    filterStatus,
+    setFilterStatus,
+    reactivateVisible,
+    setReactivateVisible,
+    reactivateConfirmation,
+    setReactivateConfirmation,
+    handleReactivateLot,
+    currentLot,
+    setCurrentLot,
+    deleteVisible,
+    setDeleteVisible,
+    deleteConfirmation,
+    setDeleteConfirmation,
+    handleDeleteConfirm,
   }
 }
 

@@ -9,7 +9,7 @@ import {
   CButton,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilPencil, cilTrash, cilInfo, cilSearch } from '@coreui/icons'
+import { cilPencil, cilTrash, cilInfo, cilSearch, cilCheckCircle } from '@coreui/icons'
 
 const LotsTable = ({ lots, onEdit, onDelete, onViewDetails, onViewBovines, loading }) => {
   return (
@@ -53,25 +53,45 @@ const LotsTable = ({ lots, onEdit, onDelete, onViewDetails, onViewBovines, loadi
                 >
                   <CIcon icon={cilInfo} />
                 </CButton>
-                <CButton
-                  color="warning"
-                  size="sm"
-                  className="me-2 text-white"
-                  title="Editar"
-                  onClick={() => onEdit(lot)}
-                  disabled={loading}
-                >
-                  <CIcon icon={cilPencil} />
-                </CButton>
-                <CButton
-                  color="danger"
-                  size="sm"
-                  title="Eliminar"
-                  onClick={() => onDelete(lot.id)}
-                  disabled={loading}
-                >
-                  <CIcon icon={cilTrash} />
-                </CButton>
+                {/* Deshabilitar edición si está inactivo, o permitir reactivar */}
+                {lot.estado === 'INACTIVO' ? (
+                  <CButton
+                    color="success"
+                    size="sm"
+                    className="text-white"
+                    title="Reactivar"
+                    onClick={() => {
+                      // Usamos onReactivate (prop nueva) o reutilizamos una existente si se pasa
+                      if (onDelete) onDelete(lot, 'reactivar') // Hack si no actualizamos props todavía, mejor actualizar props
+                    }}
+                    disabled={loading}
+                  >
+                    <CIcon icon={cilCheckCircle} size="sm" className="me-1" />
+                    Reactivar
+                  </CButton>
+                ) : (
+                  <>
+                    <CButton
+                      color="warning"
+                      size="sm"
+                      className="me-2 text-white"
+                      title="Editar"
+                      onClick={() => onEdit(lot)}
+                      disabled={loading}
+                    >
+                      <CIcon icon={cilPencil} />
+                    </CButton>
+                    <CButton
+                      color="danger"
+                      size="sm"
+                      title="Desactivar"
+                      onClick={() => onDelete(lot, 'eliminar')}
+                      disabled={loading}
+                    >
+                      <CIcon icon={cilTrash} />
+                    </CButton>
+                  </>
+                )}
               </CTableDataCell>
             </CTableRow>
           ))

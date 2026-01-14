@@ -39,9 +39,9 @@ const MastitisDetalle = ({ detalle, onChange }) => {
 
   return (
     <CCard className="mb-3 border-danger">
-      <CCardHeader className="bg-danger-gradient text-white">
+      <CCardHeader className="bg-danger-gradient text-black">
         <strong>
-          <CIcon icon={cilHeart} className="me-2" />
+          <CIcon icon={cilHeart} className="me-2 " />
           🐄 Control de Mastitis - Cuartos Mamarios Afectados
         </strong>
         {cuartosAfectados > 0 && (
@@ -59,7 +59,7 @@ const MastitisDetalle = ({ detalle, onChange }) => {
         {/* Checkboxes de Cuartos Mamarios */}
         <CRow className="mb-4">
           <CCol md={6} className="mb-3">
-            <div className="p-3 border rounded bg-light">
+            <div className="p-3 border rounded bg-light ">
               <CFormCheck
                 id="cuarto1"
                 label={<span className="fw-bold">1 - Cuarto Anterior Derecho</span>}
@@ -77,7 +77,7 @@ const MastitisDetalle = ({ detalle, onChange }) => {
                 label={<span className="fw-bold">2 - Cuarto Anterior Izquierdo</span>}
                 checked={detalle.ttr_cuarto2}
                 onChange={(e) => handleCuartoChange(2, e.target.checked)}
-                className="mb-0"
+                className="mb-0 "
               />
             </div>
           </CCol>

@@ -37,6 +37,12 @@ const PastureActivity = () => {
     handleAssignLotToPasture,
     pastureStatus,
     fetchHistoricalBovines,
+    duration,
+    setDuration,
+    handleFinalizarRotacion,
+    handleLiberarPotrero,
+    tiposMantenimiento,
+    handleCreateMantenimiento,
   } = usePastureActivity()
 
   const [activeTab, setActiveTab] = useState('activity')
@@ -104,6 +110,12 @@ const PastureActivity = () => {
                 lots={lots}
                 onAssign={handleAssignLotToPasture}
                 loading={loading}
+                duration={duration}
+                setDuration={setDuration}
+                onFinalize={handleFinalizarRotacion}
+                onRelease={handleLiberarPotrero}
+                tiposMantenimiento={tiposMantenimiento}
+                onCreateMantenimiento={handleCreateMantenimiento}
               />
             </div>
           </CTabPane>

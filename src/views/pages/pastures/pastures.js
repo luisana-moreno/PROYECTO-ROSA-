@@ -60,14 +60,14 @@ const Pastures = () => {
             <CIcon icon={cilList} className="me-2" />
             Control de Actividad y Rotación
           </CButton>
-          <CButton
+          {/* <CButton
             color="info"
             className="text-white me-2"
             onClick={() => setMantenimientoModalVisible(true)}
           >
             <CIcon icon={cilPlus} className="me-2" />
             Reg. Mantenimiento
-          </CButton>
+          </CButton> */}
           <CButton color="success" className="text-white" onClick={() => setVisible(!visible)}>
             <CIcon icon={cilPlus} className="me-2" />
             Nuevo Potrero

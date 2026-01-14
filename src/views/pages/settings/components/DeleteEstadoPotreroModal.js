@@ -20,7 +20,7 @@ const DeleteEstadoPotreroModal = ({
   const handleDeleteConfirm = async () => {
     if (deleteConfirmation === 'confirmar') {
       try {
-        await handleDelete(currentId?.tma_idestpo) // Corregido: pasar el ID correcto
+        await handleDelete(currentId) // Corregido: currentId ya es el ID
         setDeleteConfirmation('')
         setVisible(false)
       } catch (error) {

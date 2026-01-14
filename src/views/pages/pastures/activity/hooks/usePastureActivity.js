@@ -10,6 +10,7 @@ const usePastureActivity = () => {
   const [lots, setLots] = useState([])
   const [bovines, setBovines] = useState([])
   const [pastureStates, setPastureStates] = useState([]) // Estados de TMAESTPOTRE
+  const [tiposMantenimiento, setTiposMantenimiento] = useState([]) // Tipos de Mantenimiento
   const [selectedPasture, setSelectedPasture] = useState(null)
   const [selectedLot, setSelectedLot] = useState(null)
 
@@ -17,6 +18,7 @@ const usePastureActivity = () => {
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0])
   const [turno, setTurno] = useState('AM')
   const [observaciones, setObservaciones] = useState('')
+  const [duration, setDuration] = useState('') // Duración estimada en días
 
   const [loading, setLoading] = useState(false)
   const [pastureHistory, setPastureHistory] = useState([])
@@ -27,16 +29,19 @@ const usePastureActivity = () => {
   const fetchInitialData = useCallback(async () => {
     setLoading(true)
     try {
-      const [pasturesData, lotsData, statesData, dashboardStats] = await Promise.all([
-        pastureService.getAllPotreros(),
-        lotService.getAllLots(),
-        pastureService.getAllEstadosPotrero(),
-        pastureService.getDashboardStats(),
-      ])
+      const [pasturesData, lotsData, statesData, dashboardStats, tiposManteData] =
+        await Promise.all([
+          pastureService.getAllPotreros(),
+          lotService.getAllLots(),
+          pastureService.getAllEstadosPotrero(),
+          pastureService.getDashboardStats(),
+          pastureService.getAllTiposMantenimiento(),
+        ])
 
       setPastures(pasturesData)
       setLots(lotsData)
       setPastureStates(statesData)
+      setTiposMantenimiento(tiposManteData)
 
       // Transformar dashboardStats a mapa por ID para acceso rápido
       const statusMap = {}
@@ -55,6 +60,30 @@ const usePastureActivity = () => {
   useEffect(() => {
     fetchInitialData()
   }, [fetchInitialData])
+
+  // Registrar Mantenimiento
+  const handleCreateMantenimiento = useCallback(
+    async (data) => {
+      setLoading(true)
+      try {
+        await pastureService.createMantenimiento(data)
+        toast.success('Mantenimiento registrado exitosamente')
+
+        // Limpiar formulario básico (si se comparte estado, si no, lo limpia el componente)
+        setObservaciones('')
+        setDuration('')
+        setStartDate(new Date().toISOString().split('T')[0])
+
+        fetchInitialData() // Recargar para ver cambio a estado Mantenimiento
+      } catch (error) {
+        console.error(error)
+        toast.error('Error al registrar mantenimiento')
+      } finally {
+        setLoading(false)
+      }
+    },
+    [fetchInitialData],
+  )
 
   // Registrar Rotación (Asignar Lote a Potrero)
   const handleAssignLotToPasture = useCallback(async () => {
@@ -131,6 +160,42 @@ const usePastureActivity = () => {
     }
   }
 
+  // Finalizar Rotación (Ganado sale -> Potrero en Recuperación)
+  const handleFinalizarRotacion = useCallback(
+    async (data) => {
+      setLoading(true)
+      try {
+        await pastureService.finalizarRotacion(data)
+        toast.success('Rotación finalizada. Potrero en recuperación.')
+        fetchInitialData() // Recargar para ver cambio de estado
+      } catch (error) {
+        console.error(error)
+        toast.error('Error al finalizar rotación')
+      } finally {
+        setLoading(false)
+      }
+    },
+    [fetchInitialData],
+  )
+
+  // Liberar Potrero (Recuperación -> Disponible)
+  const handleLiberarPotrero = useCallback(
+    async (pastureId) => {
+      setLoading(true)
+      try {
+        await pastureService.liberarPotrero(pastureId)
+        toast.success('Potrero liberado y disponible.')
+        fetchInitialData() // Recargar para ver cambio de estado
+      } catch (error) {
+        console.error(error)
+        toast.error('Error al liberar potrero')
+      } finally {
+        setLoading(false)
+      }
+    },
+    [fetchInitialData],
+  )
+
   return {
     pastures,
     lots,
@@ -145,12 +210,18 @@ const usePastureActivity = () => {
     setTurno,
     observaciones,
     setObservaciones,
+    duration, // Exposed
+    setDuration, // Exposed
     loading,
     pastureHistory,
     fetchPastureHistory,
     handleAssignLotToPasture,
     pastureStatus,
     fetchHistoricalBovines, // Exponemos para que el Modal pueda usarlo
+    handleFinalizarRotacion, // Exposed
+    handleLiberarPotrero, // Exposed
+    tiposMantenimiento, // Exposed
+    handleCreateMantenimiento, // Exposed
   }
 }
 

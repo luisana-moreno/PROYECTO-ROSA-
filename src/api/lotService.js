@@ -148,11 +148,33 @@ export const lotService = {
         const errorData = await response.json()
         throw new Error(errorData.message || 'Error al eliminar lote')
       }
-      toast.success('Lote eliminado exitosamente.')
+      toast.success('Lote desactivado exitosamente.')
       return true
     } catch (error) {
       console.error('Error en deleteLot:', error)
       toast.error(error.message || 'Error al eliminar lote.')
+      throw error
+    }
+  },
+
+  reactivateLot: async (id) => {
+    try {
+      const response = await fetch(`${LOTES_API_URL}/${id}/reactivate`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Error al reactivar lote')
+      }
+      const data = await response.json()
+      toast.success('Lote reactivado exitosamente.')
+      return mapKeysToCamelCase(data)
+    } catch (error) {
+      console.error('Error en reactivateLot:', error)
+      toast.error(error.message || 'Error al reactivar lote.')
       throw error
     }
   },

@@ -40,7 +40,7 @@ const ControlForm = ({
     ? getOpcionesResultado(tipoSeleccionado.tma_codigo)
     : null
 
-  console.log(empleados)
+  // console.log(empleados)
   return (
     <>
       <div className="mb-4">

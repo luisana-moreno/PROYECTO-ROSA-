@@ -18,9 +18,13 @@ const PasturesTable = ({ pastures, setCurrentPasture, setEditVisible, setDeleteV
       case 'Disponible':
         return 'success'
       case 'En uso':
-        return 'primary'
+      case 'Ocupado':
+        return 'danger'
       case 'En mantenimiento':
+      case 'Mantenimiento':
         return 'warning'
+      case 'En Recuperación':
+        return 'info' // O quizás 'warning' dependiendo del gusto, pero 'info' diferencia bien
       default:
         return 'secondary'
     }
@@ -40,13 +44,20 @@ const PasturesTable = ({ pastures, setCurrentPasture, setEditVisible, setDeleteV
       <CTableBody>
         {pastures.map((pasture) => (
           <CTableRow key={pasture.ttr_idpotrer}>
-            <CTableDataCell className="fw-semibold text-success">
+            <CTableDataCell className="fw-semibold text-black">
               {pasture.ttr_codpotre}
             </CTableDataCell>
             <CTableDataCell>
               <CBadge color={getStatusColor(pasture.tma_nomestp)}>{pasture.tma_nomestp}</CBadge>
             </CTableDataCell>
-            <CTableDataCell>{pasture.ttr_descripc}</CTableDataCell>
+            <CTableDataCell>
+              {pasture.ttr_descripc}
+              {pasture.ttr_fecfinmnt && new Date(pasture.ttr_fecfinmnt) > new Date() && (
+                <div className="small text-danger">
+                  Fin Mantenimiento: {new Date(pasture.ttr_fecfinmnt).toLocaleDateString()}
+                </div>
+              )}
+            </CTableDataCell>
             <CTableDataCell>{new Date(pasture.ttr_fechamnt).toLocaleDateString()}</CTableDataCell>
             <CTableDataCell className="text-end">
               <CButton

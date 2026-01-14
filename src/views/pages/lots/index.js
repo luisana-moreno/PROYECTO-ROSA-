@@ -1,12 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { CCard, CCardBody, CCardHeader } from '@coreui/react'
+import { CCard, CCardBody, CCardHeader, CNav, CNavItem, CNavLink } from '@coreui/react'
 import { useLots } from './hooks/useLots'
 import LotForm from './components/LotForm'
 import LotsTable from './components/LotsTable'
 import LotDetailsModal from './components/LotDetailsModal'
 import LotFilters from './components/LotFilters'
+import ReactivateLotModal from './components/ReactivateLotModal'
+import DeleteLotModal from './components/DeleteLotModal'
 import CustomTableModal from '../../../components/CustomTableModal'
 
 const LotRegistration = () => {
@@ -32,6 +34,20 @@ const LotRegistration = () => {
     addBovinesToLot,
     removeBovineFromLot,
     updateBovineLotAssignment,
+    // Soft Delete props
+    filterStatus,
+    setFilterStatus,
+    reactivateVisible,
+    setReactivateVisible,
+    reactivateConfirmation,
+    setReactivateConfirmation,
+    handleReactivateLot,
+    deleteVisible,
+    setDeleteVisible,
+    deleteConfirmation,
+    setDeleteConfirmation,
+    handleDeleteConfirm,
+    setCurrentLot,
   } = useLots()
 
   const [detailsModalVisible, setDetailsModalVisible] = useState(false)
@@ -58,6 +74,15 @@ const LotRegistration = () => {
     setBovinesModalVisible(true)
   }
 
+  const handleTableAction = (lot, action) => {
+    setCurrentLot(lot)
+    if (action === 'eliminar') {
+      setDeleteVisible(true)
+    } else if (action === 'reactivar') {
+      setReactivateVisible(true)
+    }
+  }
+
   const handleSubmit = () => {
     if (editingLot) {
       handleEditLot()
@@ -75,6 +100,27 @@ const LotRegistration = () => {
         <strong>Registro de Lotes</strong>
       </CCardHeader>
       <CCardBody>
+        <CNav variant="tabs" className="mb-3">
+          <CNavItem>
+            <CNavLink
+              active={filterStatus === 'ACTIVO'}
+              onClick={() => setFilterStatus('ACTIVO')}
+              style={{ cursor: 'pointer', color: filterStatus === 'ACTIVO' ? '#2eb85c' : '' }}
+            >
+              Activos
+            </CNavLink>
+          </CNavItem>
+          <CNavItem>
+            <CNavLink
+              active={filterStatus === 'INACTIVO'}
+              onClick={() => setFilterStatus('INACTIVO')}
+              style={{ cursor: 'pointer', color: filterStatus === 'INACTIVO' ? '#e55353' : '' }}
+            >
+              Inactivos
+            </CNavLink>
+          </CNavItem>
+        </CNav>
+
         <LotForm
           formData={formData}
           setFormData={setFormData}
@@ -89,7 +135,7 @@ const LotRegistration = () => {
         <LotsTable
           lots={lots}
           onEdit={handleEditClick}
-          onDelete={handleDeleteLot}
+          onDelete={handleTableAction}
           onViewDetails={handleViewDetails}
           onViewBovines={handleViewBovines}
           loading={loading}
@@ -110,6 +156,22 @@ const LotRegistration = () => {
         addBovinesToLot={addBovinesToLot}
         removeBovineFromLot={removeBovineFromLot}
         updateBovineLotAssignment={updateBovineLotAssignment}
+      />
+
+      <ReactivateLotModal
+        visible={reactivateVisible}
+        onClose={() => setReactivateVisible(false)}
+        confirmationText={reactivateConfirmation}
+        setConfirmationText={setReactivateConfirmation}
+        onConfirm={handleReactivateLot}
+      />
+
+      <DeleteLotModal
+        visible={deleteVisible}
+        onClose={() => setDeleteVisible(false)}
+        confirmationText={deleteConfirmation}
+        setConfirmationText={setDeleteConfirmation}
+        onConfirm={handleDeleteConfirm}
       />
 
       <CustomTableModal
