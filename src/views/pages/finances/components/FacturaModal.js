@@ -17,14 +17,16 @@ import {
   CBadge,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilX } from '@coreui/icons'
+import { cilX, cilFile, cilCheckCircle } from '@coreui/icons'
+import { ventasService } from '../../../../api/ventasService'
+import { toast } from 'react-toastify'
 
-const FacturaModal = ({ visible, onClose, venta }) => {
+const FacturaModal = ({ visible, onClose, venta, onPaymentSuccess }) => {
   if (!venta) return null
 
-  // Calcular totales (asumiendo que vienen del backend)
+  // Calcular totales (asumiendo que vienen del backend o recalculando por seguridad visual)
   const subtotal = venta.ttr_montofac || 0
-  const iva = subtotal * 0.16
+  const iva = subtotal * 0.16 // O el impuesto que venga del backend
   const total = subtotal + iva
 
   // Formatear fecha
@@ -41,6 +43,7 @@ const FacturaModal = ({ visible, onClose, venta }) => {
   // Color del badge según estado
   const getEstadoColor = (estado) => {
     switch (estado?.toLowerCase()) {
+      case 'pagada':
       case 'completada':
         return 'success'
       case 'pendiente':
@@ -49,6 +52,42 @@ const FacturaModal = ({ visible, onClose, venta }) => {
         return 'danger'
       default:
         return 'secondary'
+    }
+  }
+
+  const handleDownloadPDF = async () => {
+    try {
+      toast.info('Solicitando factura al servidor...')
+      const blob = await ventasService.downloadFactura(venta.ttr_idfactur)
+
+      // Crear URL y descargar
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', `Factura_${venta.ttr_idfactur}.pdf`)
+      document.body.appendChild(link)
+      link.click()
+
+      // Limpieza
+      window.URL.revokeObjectURL(url)
+      link.parentNode.removeChild(link)
+
+      toast.success('Factura descargada')
+    } catch (error) {
+      console.error(error)
+      toast.error('Error al descargar factura')
+    }
+  }
+
+  const handlePagar = async () => {
+    try {
+      await ventasService.pagarVenta(venta.ttr_idfactur)
+      toast.success('Pago registrado exitosamente')
+      if (onPaymentSuccess) onPaymentSuccess()
+      onClose()
+    } catch (error) {
+      console.error(error)
+      toast.error('Error al registrar pago')
     }
   }
 
@@ -86,11 +125,11 @@ const FacturaModal = ({ visible, onClose, venta }) => {
               <tbody>
                 <tr>
                   <td className="fw-bold">Nombre:</td>
-                  <td>{venta.cliente_nombre || 'N/A'}</td>
+                  <td>{venta.ttr_nombrecl + ' ' + venta.ttr_apellido}</td>
                 </tr>
                 <tr>
                   <td className="fw-bold">Teléfono:</td>
-                  <td>{venta.cliente_telefono || 'N/A'}</td>
+                  <td>{venta.ttr_telefono || 'N/A'}</td>
                 </tr>
               </tbody>
             </table>
@@ -100,42 +139,51 @@ const FacturaModal = ({ visible, onClose, venta }) => {
         <hr />
 
         {/* Productos */}
-        <h6 className="text-muted mb-3">PRODUCTOS</h6>
+        <h6 className="text-muted mb-3">DETALLES DE PRODUCTOS</h6>
         {venta.detalles && venta.detalles.length > 0 ? (
           <CTable hover responsive className="mb-4">
             <CTableHead>
               <CTableRow>
-                <CTableHeaderCell>Tipo</CTableHeaderCell>
-                <CTableHeaderCell>Producto</CTableHeaderCell>
-                <CTableHeaderCell className="text-center">Cantidad</CTableHeaderCell>
-                <CTableHeaderCell className="text-end">Precio Unit.</CTableHeaderCell>
-                <CTableHeaderCell className="text-end">Subtotal</CTableHeaderCell>
+                <CTableHeaderCell>Descripción</CTableHeaderCell>
+                <CTableHeaderCell className="text-center">Cant.</CTableHeaderCell>
+                <CTableHeaderCell className="text-end">Precio</CTableHeaderCell>
+                <CTableHeaderCell className="text-end">Total</CTableHeaderCell>
               </CTableRow>
             </CTableHead>
             <CTableBody>
-              {venta.detalles.map((detalle, index) => (
-                <CTableRow key={index}>
-                  <CTableDataCell>
-                    <CBadge color={detalle.tipo === 'insumo' ? 'info' : 'success'}>
-                      {detalle.tipo === 'insumo' ? 'Insumo' : 'Bovino'}
-                    </CBadge>
-                  </CTableDataCell>
-                  <CTableDataCell>{detalle.nombre_producto || 'N/A'}</CTableDataCell>
-                  <CTableDataCell className="text-center">{detalle.cantidad}</CTableDataCell>
-                  <CTableDataCell className="text-end">
-                    Bs. {parseFloat(detalle.precio_unitario || 0).toFixed(2)}
-                  </CTableDataCell>
-                  <CTableDataCell className="text-end">
-                    <strong>
-                      Bs. {(detalle.cantidad * parseFloat(detalle.precio_unitario || 0)).toFixed(2)}
-                    </strong>
-                  </CTableDataCell>
-                </CTableRow>
-              ))}
+              {venta.detalles.map((detalle, index) => {
+                const esBovino =
+                  detalle.tipo === 'bovino' || detalle.tipo?.toUpperCase() === 'BOVINO'
+                const descripcion = esBovino
+                  ? `Bovino N° ${detalle.numero_bovino || ''}`
+                  : detalle.nombre_producto
+
+                return (
+                  <CTableRow key={index}>
+                    <CTableDataCell>
+                      <div>
+                        <strong>{descripcion}</strong>
+                        {esBovino && <div className="small text-muted">Ganado en pie</div>}
+                        {!esBovino && <div className="small text-muted">Insumo</div>}
+                      </div>
+                    </CTableDataCell>
+                    <CTableDataCell className="text-center">{detalle.cantidad}</CTableDataCell>
+                    <CTableDataCell className="text-end">
+                      Bs. {parseFloat(detalle.precio_unitario || 0).toFixed(2)}
+                    </CTableDataCell>
+                    <CTableDataCell className="text-end">
+                      <strong>
+                        Bs.{' '}
+                        {(detalle.cantidad * parseFloat(detalle.precio_unitario || 0)).toFixed(2)}
+                      </strong>
+                    </CTableDataCell>
+                  </CTableRow>
+                )
+              })}
             </CTableBody>
           </CTable>
         ) : (
-          <p className="text-muted">No hay detalles de productos disponibles.</p>
+          <p className="text-muted">No hay detalles disponibles.</p>
         )}
 
         {/* Totales */}
@@ -173,6 +221,16 @@ const FacturaModal = ({ visible, onClose, venta }) => {
           <CIcon icon={cilX} className="me-2" />
           Cerrar
         </CButton>
+        <CButton color="info" className="text-white" onClick={handleDownloadPDF}>
+          <CIcon icon={cilFile} className="me-2" />
+          Descargar PDF
+        </CButton>
+        {venta.estado_factura === 'Pendiente' && (
+          <CButton color="success" className="text-white" onClick={handlePagar}>
+            <CIcon icon={cilCheckCircle} className="me-2" />
+            Registrar Pago
+          </CButton>
+        )}
       </CModalFooter>
     </CModal>
   )

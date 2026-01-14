@@ -23,8 +23,12 @@ const ClientTable = ({
   setCurrentClient,
   setEditVisibleClient,
   setDeleteVisibleClient,
+  activeTab,
+  setActiveTab,
+  onReactivate,
 }) => {
-  const [activeKey, setActiveKey] = useState(1)
+  // Estado local para sub-tabs (Natural/Juridico)
+  const [clientTypeTab, setClientTypeTab] = useState(1)
 
   const naturalClients = clients.filter((client) => client.client_type === 'Person')
   const juridicalClients = clients.filter((client) => client.client_type === 'Company')
@@ -37,10 +41,11 @@ const ClientTable = ({
       firts_name: client.ttr_nombrecl,
       Firts_Las_Name: client.ttr_apellido,
       Document_Number: client.ttr_documecl,
-      Rif: client.ttr_documecl,
+      Rif: client.ttr_documecl, // Ajuste para que coincida con modelo
       Phone: client.ttr_telefono,
       Address: client.ttr_direccio,
       email: client.ttr_correocl,
+      ...client, // Keep original fields too
     })
     setEditVisibleClient(true)
   }
@@ -50,31 +55,54 @@ const ClientTable = ({
     setDeleteVisibleClient(true)
   }
 
+  console.log(clients)
+
   return (
     <>
       <CNav variant="tabs" role="tablist" className="mb-3">
         <CNavItem>
           <CNavLink
-            active={activeKey === 1}
-            onClick={() => setActiveKey(1)}
+            active={activeTab === 'active'}
+            onClick={() => setActiveTab('active')}
+            style={{ cursor: 'pointer' }}
+          >
+            Activos
+          </CNavLink>
+        </CNavItem>
+        <CNavItem>
+          <CNavLink
+            active={activeTab === 'inactive'}
+            onClick={() => setActiveTab('inactive')}
+            style={{ cursor: 'pointer' }}
+          >
+            Inactivos
+          </CNavLink>
+        </CNavItem>
+      </CNav>
+
+      <CNav variant="pills" role="tablist" className="mb-3 border-bottom pb-2">
+        <CNavItem>
+          <CNavLink
+            active={clientTypeTab === 1}
+            onClick={() => setClientTypeTab(1)}
             style={{ cursor: 'pointer' }}
           >
             <CIcon icon={cilUser} className="me-2" />
             Personas Naturales
-            <CBadge color="success" className="ms-2">
+            <CBadge color={activeTab === 'active' ? 'success' : 'secondary'} className="ms-2">
               {naturalClients.length}
             </CBadge>
           </CNavLink>
         </CNavItem>
         <CNavItem>
           <CNavLink
-            active={activeKey === 2}
-            onClick={() => setActiveKey(2)}
+            active={clientTypeTab === 2}
+            onClick={() => setClientTypeTab(2)}
             style={{ cursor: 'pointer' }}
           >
             <CIcon icon={cilBuilding} className="me-2" />
             Personas Jurídicas
-            <CBadge color="info" className="ms-2">
+            <CBadge color={activeTab === 'active' ? 'info' : 'secondary'} className="ms-2">
               {juridicalClients.length}
             </CBadge>
           </CNavLink>
@@ -83,7 +111,7 @@ const ClientTable = ({
 
       <CTabContent>
         {/* Tab Personas Naturales */}
-        <CTabPane role="tabpanel" visible={activeKey === 1}>
+        <CTabPane role="tabpanel" visible={clientTypeTab === 1}>
           <CTable striped hover responsive>
             <CTableHead>
               <CTableRow>
@@ -108,31 +136,51 @@ const ClientTable = ({
                   <CTableDataCell>{client?.ttr_correocl || '-'}</CTableDataCell>
                   <CTableDataCell>{client?.ttr_direccio || '-'}</CTableDataCell>
                   <CTableDataCell>
-                    <CButton
-                      color="warning"
-                      size="sm"
-                      className="me-2"
-                      onClick={() => handleEdit(client)}
-                    >
-                      <CIcon icon={cilPencil} size="sm" className="me-1" />
-                      Editar
-                    </CButton>
-                    <CButton color="danger" size="sm" onClick={() => handleDelete(client)}>
-                      <CIcon icon={cilTrash} size="sm" className="me-1" />
-                      Eliminar
-                    </CButton>
+                    {activeTab === 'active' ? (
+                      <>
+                        <CButton
+                          color="warning"
+                          size="sm"
+                          className="me-2"
+                          onClick={() => handleEdit(client)}
+                          title="Editar"
+                        >
+                          <CIcon icon={cilPencil} size="sm" className="me-1" />
+                        </CButton>
+                        <CButton
+                          color="danger"
+                          size="sm"
+                          onClick={() => handleDelete(client)}
+                          title="Desactivar"
+                        >
+                          <CIcon icon={cilTrash} size="sm" className="me-1" />
+                        </CButton>
+                      </>
+                    ) : (
+                      <CButton
+                        color="success"
+                        size="sm"
+                        className="text-white"
+                        onClick={() => onReactivate(client)}
+                        title="Reactivar"
+                      >
+                        Reactivar
+                      </CButton>
+                    )}
                   </CTableDataCell>
                 </CTableRow>
               ))}
             </CTableBody>
           </CTable>
           {naturalClients.length === 0 && (
-            <CAlert color="info">No hay clientes naturales registrados.</CAlert>
+            <CAlert color="info">
+              No hay clientes naturales {activeTab === 'active' ? 'activos' : 'inactivos'}.
+            </CAlert>
           )}
         </CTabPane>
 
         {/* Tab Personas Jurídicas */}
-        <CTabPane role="tabpanel" visible={activeKey === 2}>
+        <CTabPane role="tabpanel" visible={clientTypeTab === 2}>
           <CTable striped hover responsive>
             <CTableHead>
               <CTableRow>
@@ -155,26 +203,46 @@ const ClientTable = ({
                   <CTableDataCell>{client?.ttr_correocl || '-'}</CTableDataCell>
                   <CTableDataCell>{client?.ttr_direccio || '-'}</CTableDataCell>
                   <CTableDataCell>
-                    <CButton
-                      color="warning"
-                      size="sm"
-                      className="me-2"
-                      onClick={() => handleEdit(client)}
-                    >
-                      <CIcon icon={cilPencil} size="sm" className="me-1" />
-                      Editar
-                    </CButton>
-                    <CButton color="danger" size="sm" onClick={() => handleDelete(client)}>
-                      <CIcon icon={cilTrash} size="sm" className="me-1" />
-                      Eliminar
-                    </CButton>
+                    {activeTab === 'active' ? (
+                      <>
+                        <CButton
+                          color="warning"
+                          size="sm"
+                          className="me-2"
+                          onClick={() => handleEdit(client)}
+                          title="Editar"
+                        >
+                          <CIcon icon={cilPencil} size="sm" className="me-1" />
+                        </CButton>
+                        <CButton
+                          color="danger"
+                          size="sm"
+                          onClick={() => handleDelete(client)}
+                          title="Desactivar"
+                        >
+                          <CIcon icon={cilTrash} size="sm" className="me-1" />
+                        </CButton>
+                      </>
+                    ) : (
+                      <CButton
+                        color="success"
+                        size="sm"
+                        className="text-white"
+                        onClick={() => onReactivate(client)}
+                        title="Reactivar"
+                      >
+                        Reactivar
+                      </CButton>
+                    )}
                   </CTableDataCell>
                 </CTableRow>
               ))}
             </CTableBody>
           </CTable>
           {juridicalClients.length === 0 && (
-            <CAlert color="info">No hay clientes jurídicos registrados.</CAlert>
+            <CAlert color="info">
+              No hay clientes jurídicos {activeTab === 'active' ? 'activos' : 'inactivos'}.
+            </CAlert>
           )}
         </CTabPane>
       </CTabContent>

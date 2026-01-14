@@ -1,118 +1,118 @@
-const API_URL = import.meta.env.VITE_API_URL
+import { helpFetch } from '../helpper/helpFetch'
+
+const API_URL = 'ventas'
+const api = helpFetch()
 
 export const ventasService = {
   // Obtener todas las ventas
   getVentas: async () => {
-    const response = await fetch(`${API_URL}/ventas`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al obtener ventas')
+    try {
+      const response = await api.get(API_URL)
+      if (response && !response.error) {
+        return response
+      } else {
+        throw new Error(response.message || 'Error al obtener ventas')
+      }
+    } catch (error) {
+      throw error
     }
-    const data = await response.json()
-    return data
   },
 
   // Obtener una venta por ID
   getVentaById: async (id) => {
-    const response = await fetch(`${API_URL}/ventas/${id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al obtener venta')
+    try {
+      const response = await api.get(`${API_URL}/${id}`)
+      if (response && !response.error) {
+        return response
+      } else {
+        throw new Error(response.message || 'Error al obtener venta')
+      }
+    } catch (error) {
+      throw error
     }
-    const data = await response.json()
-    return data
   },
 
   // Obtener productos disponibles para venta
   getProductosDisponibles: async (tipo = null) => {
-    const url = tipo
-      ? `${API_URL}/ventas/productos-disponibles?tipo=${tipo}`
-      : `${API_URL}/ventas/productos-disponibles`
+    try {
+      const url = tipo
+        ? `${API_URL}/productos-disponibles?tipo=${tipo}`
+        : `${API_URL}/productos-disponibles`
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al obtener productos disponibles')
+      const response = await api.get(url)
+      if (response && !response.error) {
+        return response
+      } else {
+        throw new Error(response.message || 'Error al obtener productos disponibles')
+      }
+    } catch (error) {
+      throw error
     }
-    const data = await response.json()
-    return data
   },
 
-  // Crear una nueva venta (para implementar después)
+  // Crear una nueva venta
   createVenta: async (ventaData) => {
-    const response = await fetch(`${API_URL}/ventas`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-      body: JSON.stringify(ventaData),
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al crear venta')
+    try {
+      const response = await api.post(API_URL, ventaData)
+      if (response && !response.error) {
+        return response
+      } else {
+        throw new Error(response.message || 'Error al crear venta')
+      }
+    } catch (error) {
+      // Propagate detailed error if available
+      if (error.response) throw error
+      throw error
     }
-    const data = await response.json()
-    return data
   },
 
-  // Actualizar estado de venta (para implementar después)
+  // Actualizar estado de venta
   updateEstadoVenta: async (id, idEstado) => {
-    const response = await fetch(`${API_URL}/ventas/${id}/estado`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-      body: JSON.stringify({ idEstado }),
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al actualizar estado')
+    try {
+      const response = await api.put(API_URL, `${id}/estado`, { idEstado })
+      if (response && !response.error) {
+        return response
+      } else {
+        throw new Error(response.message || 'Error al actualizar estado')
+      }
+    } catch (error) {
+      throw error
     }
-    const data = await response.json()
-    return data
   },
-}
 
-// Servicio de clientes (para el selector)
-export const clientesService = {
+  // Obtener clientes (Wrapper para consistencia)
   getClientes: async () => {
-    const response = await fetch(`${API_URL}/clientes`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    })
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Error al obtener clientes')
+    try {
+      const response = await api.get('clientes')
+      if (response && !response.error) {
+        return response
+      } else {
+        throw new Error(response.message || 'Error al obtener clientes')
+      }
+    } catch (error) {
+      throw error
     }
-    const data = await response.json()
-    return data
+  },
+
+  downloadFactura: async (id) => {
+    const token = localStorage.getItem('token')
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/ventas/${id}/factura`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    )
+    if (!response.ok) throw new Error('Error descargando factura')
+    return await response.blob()
   },
 }
 
-// Export default para facilitar importación
+export const clientesService = {
+  getClientes: ventasService.getClientes,
+}
+
 export default {
   ...ventasService,
   clientesService,

@@ -101,7 +101,7 @@ const CattleTable = ({
                     </CButton>
 
                     {/* Botón Reactivar / Desactivar */}
-                    {cattleItem.ttrIdestadb === 1 ? (
+                    {[1, 15].includes(cattleItem.ttrIdestadb) ? (
                       <CButton
                         color="success"
                         size="sm"

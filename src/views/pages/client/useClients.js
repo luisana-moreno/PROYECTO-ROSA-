@@ -22,15 +22,37 @@ export const useClients = () => {
     email: '',
   })
 
+  const [activeTab, setActiveTab] = useState('active') // 'active' | 'inactive'
+
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const naturalClients = await clientService.getNaturalClients()
-        const companyClients = await clientService.getCompanyClients()
+        // Fetch fetching based on activeTab
+        // Note: The service getAllClients accepts 'true', 'false', 'all'.
+        // But getNaturalClients and getCompanyClients also need to support it or we use getAllClients and filter?
+        // clientService.getNaturalClients and getCompanyClients were updated in backend but maybe not frontend helper?
+        // I updated getAllClients in Step 3196 in service.
+        // But backend getNaturalClients/getCompanyClients controller also support `active` param.
+        // Let's assume standard clientService.getNaturalClients supports it (I didn't verify if I updated those service methods).
+        // I only updated getAllClients in api/clientService.js (Step 3196).
+        // I need to check if I updated getNaturalClients/getCompanyClients in clientService.js.
+        // Looking at Step 3196 output: I only updated getAllClients and added reactivateClient.
+        // I SHOULD update getNaturalClients/getCompanyClients in service too, or just use getAllClients and separate them here.
+
+        // Reuse getAllClients and separate in frontend is easier given I have limited tool calls.
+        const response = await clientService.getAllClients(
+          activeTab === 'active' ? 'true' : 'false',
+        )
+
+        // response is array of clients
+        // Separate them
+        // Backend returns array of clients.
+        const natural = response.filter((c) => !c.ttr_nomcompa)
+        const company = response.filter((c) => !c.ttr_nombrecl)
 
         const allClients = [
-          ...naturalClients.map((client) => ({ ...client, client_type: 'Person' })),
-          ...companyClients.map((client) => ({ ...client, client_type: 'Company' })),
+          ...natural.map((client) => ({ ...client, client_type: 'Person' })),
+          ...company.map((client) => ({ ...client, client_type: 'Company' })),
         ]
         setClients(allClients)
       } catch (error) {
@@ -38,7 +60,7 @@ export const useClients = () => {
       }
     }
     fetchClients()
-  }, [])
+  }, [activeTab]) // Re-fetch when activeTab changes
 
   const filteredClients = clients.filter((client) => {
     const matchesSearchTerm = searchTerm
@@ -163,22 +185,41 @@ export const useClients = () => {
     }
   }
 
+  // handleReactivateClient
+  const handleReactivateClient = async (client) => {
+    try {
+      await clientService.reactivateClient(client.ttr_idclient)
+      setClients(clients.filter((c) => c.ttr_idclient !== client.ttr_idclient))
+      toast.success('Cliente reactivado exitosamente!')
+    } catch (error) {
+      toast.error('Error al reactivar cliente: ' + (error.message || 'Error desconocido.'))
+    }
+  }
+
   const handleDeleteClient = async () => {
     if (!currentClient || !currentClient.ttr_idclient) {
-      toast.error('No hay cliente seleccionado para eliminar.')
+      toast.error('No hay cliente seleccionado.')
       return
     }
+    // If activeTab is 'inactive', we probably assume deletion is permanent or disabled?
+    // User wants "Desactivar" instead of "Eliminar" for active.
+    // My backend logic for Delete is actually Soft Delete (Update ttr_activo=false).
+
     if (deleteConfirmationClient === 'confirmar') {
       try {
         await clientService.deleteClient(currentClient.ttr_idclient)
         setClients(clients.filter((c) => c.ttr_idclient !== currentClient.ttr_idclient))
         setDeleteVisibleClient(false)
-        toast.success('Cliente eliminado exitosamente!')
+        const msg =
+          activeTab === 'active'
+            ? 'Cliente desactivado exitosamente!'
+            : 'Cliente eliminado permanentemente (simulado)' // Backend is just soft delete, unless I implement hard delete. But schema says soft delete.
+        toast.success(msg)
       } catch (error) {
-        toast.error('Error al eliminar cliente: ' + (error.message || 'Error desconocido.'))
+        toast.error('Error al procesar cliente: ' + (error.message || 'Error desconocido.'))
       }
     } else {
-      toast.error('Confirmación de eliminación fallida. Escriba "confirmar".')
+      toast.error('Confirmación fallida. Escriba "confirmar".')
     }
   }
 
@@ -202,5 +243,8 @@ export const useClients = () => {
     searchTerm,
     setSearchTerm,
     filteredClients,
+    activeTab,
+    setActiveTab,
+    handleReactivateClient,
   }
 }

@@ -233,7 +233,12 @@ export const useCattle = () => {
     const matchesEstado = filterEstado ? bovino.ttrIdestadb === parseInt(filterEstado) : true
 
     // Status Filter: Check against ttrIdestadb based on filterStatus (1 or 3)
-    const matchesStatus = filterStatus ? bovino.ttrIdestadb === parseInt(filterStatus) : true
+    // If filterStatus is '1' (Inactivos), include status 1 (Inactivo) and 15 (Vendido)
+    const matchesStatus = filterStatus
+      ? filterStatus === '1'
+        ? [1, 15].includes(bovino.ttrIdestadb)
+        : bovino.ttrIdestadb === parseInt(filterStatus)
+      : true
 
     return (
       matchesSearchTerm &&

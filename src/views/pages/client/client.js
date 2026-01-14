@@ -31,6 +31,9 @@ const Client = () => {
     searchTerm,
     setSearchTerm,
     filteredClients,
+    activeTab,
+    setActiveTab,
+    handleReactivateClient,
   } = useClients()
 
   return (
@@ -76,6 +79,9 @@ const Client = () => {
                 setCurrentClient={setCurrentClient}
                 setEditVisibleClient={setEditVisibleClient}
                 setDeleteVisibleClient={setDeleteVisibleClient}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                onReactivate={handleReactivateClient}
               />
             </CCardBody>
           </CCard>

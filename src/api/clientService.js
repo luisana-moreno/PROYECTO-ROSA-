@@ -4,13 +4,26 @@ const API_URL = 'clientes'
 const api = helpFetch()
 
 export const clientService = {
-  getAllClients: async () => {
+  getAllClients: async (active = 'true') => {
     try {
-      const response = await api.get(API_URL)
+      const response = await api.get(`${API_URL}?activo=${active}`)
       if (response && !response.error) {
         return response
       } else {
         throw new Error(response.statusText || 'Error al obtener clientes')
+      }
+    } catch (error) {
+      throw error
+    }
+  },
+
+  reactivateClient: async (id) => {
+    try {
+      const response = await api.put(API_URL, id + '/reactivate', {})
+      if (response && !response.error) {
+        return response
+      } else {
+        throw new Error(response.message || 'Error al reactivar cliente')
       }
     } catch (error) {
       throw error

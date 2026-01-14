@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   CCard,
   CCardBody,
@@ -11,17 +11,32 @@ import {
   CTabPane,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilPlus, cilList, cilChart } from '@coreui/icons'
+import { cilPlus, cilList, cilChart, cilSettings } from '@coreui/icons'
 import VentasList from './components/VentasList'
 import VentaForm from './components/VentaForm'
 import FacturaModal from './components/FacturaModal'
+import EditVentaModal from './components/EditVentaModal'
+import ConfiguracionModal from './components/ConfiguracionModal'
 import useVentas from './hooks/useVentas'
 
 const Finances = () => {
   const [activeTab, setActiveTab] = useState('ventas')
   const { ventas, loading, fetchVentas, getVentaById } = useVentas()
   const [facturaModalVisible, setFacturaModalVisible] = useState(false)
+  const [editModalVisible, setEditModalVisible] = useState(false)
+  const [configModalVisible, setConfigModalVisible] = useState(false)
   const [ventaSeleccionada, setVentaSeleccionada] = useState(null)
+
+  // Estado de Configuración (Inicializado desde localStorage o default)
+  const [config, setConfig] = useState(() => {
+    const savedConfig = localStorage.getItem('financesConfig')
+    return savedConfig ? JSON.parse(savedConfig) : { tasaCambio: 60, precioLeche: 0.5 }
+  })
+
+  const handleSaveConfig = (newConfig) => {
+    setConfig(newConfig)
+    localStorage.setItem('financesConfig', JSON.stringify(newConfig))
+  }
 
   const handleViewVenta = async (venta) => {
     try {
@@ -35,8 +50,8 @@ const Finances = () => {
   }
 
   const handleEditVenta = (venta) => {
-    console.log('Editar venta:', venta)
-    // TODO: Implementar modal de edición si es necesario
+    setVentaSeleccionada(venta)
+    setEditModalVisible(true)
   }
 
   const handleVentaCreated = () => {
@@ -52,10 +67,21 @@ const Finances = () => {
         <CCardHeader>
           <div className="d-flex justify-content-between align-items-center">
             <h4 className="mb-0">Gestión de Ventas</h4>
-            <CButton color="success" onClick={() => setActiveTab('nueva')}>
-              <CIcon icon={cilPlus} className="me-2" />
-              Nueva Venta
-            </CButton>
+            <div>
+              <CButton
+                color="info"
+                variant="outline"
+                className="me-2"
+                onClick={() => setConfigModalVisible(true)}
+              >
+                <CIcon icon={cilSettings} className="me-2" />
+                Configuración
+              </CButton>
+              <CButton color="success" onClick={() => setActiveTab('nueva')}>
+                <CIcon icon={cilPlus} className="me-2" />
+                Nueva Venta
+              </CButton>
+            </div>
           </div>
         </CCardHeader>
         <CCardBody>
@@ -107,7 +133,10 @@ const Finances = () => {
 
             {/* Tab de Nueva Venta */}
             <CTabPane visible={activeTab === 'nueva'}>
-              <VentaForm onVentaCreated={handleVentaCreated} />
+              <VentaForm
+                onVentaCreated={handleVentaCreated}
+                config={config} // Pasar configuración
+              />
             </CTabPane>
 
             {/* Tab de Estadísticas */}
@@ -126,6 +155,23 @@ const Finances = () => {
         visible={facturaModalVisible}
         onClose={() => setFacturaModalVisible(false)}
         venta={ventaSeleccionada}
+        onPaymentSuccess={fetchVentas}
+      />
+
+      {/* Modal de Edición */}
+      <EditVentaModal
+        visible={editModalVisible}
+        onClose={() => setEditModalVisible(false)}
+        venta={ventaSeleccionada}
+        onUpdateSuccess={fetchVentas}
+      />
+
+      {/* Modal de Configuración */}
+      <ConfiguracionModal
+        visible={configModalVisible}
+        onClose={() => setConfigModalVisible(false)}
+        config={config}
+        onSave={handleSaveConfig}
       />
     </>
   )
