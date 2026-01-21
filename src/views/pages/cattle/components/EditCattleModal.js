@@ -81,6 +81,7 @@ const EditCattleModal = ({
     }
   }
 
+  console.log(currentCattle)
   return (
     <CModal
       alignment="center"

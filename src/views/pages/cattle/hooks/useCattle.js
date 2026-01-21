@@ -149,6 +149,14 @@ export const useCattle = () => {
         pesoKilo: currentCattle.ttrPesokilo,
         idEtapaBovino: currentCattle.ttrIdetapav,
         idEstadoBovino: currentCattle.ttrIdestadb,
+        // Nuevos campos
+        sexo: currentCattle.ttrSexo,
+        idPadre: currentCattle.ttrIdpadre,
+        idMadre: currentCattle.ttrIdmadre,
+        ttrPadreExterno: currentCattle.ttrPadreExterno,
+        ttrMadreExterna: currentCattle.ttrMadreExterna,
+        numPartos: currentCattle.ttrNumpartos || 0,
+        fecUltimoParto: currentCattle.ttrFecultpar,
       })
       if (updated) {
         const formattedUpdated = {

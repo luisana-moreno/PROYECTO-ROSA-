@@ -49,6 +49,7 @@ const CattleTable = ({
                 Peso (Kg)
               </CTableHeaderCell>
               <CTableHeaderCell className="d-none d-md-table-cell">Etapa</CTableHeaderCell>
+              <CTableHeaderCell className="d-none d-xl-table-cell">Fecha Registro</CTableHeaderCell>
               <CTableHeaderCell className="text-center">Estado</CTableHeaderCell>
               <CTableHeaderCell className="text-center">Acciones</CTableHeaderCell>
             </CTableRow>
@@ -80,6 +81,13 @@ const CattleTable = ({
                 </CTableDataCell>
                 <CTableDataCell className="d-none d-md-table-cell">
                   {cattleItem?.etapaNombre || '-'}
+                </CTableDataCell>
+                <CTableDataCell className="d-none d-xl-table-cell">
+                  <small className="text-muted">
+                    {cattleItem?.ttrFeccreacion
+                      ? formatDateToDDMMYYYY(cattleItem.ttrFeccreacion)
+                      : '-'}
+                  </small>
                 </CTableDataCell>
                 <CTableDataCell className="text-center">
                   <CBadge color={getEstadoBadgeColor(cattleItem?.estadoNombre)}>

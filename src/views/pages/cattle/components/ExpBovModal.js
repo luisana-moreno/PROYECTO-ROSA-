@@ -253,6 +253,16 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
                     <InfoRow label="Color" value={currentCattle?.colorNombre} />
                   </CCol>
                   <CCol md={4}>
+                    <InfoRow
+                      label="Sexo"
+                      value={
+                        <CBadge color={currentCattle?.ttrSexo === 'Macho' ? 'primary' : 'info'}>
+                          {currentCattle?.ttrSexo || 'No especificado'}
+                        </CBadge>
+                      }
+                    />
+                  </CCol>
+                  <CCol md={4}>
                     <InfoRow label="Fecha Nac." value={currentCattle?.ttrFecnacim} />
                   </CCol>
                   <CCol md={4}>
@@ -261,6 +271,48 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
                   <CCol md={4}>
                     <InfoRow label="Edad" value={calculateAge(currentCattle?.ttrFecnacim)} />
                   </CCol>
+                  {/* Genealogía */}
+                  <CCol md={6}>
+                    <InfoRow
+                      label="Padre (Sire)"
+                      value={
+                        currentCattle?.ttrPadreExterno ||
+                        currentCattle?.padreNumero ||
+                        'No registrado'
+                      }
+                    />
+                  </CCol>
+                  <CCol md={6}>
+                    <InfoRow
+                      label="Madre (Dam)"
+                      value={
+                        currentCattle?.ttrMadreExterna ||
+                        currentCattle?.madreNumero ||
+                        'No registrada'
+                      }
+                    />
+                  </CCol>
+                  {/* Info Reproductiva (solo hembras) */}
+                  {currentCattle?.ttrSexo === 'Hembra' && currentCattle?.ttrNumpartos > 0 && (
+                    <>
+                      <CCol md={6}>
+                        <InfoRow
+                          label="Número de Partos"
+                          value={currentCattle?.ttrNumpartos || 0}
+                        />
+                      </CCol>
+                      <CCol md={6}>
+                        <InfoRow
+                          label="Último Parto"
+                          value={
+                            currentCattle?.ttrFecultpar
+                              ? formatDateToDDMMYYYY(currentCattle.ttrFecultpar)
+                              : 'N/A'
+                          }
+                        />
+                      </CCol>
+                    </>
+                  )}
                 </CRow>
               </CCol>
             </CRow>
