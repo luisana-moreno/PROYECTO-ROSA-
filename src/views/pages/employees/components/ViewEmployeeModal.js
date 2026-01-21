@@ -21,11 +21,13 @@ import {
   cilCloudDownload,
 } from '@coreui/icons'
 import { formatDateToDDMMYYYY } from '../../../../utils/dateFormatter'
+import { employeeService } from 'src/api/employeeService'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
 const ViewEmployeeModal = ({ viewVisible, setViewVisible, currentEmployee }) => {
   const [generating, setGenerating] = useState(false)
+  const [photoError, setPhotoError] = useState(false)
 
   if (!currentEmployee) return null
 
@@ -105,20 +107,38 @@ const ViewEmployeeModal = ({ viewVisible, setViewVisible, currentEmployee }) => 
       </CModalHeader>
 
       <CModalBody className="p-4">
-        {/* Header con nombre y cargo */}
+        {/* Header con nombre, foto y cargo */}
         <div className="text-center mb-4 pb-4 border-bottom">
           <div className="mb-3">
-            <div
-              className="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
-              style={{
-                width: '80px',
-                height: '80px',
-                backgroundColor: '#28a745',
-                color: 'white',
-              }}
-            >
-              <CIcon icon={cilUser} size="3xl" />
-            </div>
+            {currentEmployee?.id && !photoError ? (
+              <img
+                src={employeeService.getPhotoUrl(currentEmployee.id)}
+                alt={fullName}
+                className="rounded-circle mb-3"
+                style={{
+                  width: '120px',
+                  height: '120px',
+                  objectFit: 'cover',
+                  border: '4px solid #28a745',
+                  boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                }}
+                onError={() => setPhotoError(true)}
+              />
+            ) : (
+              <div
+                className="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
+                style={{
+                  width: '120px',
+                  height: '120px',
+                  backgroundColor: '#28a745',
+                  color: 'white',
+                  border: '4px solid #28a745',
+                  boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                }}
+              >
+                <CIcon icon={cilUser} size="4xl" />
+              </div>
+            )}
           </div>
           <h4 className="mb-2">{fullName}</h4>
           <CBadge

@@ -200,4 +200,38 @@ export const employeeService = {
     }
     return true
   },
+
+  // Métodos para fotos de empleados
+  uploadPhoto: async (id, photoFile) => {
+    const formData = new FormData()
+    formData.append('foto', photoFile)
+
+    const response = await fetch(`${API_URL}/empleados/${id}/foto`, {
+      method: 'POST',
+      body: formData, // No incluir Content-Type, el navegador lo establece automáticamente con boundary
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al subir foto')
+    }
+    return await response.json()
+  },
+
+  getPhotoUrl: (id) => {
+    return `${API_URL}/empleados/${id}/foto`
+  },
+
+  deletePhoto: async (id) => {
+    const response = await fetch(`${API_URL}/empleados/${id}/foto`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al eliminar foto')
+    }
+    return await response.json()
+  },
 }

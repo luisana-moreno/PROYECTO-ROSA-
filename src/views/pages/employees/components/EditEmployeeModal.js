@@ -17,6 +17,8 @@ import {
 import CIcon from '@coreui/icons-react'
 import { cilSave } from '@coreui/icons'
 import { toast } from 'react-toastify'
+import ImageUpload from 'src/components/ImageUpload'
+import { employeeService } from 'src/api/employeeService'
 
 const EditEmployeeModal = ({
   editVisible,
@@ -151,6 +153,27 @@ const EditEmployeeModal = ({
     }
   }
 
+  // Manejadores de foto
+  const handlePhotoUpload = async (file) => {
+    try {
+      await employeeService.uploadPhoto(currentEmployee.id, file)
+      toast.success('Foto subida exitosamente')
+    } catch (error) {
+      toast.error(error.message || 'Error al subir foto')
+      throw error
+    }
+  }
+
+  const handlePhotoDelete = async () => {
+    try {
+      await employeeService.deletePhoto(currentEmployee.id)
+      toast.success('Foto eliminada exitosamente')
+    } catch (error) {
+      toast.error(error.message || 'Error al eliminar foto')
+      throw error
+    }
+  }
+
   return (
     <CModal
       alignment="center"
@@ -282,6 +305,20 @@ const EditEmployeeModal = ({
                   </option>
                 ))}
               </CFormSelect>
+            </CCol>
+          </CRow>
+
+          {/* Foto del Empleado */}
+          <CRow className="mb-3">
+            <CCol md={12}>
+              <CFormLabel>Foto del Empleado</CFormLabel>
+              <ImageUpload
+                currentImageUrl={
+                  currentEmployee?.id ? employeeService.getPhotoUrl(currentEmployee.id) : null
+                }
+                onUpload={handlePhotoUpload}
+                onDelete={handlePhotoDelete}
+              />
             </CCol>
           </CRow>
         </CModalBody>

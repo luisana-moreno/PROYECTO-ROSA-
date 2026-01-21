@@ -252,13 +252,9 @@ const ControlForm = ({
                 onChange={(e) => setFormData({ ...formData, ttr_viaadmin: e.target.value })}
               >
                 <option value="">Seleccione...</option>
-                <option value="Oral">Oral</option>
-                <option value="Inyectable">Inyectable</option>
-                <option value="Subcutánea">Subcutánea</option>
-                <option value="Intramuscular">Intramuscular</option>
                 <option value="Intramamaria">Intramamaria</option>
                 <option value="Tópico">Tópico</option>
-                <option value="Aspersión">Aspersión</option>
+                <option value="Inyectable">Inyectable</option>
               </CFormSelect>
             </CCol>
           </CRow>
