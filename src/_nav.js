@@ -160,7 +160,7 @@ const _nav = [
         name: 'Registro de Lotes',
         to: '/lots',
         icon: <CIcon icon={cilAnimal} customClassName="nav-icon" />,
-        roles: [1, 3, 4, 6, 7, 8, 10],
+        roles: [1, 3, 4, 6, 8, 10],
       },
       {
         component: CNavItem,
