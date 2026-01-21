@@ -43,8 +43,8 @@ import {
   updatePlanVacunacion,
   deletePlanVacunacion,
   togglePlanActivo,
+  getTiposVacuna, // Añadido
 } from '../../../../api/sanidadService'
-import { regmedicosService } from '../../../../api/regmedicosService'
 
 const PlanesIndex = () => {
   const [planes, setPlanes] = useState([])
@@ -78,7 +78,7 @@ const PlanesIndex = () => {
         planesData = await getPlanesVacunacion()
       }
 
-      const tiposData = await regmedicosService.getAllTiposVacuna()
+      const tiposData = await getTiposVacuna()
 
       setPlanes(planesData)
       setTiposVacuna(tiposData)
@@ -157,6 +157,8 @@ const PlanesIndex = () => {
     return new Date(dateString).toLocaleDateString('es-ES')
   }
 
+  console.log(planes)
+
   return (
     <>
       <CRow>
@@ -212,7 +214,7 @@ const PlanesIndex = () => {
                 <CTableBody>
                   {planes.map((plan) => (
                     <CTableRow key={plan.ttr_idplanva}>
-                      <CTableDataCell className="fw-semibold">{plan.ttr_nombrepl}</CTableDataCell>
+                      <CTableDataCell className="fw-semibold">{plan.ttr_nomplan}</CTableDataCell>
                       <CTableDataCell>{plan.nombre_vacuna}</CTableDataCell>
                       <CTableDataCell>
                         {formatDate(plan.ttr_fechaini)} - {formatDate(plan.ttr_fechafin)}
