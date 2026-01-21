@@ -29,6 +29,8 @@ export const useCattle = () => {
   const [colores, setColores] = useState([])
   const [etapas, setEtapas] = useState([])
   const [estados, setEstados] = useState([])
+  const [males, setMales] = useState([])
+  const [females, setFemales] = useState([])
 
   const [addCattleForm, setAddCattleForm] = useState({
     numeroBovino: '',
@@ -38,6 +40,15 @@ export const useCattle = () => {
     pesoKilo: '',
     idEtapaBovino: '',
     idEstadoBovino: '',
+    sexo: '',
+    idPadre: '',
+    idMadre: '',
+    padreExterno: false,
+    ttrPadreExterno: '',
+    madreExterna: false,
+    ttrMadreExterna: '',
+    numPartos: 0,
+    fecUltimoParto: '',
   })
 
   useEffect(() => {
@@ -46,18 +57,23 @@ export const useCattle = () => {
 
   const loadInitialData = async () => {
     try {
-      const [cattleData, razasData, coloresData, etapasData, estadosData] = await Promise.all([
-        cattleService.getAllCattle(),
-        cattleService.getAllRazas(),
-        cattleService.getAllColores(),
-        cattleService.getAllEtapas(),
-        cattleService.getAllEstados(),
-      ])
+      const [cattleData, razasData, coloresData, etapasData, estadosData, malesData, femalesData] =
+        await Promise.all([
+          cattleService.getAllCattle(),
+          cattleService.getAllRazas(),
+          cattleService.getAllColores(),
+          cattleService.getAllEtapas(),
+          cattleService.getAllEstados(),
+          cattleService.getMales(),
+          cattleService.getFemales(),
+        ])
       setCattle(cattleData)
       setRazas(razasData)
       setColores(coloresData)
       setEtapas(etapasData)
       setEstados(estadosData)
+      setMales(malesData || [])
+      setFemales(femalesData || [])
     } catch (error) {
       console.error('Error loading initial data:', error)
       toast.error('Error al cargar datos iniciales')
@@ -95,6 +111,15 @@ export const useCattle = () => {
           pesoKilo: '',
           idEtapaBovino: '',
           idEstadoBovino: '',
+          sexo: '',
+          idPadre: '',
+          idMadre: '',
+          padreExterno: false,
+          ttrPadreExterno: '',
+          madreExterna: false,
+          ttrMadreExterna: '',
+          numPartos: 0,
+          fecUltimoParto: '',
         })
         setVisible(false)
         toast.success('Registro agregado correctamente')
@@ -276,6 +301,8 @@ export const useCattle = () => {
     colores,
     etapas,
     estados,
+    males,
+    females,
     searchTerm,
     setSearchTerm,
     filterRaza,

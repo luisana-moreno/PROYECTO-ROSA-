@@ -42,6 +42,7 @@ const CattleTable = ({
             <CTableRow>
               <CTableHeaderCell className="text-center">N° Bovino</CTableHeaderCell>
               <CTableHeaderCell>Raza</CTableHeaderCell>
+              <CTableHeaderCell className="text-center">Sexo</CTableHeaderCell>
               <CTableHeaderCell className="d-none d-md-table-cell">Fecha Nac.</CTableHeaderCell>
               <CTableHeaderCell className="d-none d-lg-table-cell">Color</CTableHeaderCell>
               <CTableHeaderCell className="d-none d-lg-table-cell text-center">
@@ -60,6 +61,11 @@ const CattleTable = ({
                 </CTableDataCell>
                 <CTableDataCell>
                   <span className="fw-semibold">{cattleItem?.razaNombre || '-'}</span>
+                </CTableDataCell>
+                <CTableDataCell className="text-center">
+                  <CBadge color={cattleItem?.ttrSexo === 'Macho' ? 'primary' : 'info'}>
+                    {cattleItem?.ttrSexo || 'N/D'}
+                  </CBadge>
                 </CTableDataCell>
                 <CTableDataCell className="d-none d-md-table-cell">
                   <small>{formatDateToDDMMYYYY(cattleItem?.ttrFecnacim) || '-'}</small>

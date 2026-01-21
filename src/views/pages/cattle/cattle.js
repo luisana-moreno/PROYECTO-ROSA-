@@ -50,6 +50,8 @@ const Cattle = () => {
     colores,
     etapas,
     estados,
+    males,
+    females,
     searchTerm,
     setSearchTerm,
     filterRaza,
@@ -173,6 +175,8 @@ const Cattle = () => {
         colores={colores}
         etapas={etapas}
         estados={estados}
+        males={males}
+        females={females}
       />
       <EditCattleModal
         editVisible={editVisible}
@@ -184,6 +188,8 @@ const Cattle = () => {
         colores={colores}
         etapas={etapas}
         estados={estados}
+        males={males}
+        females={females}
       />
       <DeleteCattleModal
         deleteVisible={deleteVisible}

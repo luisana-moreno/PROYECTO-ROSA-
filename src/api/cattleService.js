@@ -364,4 +364,89 @@ export const cattleService = {
 
   // Servicio para exportar expediente de bovino a PDF
   // Esta función se ha movido a pdfService.js
+
+  // ==========================================
+  // Servicios de Genealogía y Reproducción
+  // ==========================================
+
+  // Obtener genealogía (árbol de antepasados)
+  getGenealogy: async (id, depth = 3) => {
+    const response = await fetch(`${API_URL}/bovinos/${id}/genealogy?depth=${depth}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al obtener genealogía')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  // Obtener descendencia (hijos)
+  getOffspring: async (id) => {
+    const response = await fetch(`${API_URL}/bovinos/${id}/offspring`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al obtener descendencia')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  // Actualizar información reproductiva
+  updateReproductive: async (id, reproductiveData) => {
+    const response = await fetch(`${API_URL}/bovinos/${id}/reproductive`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(reproductiveData),
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al actualizar información reproductiva')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  // Obtener machos (para selección de padre)
+  getMales: async () => {
+    const response = await fetch(`${API_URL}/bovinos/males/list`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al obtener machos')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  // Obtener hembras (para selección de madre)
+  getFemales: async () => {
+    const response = await fetch(`${API_URL}/bovinos/females/list`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al obtener hembras')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
 }

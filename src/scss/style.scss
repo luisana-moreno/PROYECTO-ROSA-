@@ -1,6 +1,16 @@
 @use 'sass:color';
+
+// ==========================================
+// VARIABLES DEL TEMA (ESTÁNDAR)
+// ==========================================
+$primary-green: #28a745; // Verde principal (botones, activos)
+$dark-green: #1e7e34; // Verde oscuro (hover, bordes)
+
+// Imports de CoreUI con overrides de colores
 @use '@coreui/coreui/scss/coreui' as * with (
-  $enable-deprecation-messages: false
+  $enable-deprecation-messages: false,
+  $info: #28a745,
+  $primary: #28a745
 );
 @use '@coreui/chartjs/scss/coreui-chartjs';
 @use 'vendors/simplebar';
@@ -11,8 +21,7 @@
 // ==========================================
 // VARIABLES DEL TEMA (ESTÁNDAR)
 // ==========================================
-$primary-green: #28a745; // Verde principal (botones, activos)
-$dark-green: #1e7e34; // Verde oscuro (hover, bordes)
+// Las variables principales ya están definidas arriba
 $sidebar-bg: #212631; // Fondo oscuro profesional para Sidebar
 $sidebar-header-bg: #1b1f28; // Fondo más oscuro para header del sidebar
 $text-light: #ffffff;
@@ -276,4 +285,70 @@ body.login-page {
     height: 36px !important;
     font-size: 0.85rem !important;
   }
+}
+
+// ==========================================
+// FORZAR VERDE EN INFO Y PRIMARY (GLOBAL)
+// ==========================================
+
+// Botones info y primary → verde (mantener otros colores semánticos)
+.btn-info,
+.btn-primary {
+  background-color: $primary-green !important;
+  border-color: $primary-green !important;
+  color: white !important;
+
+  &:hover,
+  &:focus {
+    background-color: $dark-green !important;
+    border-color: $dark-green !important;
+  }
+}
+
+// Botones outline info y primary
+.btn-outline-info,
+.btn-outline-primary {
+  color: $primary-green !important;
+  border-color: $primary-green !important;
+
+  &:hover {
+    background-color: $primary-green !important;
+    color: white !important;
+  }
+}
+
+// Badges info y primary → verde
+.badge-info,
+.badge-primary,
+.badge.bg-info,
+.badge.bg-primary {
+  background-color: $primary-green !important;
+  color: white !important;
+}
+
+// Alerts info → fondo verde claro con texto negro
+.alert-info {
+  background-color: rgba($primary-green, 0.1) !important;
+  border-color: $primary-green !important;
+  color: #000000 !important;
+}
+
+// Spinners
+.spinner-border.text-primary {
+  color: $primary-green !important;
+}
+
+// Tabs activas (solo si usan primary)
+.nav-pills .nav-link.active {
+  background-color: $primary-green !important;
+}
+
+// Text utilities
+.text-primary {
+  color: $primary-green !important;
+}
+
+// Border utilities
+.border-primary {
+  border-color: $primary-green !important;
 }

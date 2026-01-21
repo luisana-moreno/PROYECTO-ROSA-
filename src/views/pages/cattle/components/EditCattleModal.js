@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
   CButton,
   CModal,
@@ -12,11 +12,13 @@ import {
   CRow,
   CFormSelect,
   CForm,
+  CFormCheck,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilSave } from '@coreui/icons'
 import { toast } from 'react-toastify'
 import { formatDateToYYYYMMDD } from 'src/utils/dateFormatter'
+import SearchableSelect from './SearchableSelect'
 
 const EditCattleModal = ({
   editVisible,
@@ -28,8 +30,26 @@ const EditCattleModal = ({
   colores,
   etapas,
   estados,
+  males,
+  females,
 }) => {
   const today = new Date().toISOString().split('T')[0]
+
+  // Inicializar flags de padres externos cuando se abre el modal
+  useEffect(() => {
+    if (editVisible && currentCattle) {
+      // Determinar si el padre es externo
+      const isPadreExterno = !!(currentCattle.ttrPadreExterno && !currentCattle.ttrIdpadre)
+      // Determinar si la madre es externa
+      const isMadreExterna = !!(currentCattle.ttrMadreExterna && !currentCattle.ttrIdmadre)
+
+      setCurrentCattle({
+        ...currentCattle,
+        padreExterno: isPadreExterno,
+        madreExterna: isMadreExterna,
+      })
+    }
+  }, [editVisible, currentCattle?.ttrIdbovino])
 
   const validateForm = () => {
     if (
@@ -39,7 +59,8 @@ const EditCattleModal = ({
       !currentCattle.ttrIdcolorb ||
       !currentCattle.ttrPesokilo ||
       !currentCattle.ttrIdetapav ||
-      !currentCattle.ttrIdestadb
+      !currentCattle.ttrIdestadb ||
+      !currentCattle.ttrSexo
     ) {
       toast.error('Todos los campos obligatorios deben ser llenados.')
       return false
@@ -194,6 +215,182 @@ const EditCattleModal = ({
               </CFormSelect>
             </CCol>
           </CRow>
+
+          {/* Sexo */}
+          <CRow className="mb-3">
+            <CCol md={12}>
+              <CFormLabel>Sexo *</CFormLabel>
+              <div>
+                <CFormCheck
+                  type="radio"
+                  name="sexoEdit"
+                  id="sexoMachoEdit"
+                  label="Macho"
+                  value="Macho"
+                  checked={currentCattle?.ttrSexo === 'Macho'}
+                  onChange={(e) => setCurrentCattle({ ...currentCattle, ttrSexo: e.target.value })}
+                  inline
+                />
+                <CFormCheck
+                  type="radio"
+                  name="sexoEdit"
+                  id="sexoHembraEdit"
+                  label="Hembra"
+                  value="Hembra"
+                  checked={currentCattle?.ttrSexo === 'Hembra'}
+                  onChange={(e) => setCurrentCattle({ ...currentCattle, ttrSexo: e.target.value })}
+                  inline
+                />
+              </div>
+            </CCol>
+          </CRow>
+
+          {/* Genealogía: Padre */}
+          <CRow className="mb-3">
+            <CCol md={12}>
+              <CFormLabel>Padre (Sire)</CFormLabel>
+              <div className="mb-2">
+                <CFormCheck
+                  type="radio"
+                  name="tipoPadreEdit"
+                  id="padreFincaEdit"
+                  label="De la finca"
+                  checked={!currentCattle?.padreExterno}
+                  onChange={() =>
+                    setCurrentCattle({ ...currentCattle, padreExterno: false, ttrPadreExterno: '' })
+                  }
+                  inline
+                />
+                <CFormCheck
+                  type="radio"
+                  name="tipoPadreEdit"
+                  id="padreExternoEdit"
+                  label="Externo (fuera de la finca)"
+                  checked={currentCattle?.padreExterno === true}
+                  onChange={() =>
+                    setCurrentCattle({ ...currentCattle, padreExterno: true, ttrIdpadre: null })
+                  }
+                  inline
+                />
+              </div>
+              {currentCattle?.padreExterno ? (
+                <>
+                  <CFormInput
+                    placeholder="Nombre del padre externo"
+                    value={currentCattle?.ttrPadreExterno || ''}
+                    onChange={(e) =>
+                      setCurrentCattle({ ...currentCattle, ttrPadreExterno: e.target.value })
+                    }
+                  />
+                  <small className="text-muted">Ingrese el nombre/identificación del padre</small>
+                </>
+              ) : (
+                <>
+                  <SearchableSelect
+                    options={males.map((macho) => ({
+                      value: macho.ttrIdbovino,
+                      label: `${macho.ttrNumerobv} - ${macho.razaNombre}`,
+                    }))}
+                    value={currentCattle?.ttrIdpadre}
+                    onChange={(value) => setCurrentCattle({ ...currentCattle, ttrIdpadre: value })}
+                    placeholder="Buscar toro reproductor..."
+                    emptyMessage="No se encontraron machos"
+                  />
+                  <small className="text-muted">Escriba para buscar el toro</small>
+                </>
+              )}
+            </CCol>
+          </CRow>
+
+          {/* Genealogía: Madre */}
+          <CRow className="mb-3">
+            <CCol md={12}>
+              <CFormLabel>Madre (Dam)</CFormLabel>
+              <div className="mb-2">
+                <CFormCheck
+                  type="radio"
+                  name="tipoMadreEdit"
+                  id="madreFincaEdit"
+                  label="De la finca"
+                  checked={!currentCattle?.madreExterna}
+                  onChange={() =>
+                    setCurrentCattle({ ...currentCattle, madreExterna: false, ttrMadreExterna: '' })
+                  }
+                  inline
+                />
+                <CFormCheck
+                  type="radio"
+                  name="tipoMadreEdit"
+                  id="madreExternaEdit"
+                  label="Externa (fuera de la finca)"
+                  checked={currentCattle?.madreExterna === true}
+                  onChange={() =>
+                    setCurrentCattle({ ...currentCattle, madreExterna: true, ttrIdmadre: null })
+                  }
+                  inline
+                />
+              </div>
+              {currentCattle?.madreExterna ? (
+                <>
+                  <CFormInput
+                    placeholder="Nombre de la madre externa"
+                    value={currentCattle?.ttrMadreExterna || ''}
+                    onChange={(e) =>
+                      setCurrentCattle({ ...currentCattle, ttrMadreExterna: e.target.value })
+                    }
+                  />
+                  <small className="text-muted">Ingrese el nombre/identificación de la madre</small>
+                </>
+              ) : (
+                <>
+                  <SearchableSelect
+                    options={females.map((hembra) => ({
+                      value: hembra.ttrIdbovino,
+                      label: `${hembra.ttrNumerobv} - ${hembra.razaNombre}`,
+                    }))}
+                    value={currentCattle?.ttrIdmadre}
+                    onChange={(value) => setCurrentCattle({ ...currentCattle, ttrIdmadre: value })}
+                    placeholder="Buscar vaca madre..."
+                    emptyMessage="No se encontraron hembras"
+                  />
+                  <small className="text-muted">Escriba para buscar la vaca</small>
+                </>
+              )}
+            </CCol>
+          </CRow>
+
+          {/* Información reproductiva (solo para hembras) */}
+          {currentCattle?.ttrSexo === 'Hembra' && (
+            <CRow className="mb-3">
+              <CCol md={6}>
+                <CFormLabel>Número de Partos</CFormLabel>
+                <CFormInput
+                  type="number"
+                  min="0"
+                  value={currentCattle?.ttrNumpartos || 0}
+                  onChange={(e) =>
+                    setCurrentCattle({
+                      ...currentCattle,
+                      ttrNumpartos: parseInt(e.target.value) || 0,
+                    })
+                  }
+                />
+                <small className="text-muted">Cantidad de partos registrados</small>
+              </CCol>
+              <CCol md={6}>
+                <CFormLabel>Fecha Último Parto</CFormLabel>
+                <CFormInput
+                  type="date"
+                  value={formatDateToYYYYMMDD(currentCattle?.ttrFecultpar) || ''}
+                  onChange={(e) =>
+                    setCurrentCattle({ ...currentCattle, ttrFecultpar: e.target.value })
+                  }
+                  max={today}
+                />
+                <small className="text-muted">Fecha del parto más reciente</small>
+              </CCol>
+            </CRow>
+          )}
         </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setEditVisible(false)}>

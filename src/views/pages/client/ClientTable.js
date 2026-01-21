@@ -102,7 +102,7 @@ const ClientTable = ({
           >
             <CIcon icon={cilBuilding} className="me-2" />
             Personas Jurídicas
-            <CBadge color={activeTab === 'active' ? 'info' : 'secondary'} className="ms-2">
+            <CBadge color={activeTab === 'active' ? 'success' : 'secondary'} className="ms-2">
               {juridicalClients.length}
             </CBadge>
           </CNavLink>
