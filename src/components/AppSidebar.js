@@ -65,9 +65,9 @@ const AppSidebar = () => {
           </div>
           {!unfoldable && (
             <div className="ms-3 text-white">
-              <h5 className="mb-0 fw-bold" style={{ fontSize: '1.1rem' }}>
+              <h3 className="mb-0 fw-bold" style={{ fontSize: '1.1rem', fontStyle: 'inherit' }}>
                 S.I.G.
-              </h5>
+              </h3>
               <small style={{ fontSize: '0.75rem', opacity: 0.9 }}>Gestión Ganadera</small>
             </div>
           )}

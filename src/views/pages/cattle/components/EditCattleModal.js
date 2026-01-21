@@ -249,7 +249,7 @@ const EditCattleModal = ({
           {/* Genealogía: Padre */}
           <CRow className="mb-3">
             <CCol md={12}>
-              <CFormLabel>Padre (Sire)</CFormLabel>
+              <CFormLabel>Padre </CFormLabel>
               <div className="mb-2">
                 <CFormCheck
                   type="radio"
@@ -306,7 +306,7 @@ const EditCattleModal = ({
           {/* Genealogía: Madre */}
           <CRow className="mb-3">
             <CCol md={12}>
-              <CFormLabel>Madre (Dam)</CFormLabel>
+              <CFormLabel>Madre </CFormLabel>
               <div className="mb-2">
                 <CFormCheck
                   type="radio"

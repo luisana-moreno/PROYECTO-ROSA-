@@ -95,7 +95,7 @@ const CattleTable = ({
                   </CBadge>
                 </CTableDataCell>
                 <CTableDataCell>
-                  <div className="d-flex flex-wrap gap-1 justify-content-center">
+                  <div className="d-flex flex-wrap flex-md-row gap-1 justify-content-center align-items-center">
                     {/* Botón Editar */}
                     <CButton
                       color="warning"

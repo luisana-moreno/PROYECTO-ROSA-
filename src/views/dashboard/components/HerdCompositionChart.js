@@ -17,7 +17,7 @@ const HerdCompositionChart = ({ hembras, machos }) => {
   return (
     <CCard className="mb-4 border-0 shadow-sm" style={{ borderRadius: '12px', minHeight: '350px' }}>
       <CCardHeader className="bg-transparent border-0 pt-4 px-4">
-        <h5 className="mb-0">Composición del Hato</h5>
+        <h5 className="mb-0">Composición del rebaño</h5>
       </CCardHeader>
       <CCardBody style={{ height: '300px' }}>
         <ResponsiveContainer width="100%" height="100%">

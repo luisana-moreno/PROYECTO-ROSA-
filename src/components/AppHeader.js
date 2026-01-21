@@ -120,66 +120,64 @@ const AppHeader = () => {
           />
         </CHeaderToggler>
         <CHeaderNav className="ms-auto d-flex align-items-center">
-          <CNavItem className="me-2 me-md-3">
-            <CDropdown variant="nav-item" placement="bottom-end">
-              <CDropdownToggle caret={false} className="py-0 position-relative">
-                <CIcon icon={cilBell} size="lg" style={{ color: '#212631', cursor: 'pointer' }} />
-                {unreadCount > 0 && (
-                  <span
-                    className="position-absolute badge rounded-pill"
-                    style={{
-                      backgroundColor: '#dc3545',
-                      fontSize: '0.65rem',
-                      padding: '0.25em 0.5em',
-                      top: '-5px',
-                      right: '-5px',
-                    }}
-                  >
-                    {unreadCount}
-                    <span className="visually-hidden">notificaciones</span>
-                  </span>
-                )}
-              </CDropdownToggle>
-              <CDropdownMenu
-                className="pt-0"
-                style={{ minWidth: '300px', maxHeight: '400px', overflowY: 'auto' }}
-              >
-                <CDropdownItem className="fw-bold text-center bg-light disabled">
-                  Notificaciones
-                </CDropdownItem>
-                {notifications.length === 0 ? (
-                  <CDropdownItem className="text-center text-muted py-3">
-                    No tienes notificaciones pendientes
-                  </CDropdownItem>
-                ) : (
-                  notifications.map((notif, index) => (
-                    <CDropdownItem key={index} href="#">
-                      <div className="d-flex align-items-center mb-1">
-                        <CIcon
-                          icon={getIconForType(notif.type)}
-                          className={`me-2 ${getColorForStatus(notif.status)}`}
-                        />
-                        <strong className="small">{notif.title}</strong>
-                      </div>
-                      <div
-                        className="small text-medium-emphasis text-wrap"
-                        style={{ lineHeight: '1.2' }}
-                      >
-                        {notif.message}
-                      </div>
-                    </CDropdownItem>
-                  ))
-                )}
-                <CDropdownDivider />
-                <CDropdownItem
-                  href="#/notifications"
-                  className="text-center small fw-bold text-primary py-2"
+          <CDropdown variant="nav-item" placement="bottom-end" className="me-2 me-md-3">
+            <CDropdownToggle caret={false} className="py-0 position-relative">
+              <CIcon icon={cilBell} size="lg" style={{ color: '#212631', cursor: 'pointer' }} />
+              {unreadCount > 0 && (
+                <span
+                  className="position-absolute badge rounded-pill"
+                  style={{
+                    backgroundColor: '#dc3545',
+                    fontSize: '0.65rem',
+                    padding: '0.25em 0.5em',
+                    top: '-5px',
+                    right: '-5px',
+                  }}
                 >
-                  Ver todas las notificaciones
+                  {unreadCount}
+                  <span className="visually-hidden">notificaciones</span>
+                </span>
+              )}
+            </CDropdownToggle>
+            <CDropdownMenu
+              className="pt-0"
+              style={{ minWidth: '300px', maxHeight: '400px', overflowY: 'auto' }}
+            >
+              <CDropdownItem className="fw-bold text-center bg-light disabled">
+                Notificaciones
+              </CDropdownItem>
+              {notifications.length === 0 ? (
+                <CDropdownItem className="text-center text-muted py-3">
+                  No tienes notificaciones pendientes
                 </CDropdownItem>
-              </CDropdownMenu>
-            </CDropdown>
-          </CNavItem>
+              ) : (
+                notifications.map((notif, index) => (
+                  <CDropdownItem key={index} href="#">
+                    <div className="d-flex align-items-center mb-1">
+                      <CIcon
+                        icon={getIconForType(notif.type)}
+                        className={`me-2 ${getColorForStatus(notif.status)}`}
+                      />
+                      <strong className="small">{notif.title}</strong>
+                    </div>
+                    <div
+                      className="small text-medium-emphasis text-wrap"
+                      style={{ lineHeight: '1.2' }}
+                    >
+                      {notif.message}
+                    </div>
+                  </CDropdownItem>
+                ))
+              )}
+              <CDropdownDivider />
+              <CDropdownItem
+                href="#/notifications"
+                className="text-center small fw-bold text-primary py-2"
+              >
+                Ver todas las notificaciones
+              </CDropdownItem>
+            </CDropdownMenu>
+          </CDropdown>
         </CHeaderNav>
         <CHeaderNav className="ms-1 ms-md-2">
           <AppHeaderDropdown />

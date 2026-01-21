@@ -37,8 +37,10 @@ const NotificationsIndex = () => {
   }, [])
 
   const loadNotifications = async () => {
+    console.log('NotificationsIndex: loadNotifications called')
     try {
       const data = await notificationService.getNotifications()
+      console.log('NotificationsIndex: data received', data)
       setNotifications(data)
     } catch (error) {
       console.error('Error cargando notificaciones:', error)
@@ -57,6 +59,19 @@ const NotificationsIndex = () => {
         return cilWarning
       default:
         return cilBell
+    }
+  }
+
+  const getColorForStatus = (status) => {
+    switch (status) {
+      case 'danger':
+        return 'text-danger'
+      case 'warning':
+        return 'text-warning'
+      case 'info':
+        return 'text-info'
+      default:
+        return 'text-secondary'
     }
   }
 
@@ -87,6 +102,7 @@ const NotificationsIndex = () => {
       day: 'numeric',
     })
   }
+  console.log(notifications)
 
   return (
     <CRow>
@@ -106,10 +122,10 @@ const NotificationsIndex = () => {
                 style={{ width: 'auto' }}
               >
                 <option value="all">Todas</option>
-                <option value="vencido">⚠️ Urgentes / Vencidas</option>
-                <option value="sanidad">🏥 Sanidad</option>
-                <option value="parto">🤰 Partos</option>
-                <option value="inventario">📦 Stock Bajo</option>
+                <option value="vencido"> Urgentes / Vencidas</option>
+                <option value="sanidad"> Sanidad</option>
+                <option value="parto"> Partos</option>
+                <option value="inventario"> Stock Bajo</option>
               </CFormSelect>
               <CButton
                 color="light"
@@ -134,43 +150,60 @@ const NotificationsIndex = () => {
                 ¡Excelente! No hay notificaciones pendientes con el filtro actual.
               </CAlert>
             ) : (
-              <CListGroup>
-                {filteredNotifications.map((note, index) => (
-                  <CListGroupItem
-                    key={index}
-                    className={`d-flex align-items-start p-3 ${note.status === 'danger' ? 'list-group-item-danger' : ''}`}
-                  >
-                    <div className="me-3 mt-1">
-                      <CBadge
-                        color={getBadgeColor(note.status)}
-                        shape="rounded-pill"
-                        className="p-2"
-                      >
-                        <CIcon icon={getIcon(note.type)} size="lg" />
-                      </CBadge>
-                    </div>
-                    <div className="flex-grow-1">
-                      <div className="d-flex w-100 justify-content-between">
-                        <h5 className="mb-1 text-truncate" style={{ maxWidth: '80%' }}>
-                          {note.title}
-                        </h5>
-                        <small className="text-medium-emphasis text-nowrap">
-                          {formatDate(note.date_ref)}
-                        </small>
-                      </div>
-                      <p className="mb-1 fw-semibold">{note.message}</p>
-                      <small className="text-muted text-uppercase" style={{ fontSize: '0.75rem' }}>
-                        {note.type} •{' '}
-                        {note.status === 'danger'
-                          ? 'Prioridad Alta'
-                          : note.status === 'warning'
-                            ? 'Prioridad Media'
-                            : 'Informativo'}
-                      </small>
-                    </div>
-                  </CListGroupItem>
-                ))}
-              </CListGroup>
+              <div className="table-responsive">
+                <table className="table table-hover table-striped align-middle text-start">
+                  <thead className="table-light">
+                    <tr>
+                      <th className="text-center" style={{ width: '50px' }}>
+                        Tipo
+                      </th>
+                      <th>Notificación</th>
+                      <th className="text-center" style={{ width: '120px' }}>
+                        Prioridad
+                      </th>
+                      <th className="text-end" style={{ width: '150px' }}>
+                        Fecha
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredNotifications.map((note, index) => (
+                      <tr key={index}>
+                        <td className="text-center">
+                          <CBadge
+                            color={getBadgeColor(note.status === 'danger' ? 'danger' : 'light')}
+                            textColor={note.status === 'danger' ? 'white' : 'dark'}
+                            shape="rounded-pill"
+                            className="p-2"
+                          >
+                            <CIcon
+                              icon={getIcon(note.type)}
+                              size="lg"
+                              className={
+                                note.status !== 'danger' ? getColorForStatus(note.status) : ''
+                              }
+                            />
+                          </CBadge>
+                        </td>
+                        <td>
+                          <div className="fw-bold text-dark">{note.title}</div>
+                          <div className="text-medium-emphasis small">{note.message}</div>
+                        </td>
+                        <td className="text-center">
+                          <CBadge color={getBadgeColor(note.status)}>
+                            {note.status === 'danger'
+                              ? 'ALTA'
+                              : note.status === 'warning'
+                                ? 'MEDIA'
+                                : 'BAJA'}
+                          </CBadge>
+                        </td>
+                        <td className="text-end text-muted small">{formatDate(note.date_ref)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </CCardBody>
         </CCard>

@@ -44,7 +44,7 @@ const routes = [
     element: Employee,
     roles: [1, 3, 9], // Admin, Superadmin, Secretaria
   },
-  { path: '/users', exact: true, name: 'Users', element: Users, roles: [3] }, // Solo Superadmin
+  { path: '/users', exact: true, name: 'Users', element: Users, roles: [1, 3] }, // Admin y Superadmin
   {
     path: '/cattle',
     exact: true,
