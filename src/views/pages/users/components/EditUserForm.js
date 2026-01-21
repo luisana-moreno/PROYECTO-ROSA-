@@ -3,6 +3,7 @@ import { CCol, CFormInput, CFormSelect, CFormLabel, CRow, CAlert } from '@coreui
 import { useAuth } from 'src/context/AuthContext'
 
 const EditUserForm = ({ currentUser, setCurrentUser, roles }) => {
+  const { user } = useAuth()
   return (
     <div>
       <CRow className="mb-3">
@@ -87,10 +88,31 @@ const EditUserForm = ({ currentUser, setCurrentUser, roles }) => {
         </CCol>
       </CRow>
 
-      <CAlert color="info" className="mt-3">
-        <strong>Nota:</strong> Para cambiar la contraseña de un usuario, debe hacerlo desde su
-        página de perfil.
-      </CAlert>
+      {/* Solo el Superadmin puede cambiar contraseñas directamente desde aquí */}
+      {user && user.roleId === 3 && (
+        <CRow className="mb-3">
+          <CCol md={12}>
+            <CFormLabel>Nueva Contraseña (Opcional)</CFormLabel>
+            <CFormInput
+              type="password"
+              placeholder="Ingrese nueva contraseña para cambiarla"
+              value={currentUser?.contrasena || ''}
+              onChange={(e) => setCurrentUser({ ...currentUser, contrasena: e.target.value })}
+              autoComplete="new-password"
+            />
+            <small className="text-muted">
+              Dejar en blanco para mantener la contraseña actual.
+            </small>
+          </CCol>
+        </CRow>
+      )}
+
+      {(!user || user.roleId !== 3) && (
+        <CAlert color="info" className="mt-3">
+          <strong>Nota:</strong> Para cambiar la contraseña de un usuario, debe hacerlo desde su
+          página de perfil o contactar a un Superadmin.
+        </CAlert>
+      )}
     </div>
   )
 }

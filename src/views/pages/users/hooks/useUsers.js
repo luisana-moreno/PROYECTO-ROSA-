@@ -119,9 +119,15 @@ export const useUsers = () => {
       return
     }
     try {
-      // Excluir el campo de contraseña ya que no está en el formulario de edición
-      const { contrasena, ...userDataWithoutPassword } = currentUser
-      const updated = await userService.updateUser(currentUser.ttr_idusuar, userDataWithoutPassword)
+      // PREPARAR DATOS PARA LA ACTUALIZACIÓN
+      // Si hay contraseña y no está vacía, se envía. Si está vacía, se elimina del objeto para no enviarla.
+      const userDataToUpdate = { ...currentUser }
+
+      if (!userDataToUpdate.contrasena || userDataToUpdate.contrasena.trim() === '') {
+        delete userDataToUpdate.contrasena
+      }
+
+      const updated = await userService.updateUser(currentUser.ttr_idusuar, userDataToUpdate)
       if (updated) {
         fetchUsers() // Recargar la lista de usuarios
         setEditVisible(false)
