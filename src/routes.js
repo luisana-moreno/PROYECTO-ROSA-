@@ -35,7 +35,7 @@ const routes = [
     exact: true,
     name: 'Dashboard',
     element: Dashboard,
-    roles: [1, 2, 3, 4, 5, 6, 7, 8, 9], // Todos los roles
+    roles: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], // Todos los roles
   },
   {
     path: '/employee',
@@ -50,7 +50,7 @@ const routes = [
     exact: true,
     name: 'Cattle',
     element: Cattle,
-    roles: [1, 3, 4, 6, 7, 8], // Admin, Superadmin, Obrero Campo, Encargado Potreros, Ordeñador, Operario General
+    roles: [1, 3, 4, 6, 7, 8, 10], // Admin, Superadmin, Obrero Campo, Encargado Potreros, Ordeñador, Operario General, Veterinario
   },
   // Control de Sanidad - Rutas del módulo completo
   {
@@ -58,21 +58,21 @@ const routes = [
     exact: true,
     name: 'Control de Sanidad',
     element: DashboardSanidad,
-    roles: [1, 3, 4, 8], // Admin, Superadmin, Obrero Campo, Operario General
+    roles: [1, 3, 4, 8, 10], // Admin, Superadmin, Obrero Campo, Operario General, Veterinario
   },
   {
     path: '/sanidad/dashboard',
     exact: true,
     name: 'Dashboard Sanidad',
     element: DashboardSanidad,
-    roles: [1, 3, 4, 8],
+    roles: [1, 3, 4, 8, 10],
   },
   {
     path: '/sanidad/controles',
     exact: true,
     name: 'Controles Sanitarios',
     element: ControlesIndex,
-    roles: [1, 3, 4, 8],
+    roles: [1, 3, 4, 8, 10],
   },
 
   {
@@ -80,35 +80,35 @@ const routes = [
     exact: true,
     name: 'Gestión de Preñez',
     element: PrenezIndex,
-    roles: [1, 3, 4], // Admin, Superadmin, Obrero Campo
+    roles: [1, 3, 4, 10], // Admin, Superadmin, Obrero Campo, Veterinario
   },
   {
     path: '/sanidad/visitas-veterinarias',
     exact: true,
     name: 'Visitas Veterinarias',
     element: VisitasIndex,
-    roles: [1, 3, 4],
+    roles: [1, 3, 4, 10],
   },
   {
     path: '/sanidad/planes-vacunacion',
     exact: true,
     name: 'Planes de Vacunación',
     element: PlanesIndex,
-    roles: [1, 3, 4],
+    roles: [1, 3, 4, 10],
   },
   {
     path: '/sanidad/reportes',
     exact: true,
     name: 'Reportes de Sanidad',
     element: ReportesIndex,
-    roles: [1, 3, 4, 8],
+    roles: [1, 3, 4, 8, 10],
   },
   {
     path: '/notifications',
     exact: true,
     name: 'Notificaciones',
     element: NotificationsIndex,
-    roles: [1, 2, 3, 4, 5, 8], // Disponible para la mayoría
+    roles: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], // Disponible para todos
   },
   {
     path: '/client',
@@ -123,49 +123,49 @@ const routes = [
     exact: true,
     name: 'Inventory',
     element: Inventory,
-    roles: [1, 3, 9], // Admin, Superadmin, Secretaria
+    roles: [1, 2, 3, 9], // Admin, Superadmin, Empleado, Secretaria
   },
   {
     path: '/pastures',
     exact: true,
     name: 'Pastures',
     element: Pastures,
-    roles: [1, 3, 4, 6, 8], // Admin, Superadmin, Obrero Campo, Encargado Potreros, Operario General
+    roles: [1, 3, 4, 6, 8, 10], // Admin, Superadmin, Obrero Campo, Encargado Potreros, Operario General, Veterinario
   },
   {
     path: '/pastures/activity',
     exact: true,
     name: 'PastureActivityModule',
     element: PastureActivityModule,
-    roles: [1, 3, 4, 6, 8],
+    roles: [1, 3, 4, 6, 8, 10],
   },
   {
     path: '/lots',
     exact: true,
     name: 'LotRegistration',
     element: LotRegistration,
-    roles: [1, 3, 4, 6, 8], // Admin, Superadmin, Obrero Campo, Encargado Potreros, Operario General
+    roles: [1, 3, 4, 6, 8, 10], // Admin, Superadmin, Obrero Campo, Encargado Potreros, Operario General, Veterinario
   },
   {
     path: '/milkProduction',
     exact: true,
     name: 'MilkProduction',
     element: MilkProduction,
-    roles: [1, 3, 4, 7, 8], // Admin, Superadmin, Obrero Campo, Ordeñador, Operario General
+    roles: [1, 3, 4, 7, 8, 10], // Admin, Superadmin, Obrero Campo, Ordeñador, Operario General, Veterinario
   },
   {
     path: '/asisten',
     exact: true,
     name: 'Asisten',
     element: Asisten,
-    roles: [1, 2, 3, 4, 5, 6, 7, 8, 9], // Todos pueden ver su asistencia
+    roles: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], // Todos pueden ver su asistencia
   },
   {
     path: '/expbov',
     exact: true,
     name: 'Expbov',
     element: React.lazy(() => import('./views/pages/cattle/expbov')),
-    roles: [1, 3, 4, 8], // Admin, Superadmin, Obrero Campo, Operario General
+    roles: [1, 3, 4, 8, 10], // Admin, Superadmin, Obrero Campo, Operario General, Veterinario
   },
   {
     path: '/settings',
@@ -179,7 +179,7 @@ const routes = [
     exact: true,
     name: 'Profile',
     element: Profile,
-    roles: [1, 2, 3, 4, 5, 6, 7, 8, 9], // Todos los roles pueden acceder a su perfil
+    roles: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], // Todos los roles pueden acceder a su perfil
   },
 ]
 
