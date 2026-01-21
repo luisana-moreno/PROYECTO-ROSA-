@@ -160,14 +160,14 @@ const _nav = [
         name: 'Registro de Lotes',
         to: '/lots',
         icon: <CIcon icon={cilAnimal} customClassName="nav-icon" />,
-        roles: [1, 3, 4, 6, 8, 10],
+        roles: [1, 3, 4, 6, 8],
       },
       {
         component: CNavItem,
         name: 'Produccion de Leche',
         to: '/milkProduction',
         icon: <CIcon icon={cilGraph} customClassName="nav-icon" />,
-        roles: [1, 3, 4, 7, 8, 10],
+        roles: [1, 3, 4, 7, 8],
       },
     ],
   },
@@ -175,7 +175,7 @@ const _nav = [
     component: CNavGroup,
     name: 'Gestion de Potreros',
     icon: <CIcon icon={cilChart} customClassName="nav-icon" />,
-    roles: [1, 3, 4, 6, 8, 10],
+    roles: [1, 3, 4, 6, 8],
     items: [
       {
         component: CNavItem,
