@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import {
@@ -7,12 +7,14 @@ import {
   CDropdownItem,
   CDropdownMenu,
   CDropdownToggle,
+  CDropdownDivider, // Añadido
   CHeader,
   CHeaderNav,
   CHeaderToggler,
   CNavLink,
   CNavItem,
   useColorModes,
+  CBadge,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -23,10 +25,13 @@ import {
   cilMenu,
   cilMoon,
   cilSun,
+  cilWarning,
+  cilMedicalCross,
 } from '@coreui/icons'
 
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
+import notificationService from '../api/notificationService'
 
 const AppHeader = () => {
   const headerRef = useRef()
@@ -35,12 +40,53 @@ const AppHeader = () => {
   const dispatch = useDispatch()
   const sidebarShow = useSelector((state) => state.sidebarShow)
 
+  const [notifications, setNotifications] = useState([])
+  const [unreadCount, setUnreadCount] = useState(0)
+
   useEffect(() => {
     document.addEventListener('scroll', () => {
       headerRef.current &&
         headerRef.current.classList.toggle('shadow-sm', document.documentElement.scrollTop > 0)
     })
   }, [])
+
+  // Cargar notificaciones
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      const data = await notificationService.getNotifications()
+      setNotifications(data)
+      setUnreadCount(data.length)
+    }
+
+    fetchNotifications()
+    // Polling opcional cada 60 segundos
+    const interval = setInterval(fetchNotifications, 60000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const getIconForType = (type) => {
+    switch (type) {
+      case 'sanidad':
+        return cilMedicalCross
+      case 'parto':
+        return cilBell
+      case 'inventario':
+        return cilWarning
+      default:
+        return cilBell
+    }
+  }
+
+  const getColorForStatus = (status) => {
+    switch (status) {
+      case 'danger':
+        return 'text-danger'
+      case 'warning':
+        return 'text-warning'
+      default:
+        return 'text-info'
+    }
+  }
 
   return (
     <CHeader
@@ -75,37 +121,64 @@ const AppHeader = () => {
         </CHeaderToggler>
         <CHeaderNav className="ms-auto d-flex align-items-center">
           <CNavItem className="me-2 me-md-3">
-            <CNavLink
-              href="#"
-              className="position-relative d-flex align-items-center justify-content-center p-2"
-              style={{
-                transition: 'all 0.2s ease',
-                borderRadius: '8px',
-              }}
-            >
-              <CIcon
-                icon={cilBell}
-                size="lg"
-                style={{
-                  color: '#212631',
-                  transition: 'all 0.2s ease',
-                }}
-                className="bell-icon"
-              />
-              <span
-                className="position-absolute badge rounded-pill"
-                style={{
-                  backgroundColor: '#28a745',
-                  fontSize: '0.65rem',
-                  padding: '0.25em 0.5em',
-                  top: '0',
-                  right: '0',
-                  transform: 'translate(25%, -25%)',
-                }}
+            <CDropdown variant="nav-item" placement="bottom-end">
+              <CDropdownToggle caret={false} className="py-0 position-relative">
+                <CIcon icon={cilBell} size="lg" style={{ color: '#212631', cursor: 'pointer' }} />
+                {unreadCount > 0 && (
+                  <span
+                    className="position-absolute badge rounded-pill"
+                    style={{
+                      backgroundColor: '#dc3545',
+                      fontSize: '0.65rem',
+                      padding: '0.25em 0.5em',
+                      top: '-5px',
+                      right: '-5px',
+                    }}
+                  >
+                    {unreadCount}
+                    <span className="visually-hidden">notificaciones</span>
+                  </span>
+                )}
+              </CDropdownToggle>
+              <CDropdownMenu
+                className="pt-0"
+                style={{ minWidth: '300px', maxHeight: '400px', overflowY: 'auto' }}
               >
-                3<span className="visually-hidden">notificaciones sin leer</span>
-              </span>
-            </CNavLink>
+                <CDropdownItem className="fw-bold text-center bg-light disabled">
+                  Notificaciones
+                </CDropdownItem>
+                {notifications.length === 0 ? (
+                  <CDropdownItem className="text-center text-muted py-3">
+                    No tienes notificaciones pendientes
+                  </CDropdownItem>
+                ) : (
+                  notifications.map((notif, index) => (
+                    <CDropdownItem key={index} href="#">
+                      <div className="d-flex align-items-center mb-1">
+                        <CIcon
+                          icon={getIconForType(notif.type)}
+                          className={`me-2 ${getColorForStatus(notif.status)}`}
+                        />
+                        <strong className="small">{notif.title}</strong>
+                      </div>
+                      <div
+                        className="small text-medium-emphasis text-wrap"
+                        style={{ lineHeight: '1.2' }}
+                      >
+                        {notif.message}
+                      </div>
+                    </CDropdownItem>
+                  ))
+                )}
+                <CDropdownDivider />
+                <CDropdownItem
+                  href="#/notifications"
+                  className="text-center small fw-bold text-primary py-2"
+                >
+                  Ver todas las notificaciones
+                </CDropdownItem>
+              </CDropdownMenu>
+            </CDropdown>
           </CNavItem>
         </CHeaderNav>
         <CHeaderNav className="ms-1 ms-md-2">

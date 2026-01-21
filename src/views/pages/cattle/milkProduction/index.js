@@ -1,12 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import CIcon from '@coreui/icons-react'
 import { cilPlus, cilDrop } from '@coreui/icons'
-import { CCard, CCardHeader, CCardBody, CButton, CRow, CCol } from '@coreui/react'
+import { CCard, CCardHeader, CCardBody, CButton, CRow, CCol, CFormInput } from '@coreui/react'
 import { useMilkRecords } from './hooks/useMilkRecords'
 import { MilkProductionLotTable } from './components/MilkProductionLotTable'
 import { AddMilkRecordModal } from './components/AddMilkRecordModal'
 import { EditMilkRecordModal } from './components/EditMilkRecordModal'
 import { DeleteMilkRecordModal } from './components/DeleteMilkRecordModal'
+import { MilkProductionDetailModal } from './components/MilkProductionDetailModal'
 
 const MilkProduction = () => {
   const {
@@ -38,7 +39,22 @@ const MilkProduction = () => {
     handleAddRecord,
     handleEditRecord,
     handleDeleteRecord,
+    // Nuevos estados para filtro
+    filteredMilkProductionLots,
+    searchTerm,
+    setSearchTerm,
+    filterDate,
+    setFilterDate,
   } = useMilkRecords()
+
+  // Estado para el modal de detalles
+  const [detailVisible, setDetailVisible] = useState(false)
+  const [selectedLotProduction, setSelectedLotProduction] = useState(null)
+
+  const handleViewDetails = (lotProduction) => {
+    setSelectedLotProduction(lotProduction)
+    setDetailVisible(true)
+  }
 
   return (
     <>
@@ -61,6 +77,47 @@ const MilkProduction = () => {
         </CCol>
       </CRow>
 
+      <CRow className="mb-3">
+        <CCol xs={12}>
+          <CCard>
+            <CCardBody>
+              <CRow className="g-3 align-items-end">
+                <CCol md={5}>
+                  <label className="form-label">Buscar por Lote</label>
+                  <CFormInput
+                    type="text"
+                    placeholder="Escriba el nombre del lote..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </CCol>
+                <CCol md={5}>
+                  <label className="form-label">Filtrar por Fecha</label>
+                  <CFormInput
+                    type="date"
+                    value={filterDate}
+                    onChange={(e) => setFilterDate(e.target.value)}
+                  />
+                </CCol>
+                <CCol md={2}>
+                  <CButton
+                    color="secondary"
+                    variant="outline"
+                    className="w-100"
+                    onClick={() => {
+                      setSearchTerm('')
+                      setFilterDate('')
+                    }}
+                  >
+                    Limpiar
+                  </CButton>
+                </CCol>
+              </CRow>
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+
       <CRow>
         <CCol xs={12}>
           <CCard className="mb-4">
@@ -73,11 +130,8 @@ const MilkProduction = () => {
             </CCardHeader>
             <CCardBody>
               <MilkProductionLotTable
-                milkProductionLots={milkProductionLots}
-                individualMilkRecords={individualMilkRecords}
-                setCurrentRecord={setCurrentRecord}
-                setEditVisible={setEditVisible}
-                setDeleteVisible={setDeleteVisible}
+                milkProductionLots={filteredMilkProductionLots}
+                onViewDetails={handleViewDetails}
               />
             </CCardBody>
           </CCard>
@@ -101,6 +155,16 @@ const MilkProduction = () => {
         setIndividualBovineProduction={setIndividualBovineProduction}
         isLoading={isLoading}
         handleAddRecord={handleAddRecord}
+      />
+
+      <MilkProductionDetailModal
+        visible={detailVisible}
+        setVisible={setDetailVisible}
+        selectedLotProduction={selectedLotProduction}
+        individualRecords={individualMilkRecords}
+        setCurrentRecord={setCurrentRecord}
+        setEditVisible={setEditVisible}
+        setDeleteVisible={setDeleteVisible}
       />
 
       <EditMilkRecordModal

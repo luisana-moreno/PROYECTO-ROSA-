@@ -17,13 +17,24 @@ import {
   CFormSelect,
   CProgress,
   CProgressBar,
+  CWidgetStatsF,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilChartPie, cilWarning, cilCheckCircle, cilArrowRight, cilChartLine } from '@coreui/icons'
+import {
+  cilChartPie,
+  cilWarning,
+  cilCheckCircle,
+  cilArrowRight,
+  cilChartLine,
+  cilBell,
+  cilMedicalCross,
+  cilCalendar,
+} from '@coreui/icons'
 import {
   getVacunasProximasReporte,
   getCumplimientoVacunacion,
   getBovinosAtencionRequerida,
+  getDashboardSanidad,
 } from '../../../../api/sanidadService'
 import { useNavigate } from 'react-router-dom'
 
@@ -32,6 +43,15 @@ const ReportesIndex = () => {
   const [vacunasProximas, setVacunasProximas] = useState([])
   const [cumplimiento, setCumplimiento] = useState([])
   const [bovinosAtencion, setBovinosAtencion] = useState([])
+  // Estado para dashboard stats
+  const [dashboardStats, setDashboardStats] = useState({
+    vacunasVencidas: 0,
+    vacunasProximas: 0,
+    prenecesActivas: 0,
+    tratamientosProximos: 0,
+    proximaVisita: null,
+  })
+
   const [diasFiltro, setDiasFiltro] = useState(30)
   const [loading, setLoading] = useState(true)
 
@@ -42,15 +62,17 @@ const ReportesIndex = () => {
   const loadReportes = async () => {
     try {
       setLoading(true)
-      const [vacunas, cumpl, atencion] = await Promise.all([
+      const [vacunas, cumpl, atencion, stats] = await Promise.all([
         getVacunasProximasReporte(diasFiltro),
         getCumplimientoVacunacion(),
         getBovinosAtencionRequerida(),
+        getDashboardSanidad(),
       ])
 
       setVacunasProximas(vacunas)
       setCumplimiento(cumpl)
       setBovinosAtencion(atencion)
+      setDashboardStats(stats)
     } catch (error) {
       console.error('Error al cargar reportes:', error)
     } finally {
@@ -83,12 +105,71 @@ const ReportesIndex = () => {
               <div className="d-flex align-items-center">
                 <CIcon icon={cilChartLine} className="me-3 text-success" size="xl" />
                 <p className="text-medium-emphasis mb-0">
-                  Visualiza estadísticas detalladas y reportes del estado sanitario del ganado,
-                  cumplimiento de protocolos y alertas tempranas.
+                  Visualiza estadísticas detalladas y reportes del estado sanitario del ganado.
                 </p>
               </div>
             </CCardBody>
           </CCard>
+        </CCol>
+      </CRow>
+
+      {/* Widgets de Resumen */}
+      <CRow className="mb-4">
+        <CCol sm={6} lg={3}>
+          <CWidgetStatsF
+            className="mb-3"
+            color="danger"
+            icon={<CIcon icon={cilWarning} height={24} />}
+            title="Vacunas Vencidas"
+            value={dashboardStats.vacunasVencidas}
+            footer={
+              <CButton
+                color="link"
+                className="font-weight-bold text-decoration-none p-0"
+                onClick={() => navigate('/sanidad/vacunaciones')}
+              >
+                Ver pendientes <CIcon icon={cilArrowRight} className="ms-auto" width={16} />
+              </CButton>
+            }
+          />
+        </CCol>
+        <CCol sm={6} lg={3}>
+          <CWidgetStatsF
+            className="mb-3"
+            color="warning"
+            icon={<CIcon icon={cilBell} height={24} />}
+            title="Vacunas Próx. (15d)"
+            value={dashboardStats.vacunasProximas}
+            footer={<span className="text-medium-emphasis small">Programar aplicación</span>}
+          />
+        </CCol>
+        <CCol sm={6} lg={3}>
+          <CWidgetStatsF
+            className="mb-3"
+            color="info"
+            icon={<CIcon icon={cilMedicalCross} height={24} />}
+            title="Preñeces Activas"
+            value={dashboardStats.prenecesActivas}
+            footer={
+              <CButton
+                color="link"
+                className="font-weight-bold text-decoration-none p-0"
+                onClick={() => navigate('/sanidad/prenez')}
+              >
+                Gestionar <CIcon icon={cilArrowRight} className="ms-auto" width={16} />
+              </CButton>
+            }
+          />
+        </CCol>
+        <CCol sm={6} lg={3}>
+          <CWidgetStatsF
+            className="mb-3"
+            color="success"
+            icon={<CIcon icon={cilCalendar} height={24} />}
+            title="Próx. Visita Vet"
+            value={dashboardStats.proximaVisita ? formatDate(dashboardStats.proximaVisita) : 'N/A'}
+            footer={<span className="text-medium-emphasis small">Agenda veterinaria</span>}
+          />
         </CCol>
       </CRow>
 

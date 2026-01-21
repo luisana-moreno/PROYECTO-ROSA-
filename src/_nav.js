@@ -19,6 +19,7 @@ import {
   cilGraph,
   cilSettings, // Añadido para el módulo de configuración
   cilMedicalCross, // Añadido para Control de Sanidad
+  cilBell, // Añadido para Notificaciones
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -29,6 +30,17 @@ const _nav = [
     to: '/dashboard',
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
     roles: [1, 2, 3, 4, 5], // IDs de roles: 1=administrador, 2=empleado, 3=superadmin, 4=veterinario, 5=cliente
+  },
+  {
+    component: CNavItem,
+    name: 'Notificaciones',
+    to: '/notifications',
+    icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
+    roles: [1, 2, 3, 4, 5, 8],
+    badge: {
+      color: 'danger',
+      text: '!',
+    },
   },
   {
     component: CNavTitle,

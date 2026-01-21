@@ -67,7 +67,7 @@ export const useCattle = () => {
           cattleService.getMales(),
           cattleService.getFemales(),
         ])
-      setCattle(cattleData)
+      setCattle(cattleData.sort((a, b) => new Date(b.ttrFeccreacion) - new Date(a.ttrFeccreacion)))
       setRazas(razasData)
       setColores(coloresData)
       setEtapas(etapasData)

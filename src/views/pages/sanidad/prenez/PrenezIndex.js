@@ -135,20 +135,48 @@ const PrenezIndex = () => {
     }
   }
 
+  /* Estado para el modal de éxito */
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [successMessage, setSuccessMessage] = useState(null)
+
   const handleRegistrarParto = async () => {
     try {
       setLoading(true)
       const result = await agregarTratamientosPostParto(selectedPrenez, partoData.fechaParto)
-      alert(
-        '✅ Parto registrado y tratamientos programados!\n\n' +
-          'Se crearon automáticamente:\n' +
-          '• Suero + Calcio (2 días)\n' +
-          '• Desinflamatorio para ubres\n' +
-          '• Hormona expulsora uterina\n' +
-          '• Vitaminas (cada 2 meses)\n\n' +
-          'Estado de preñez: Finalizada',
-      )
+
+      // Preparar mensaje para el modal
+      setSuccessMessage({
+        title: '¡Parto Registrado Exitosamente!',
+        content: (
+          <div>
+            <p className="mb-2">Se ha registrado el parto y la preñez ha finalizado.</p>
+            <div className="alert alert-success border-0">
+              <h6 className="alert-heading">
+                <CIcon icon={cilCheckCircle} className="me-2" />
+                Tratamientos Automáticos Generados:
+              </h6>
+              <ul className="mb-0 small">
+                <li>
+                  <strong>Suero + Calcio:</strong> 2 días (preventivo fiebre de leche)
+                </li>
+                <li>
+                  <strong>Desinflamatorio:</strong> Ubres
+                </li>
+                <li>
+                  <strong>Hormona expulsora:</strong> Limpieza uterina
+                </li>
+                <li>
+                  <strong>Vitaminas:</strong> Programadas cada 2 meses
+                </li>
+              </ul>
+            </div>
+          </div>
+        ),
+      })
+
       setShowPartoModal(false)
+      setShowSuccessModal(true) // Mostrar modal de éxito
+
       setPartoData({ fechaParto: new Date().toISOString().split('T')[0] })
       loadData()
     } catch (error) {
@@ -547,6 +575,26 @@ const PrenezIndex = () => {
             disabled={loading}
           >
             {loading ? 'Procesando...' : 'Confirmar Parto'}
+          </CButton>
+        </CModalFooter>
+      </CModal>
+      <CModal
+        visible={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        backdrop="static"
+        color="success"
+      >
+        <CModalHeader closeButton>
+          <CModalTitle className="text-success">{successMessage?.title}</CModalTitle>
+        </CModalHeader>
+        <CModalBody>{successMessage?.content}</CModalBody>
+        <CModalFooter>
+          <CButton
+            color="success"
+            className="text-white"
+            onClick={() => setShowSuccessModal(false)}
+          >
+            Entendido
           </CButton>
         </CModalFooter>
       </CModal>

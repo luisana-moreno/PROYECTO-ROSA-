@@ -210,6 +210,30 @@ export const useMilkRecords = () => {
     }
   }
 
+  // Search and Filter states
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterDate, setFilterDate] = useState('')
+
+  // Derived filtered lots
+  const filteredMilkProductionLots = milkProductionLots.filter((lot) => {
+    const lotName = (lot.nombreLote || lot.nombre_lote || '').toLowerCase()
+    const prodDate = lot.fechaProduccion || lot.ttr_fechapro
+
+    // Check Date
+    let dateMatch = true
+    if (filterDate) {
+      // Comparar fechas (asumiendo formato ISO o string comparable)
+      // Si prodDate viene con hora, cortamos solo la fecha YYYY-MM-DD
+      const dateOnly = prodDate ? new Date(prodDate).toISOString().split('T')[0] : ''
+      dateMatch = dateOnly === filterDate
+    }
+
+    // Check Name
+    const nameMatch = lotName.includes(searchTerm.toLowerCase())
+
+    return dateMatch && nameMatch
+  })
+
   return {
     visible,
     setVisible,
@@ -234,9 +258,14 @@ export const useMilkRecords = () => {
     individualBovineProduction,
     setIndividualBovineProduction,
     milkProductionLots,
+    filteredMilkProductionLots, // Exportamos la lista filtrada
+    searchTerm, // Exportamos estado de búsqueda
+    setSearchTerm,
+    filterDate, // Exportamos estado de filtro fecha
+    setFilterDate,
     individualMilkRecords,
-    days, // Aunque days ya no se usa directamente en el modal de Add, lo mantenemos por si se necesita en otros componentes.
-    isLoading, // Exportar el estado de carga
+    days,
+    isLoading,
     handleAddRecord,
     handleEditRecord,
     handleDeleteRecord,

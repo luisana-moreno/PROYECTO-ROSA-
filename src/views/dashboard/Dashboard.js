@@ -16,10 +16,21 @@ import PastureStatusChart from './components/PastureStatusChart'
 const Dashboard = () => {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState({
-    bovinos: { total: 0, en_finca: 0, hembras: 0, machos: 0 },
-    leche: { litros_hoy: 0, litros_semana: 0, promedio_semana: 0 },
-    potreros: { total: 0, ocupados: 0, disponibles: 0, mantenimiento: 0 },
+    bovinos: {
+      total: 0,
+      en_finca: 0,
+      hembras: 0,
+      machos: 0,
+      terneros: 0,
+      novillas: 0,
+      vacas: 0,
+      toros: 0,
+    },
+    leche: { litros_hoy: 0, litros_semana: 0, litros_semana_anterior: 0, promedio_semana: 0 },
+    potreros: { total: 0, ocupados: 0, disponibles: 0, mantenimiento: 0, porcentaje_ocupacion: 0 },
     insumos: { total_items: 0, low_stock: 0, near_expiry: 0 },
+    vacunacion: { total_proximas: 0, proximas_semana: 0, vencidas: 0 },
+    prenez: { total_prenadas: 0, partos_proximos: 0, partos_semana: 0 },
     produccion_historial: [],
     top_bovine: { numero: 'N/A', total_litros: 0 },
   })
@@ -61,6 +72,8 @@ const Dashboard = () => {
       ? data.produccion_historial
       : []
 
+  console.log(data)
+
   return (
     <div className="fade-in p-4" style={{ backgroundColor: '#ebedef', minHeight: '100vh' }}>
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -73,64 +86,83 @@ const Dashboard = () => {
       </div>
 
       {/* --- KPIs PRINCIPALES --- */}
-      <CRow>
+      <CRow className="mb-4">
         <CCol xs={12} sm={6} lg={3}>
-          {/* ... Bovinos en Finca ... */}
+          {/* Bovinos Totales con desglose */}
           <StatCard
-            title="Bovinos en Finca"
+            title="Bovinos Activos / Totales"
             value={`${data.bovinos.en_finca} / ${data.bovinos.total}`}
             icon={<i className="cil-cow" style={{ fontSize: '2rem' }}></i>}
             color="#2eb85c"
-            description="Total de animales registrados"
-          />
-        </CCol>
-        <CCol xs={12} sm={6} lg={3}>
-          {/* ... Producción Hoy ... */}
-          <StatCard
-            title="Producción Hoy"
-            value={`${Number(data.leche.litros_hoy).toFixed(1)} L`}
-            icon={<CIcon icon={cilDrop} size="xl" />}
-            color="#3399ff"
-            description={`Promedio Semanal: ${Number(data.leche.promedio_semana).toFixed(1)} L`}
+            description={`♀ ${data.bovinos.hembras} | ♂ ${data.bovinos.machos}`}
           />
         </CCol>
 
-        {/* Nuevo Card: Top Bovine (Reemplaza o se suma a Alertas Insumos?) 
-             El usuario quiere ver "cual es el bovino que mas produccion hizo".
-             Lo pondremos en lugar de Insumos o agregamos una fila nueva?
-             Mejor reemplazamos Insumos si no es prioritario, o lo movemos.
-             Pongámoslo en el lugar de Insumos por ahora para probar, o agregamos 5ta columna?
-             Bootstrap grid es de 12. 
-             Vamos a mantener los 4 y cambiar Insumos por Top Bovine si el usuario está muy enfocado en leche.
-             O mejor, ponemos Insumos y Potreros juntos?
-             Dejemos Insumos (es importante) y Potreros (importante).
-             Hagamos una nueva fila de KPIs secundarios o agregamos el Top Bovine destacado.
-             
-             Opción: Agregar Top Bovine como un KPI destacado adicional ancho o en el array.
-             Voy a reemplazar "Alertas Insumos" momentáneamente con "Vaca Top (Mes)" a ver si le gusta, 
-             o mejor, cambio el de "Ocupación Potreros" que es menos crítico en el día a día lechero.
-             
-             Decisión: Agregar una nueva tarjeta para Top Bovine y mover Insumos/Potreros.
-             Haremos una fila de 5? No, 4 es estándar.
-             Vamos a poner: Bovinos, Producción Hoy, Top Bovine, Insumos.
-             Potreros lo bajamos al gráfico de estado.
-         */}
         <CCol xs={12} sm={6} lg={3}>
+          {/* Leche Esta Semana con tendencia */}
           <StatCard
-            title="Vaca Líder (Mes)"
-            value={`#${data.top_bovine?.numero || 'N/A'}`}
-            icon={<span className="fw-bold fs-3">🏆</span>} // Icono de trofeo o similar
-            color="#f9b115"
-            description={`${data.top_bovine?.total_litros || 0} Litros producidos`}
+            title="Leche Esta Semana"
+            value={`${Number(data.leche.litros_semana).toFixed(0)} L`}
+            icon={<CIcon icon={cilDrop} size="xl" />}
+            color="#3399ff"
+            description={
+              data.leche.litros_semana_anterior > 0
+                ? data.leche.litros_semana > data.leche.litros_semana_anterior
+                  ? `↑ +${(((data.leche.litros_semana - data.leche.litros_semana_anterior) / data.leche.litros_semana_anterior) * 100).toFixed(1)}%`
+                  : `↓ ${(((data.leche.litros_semana - data.leche.litros_semana_anterior) / data.leche.litros_semana_anterior) * 100).toFixed(1)}%`
+                : `Hoy: ${Number(data.leche.litros_hoy).toFixed(1)} L`
+            }
           />
         </CCol>
+
         <CCol xs={12} sm={6} lg={3}>
+          {/* Potreros en Uso */}
           <StatCard
-            title="Alertas Insumos"
-            value={data.insumos.low_stock}
+            title="Potreros en Uso"
+            value={`${data.potreros.ocupados}/${data.potreros.total}`}
+            icon={<CIcon icon={cilHome} size="xl" />}
+            color="#f9b115"
+            description={`${data.potreros.porcentaje_ocupacion || 0}% ocupación`}
+          />
+        </CCol>
+
+        <CCol xs={12} sm={6} lg={3}>
+          {/* Vacunas Pendientes */}
+          <StatCard
+            title="Vacunas Pendientes"
+            value={data.vacunacion.total_proximas}
             icon={<CIcon icon={cilWarning} size="xl" />}
-            color={Number(data.insumos.low_stock) > 0 ? '#e55353' : '#2eb85c'}
-            description="Items con stock crítico"
+            color={data.vacunacion.vencidas > 0 ? '#e55353' : '#3399ff'}
+            description={
+              data.vacunacion.vencidas > 0
+                ? `⚠️ ${data.vacunacion.vencidas} vencidas`
+                : `${data.vacunacion.proximas_semana} esta semana`
+            }
+          />
+        </CCol>
+      </CRow>
+
+      {/* --- KPIs SECUNDARIOS --- */}
+      <CRow className="mb-4">
+        <CCol xs={12} sm={6} lg={6}>
+          {/* Vacas Preñadas */}
+          <StatCard
+            title="Vacas Preñadas"
+            value={data.prenez.total_prenadas}
+            icon={<i className="cil-heart" style={{ fontSize: '2rem' }}></i>}
+            color="#e55353"
+            description={`${data.prenez.partos_proximos} partos próximos (30d)`}
+          />
+        </CCol>
+
+        <CCol xs={12} sm={6} lg={6}>
+          {/* Bovino Top del Mes */}
+          <StatCard
+            title="Top Productor (Mes)"
+            value={data.top_bovine.numero}
+            icon={<i className="cil-star" style={{ fontSize: '2rem' }}></i>}
+            color="#f9b115"
+            description={`${Number(data.top_bovine.total_litros || 0).toFixed(1)} L totales`}
           />
         </CCol>
       </CRow>
