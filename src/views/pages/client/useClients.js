@@ -6,8 +6,10 @@ export const useClients = () => {
   const [visibleClient, setVisibleClient] = useState(false)
   const [editVisibleClient, setEditVisibleClient] = useState(false)
   const [deleteVisibleClient, setDeleteVisibleClient] = useState(false)
+  const [reactivateVisibleClient, setReactivateVisibleClient] = useState(false)
   const [currentClient, setCurrentClient] = useState(null)
   const [deleteConfirmationClient, setDeleteConfirmationClient] = useState('')
+  const [reactivateConfirmationClient, setReactivateConfirmationClient] = useState('')
   const [clients, setClients] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [addClientForm, setAddClientForm] = useState({
@@ -185,11 +187,28 @@ export const useClients = () => {
     }
   }
 
-  // handleReactivateClient
-  const handleReactivateClient = async (client) => {
+  // handleReactivateClient - abre modal
+  const openReactivateModal = (client) => {
+    setCurrentClient(client)
+    setReactivateConfirmationClient('')
+    setReactivateVisibleClient(true)
+  }
+
+  // handleReactivateClient - confirma reactivación
+  const handleReactivateClient = async () => {
+    if (!currentClient || !currentClient.ttr_idclient) {
+      toast.error('No hay cliente seleccionado.')
+      return
+    }
+    if (reactivateConfirmationClient.toLowerCase() !== 'confirmar') {
+      toast.error('Confirmación fallida. Escriba "confirmar".')
+      return
+    }
     try {
-      await clientService.reactivateClient(client.ttr_idclient)
-      setClients(clients.filter((c) => c.ttr_idclient !== client.ttr_idclient))
+      await clientService.reactivateClient(currentClient.ttr_idclient)
+      setClients(clients.filter((c) => c.ttr_idclient !== currentClient.ttr_idclient))
+      setReactivateVisibleClient(false)
+      setReactivateConfirmationClient('')
       toast.success('Cliente reactivado exitosamente!')
     } catch (error) {
       toast.error('Error al reactivar cliente: ' + (error.message || 'Error desconocido.'))
@@ -246,5 +265,10 @@ export const useClients = () => {
     activeTab,
     setActiveTab,
     handleReactivateClient,
+    openReactivateModal,
+    reactivateVisibleClient,
+    setReactivateVisibleClient,
+    reactivateConfirmationClient,
+    setReactivateConfirmationClient,
   }
 }

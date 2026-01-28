@@ -8,6 +8,7 @@ import ClientTable from './ClientTable'
 import AddClientModal from './AddClientModal'
 import EditClientModal from './EditClientModal'
 import DeleteClientModal from './DeleteClientModal'
+import ReactivateClientModal from './ReactivateClientModal'
 import ClientFilters from './components/ClientFilters'
 
 const Client = () => {
@@ -34,6 +35,11 @@ const Client = () => {
     activeTab,
     setActiveTab,
     handleReactivateClient,
+    openReactivateModal,
+    reactivateVisibleClient,
+    setReactivateVisibleClient,
+    reactivateConfirmationClient,
+    setReactivateConfirmationClient,
   } = useClients()
 
   return (
@@ -82,6 +88,7 @@ const Client = () => {
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
                 onReactivate={handleReactivateClient}
+                openReactivateModal={openReactivateModal}
               />
             </CCardBody>
           </CCard>
@@ -109,6 +116,14 @@ const Client = () => {
         deleteConfirmationClient={deleteConfirmationClient}
         setDeleteConfirmationClient={setDeleteConfirmationClient}
         handleDeleteClient={handleDeleteClient}
+      />
+      <ReactivateClientModal
+        reactivateVisible={reactivateVisibleClient}
+        setReactivateVisible={setReactivateVisibleClient}
+        reactivateConfirmation={reactivateConfirmationClient}
+        setReactivateConfirmation={setReactivateConfirmationClient}
+        handleReactivateClient={handleReactivateClient}
+        currentClient={currentClient}
       />
     </>
   )

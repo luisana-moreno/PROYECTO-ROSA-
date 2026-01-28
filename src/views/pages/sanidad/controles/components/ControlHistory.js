@@ -64,6 +64,10 @@ const ControlHistory = ({
   const [modalVerVisible, setModalVerVisible] = useState(false)
   const [verControl, setVerControl] = useState(null)
 
+  // Modal Confirmar Eliminación
+  const [modalDeleteVisible, setModalDeleteVisible] = useState(false)
+  const [controlToDelete, setControlToDelete] = useState(null)
+
   const cargarData = async () => {
     setLoading(true)
     try {
@@ -207,16 +211,22 @@ const ControlHistory = ({
     }
   }
 
-  const handleDelete = async (id) => {
-    if (window.confirm('¿Estás seguro de eliminar este registro?')) {
-      try {
-        await deleteControl(id)
-        toast.success('Registro eliminado')
-        cargarData()
-      } catch (error) {
-        console.error(error)
-        toast.error('Error al eliminar')
-      }
+  const openDeleteModal = (control) => {
+    setControlToDelete(control)
+    setModalDeleteVisible(true)
+  }
+
+  const handleDelete = async () => {
+    if (!controlToDelete) return
+    try {
+      await deleteControl(controlToDelete.ttr_idcontsa)
+      toast.success('Registro eliminado correctamente.')
+      setModalDeleteVisible(false)
+      setControlToDelete(null)
+      cargarData()
+    } catch (error) {
+      console.error(error)
+      toast.error('Error al eliminar registro.')
     }
   }
 
@@ -357,7 +367,7 @@ const ControlHistory = ({
                             color="danger"
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleDelete(item.ttr_idcontsa)}
+                            onClick={() => openDeleteModal(item)}
                           >
                             <CIcon icon={cilTrash} />
                           </CButton>
@@ -466,6 +476,38 @@ const ControlHistory = ({
         <CModalFooter>
           <CButton color="secondary" onClick={() => setModalVerVisible(false)}>
             Cerrar
+          </CButton>
+        </CModalFooter>
+      </CModal>
+
+      {/* Modal Confirmar Eliminación */}
+      <CModal
+        visible={modalDeleteVisible}
+        onClose={() => setModalDeleteVisible(false)}
+        backdrop="static"
+      >
+        <CModalHeader>
+          <CModalTitle>Confirmar Eliminación</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          <p>¿Está seguro de que desea eliminar este control sanitario?</p>
+          {controlToDelete && (
+            <p className="text-muted small">
+              <strong>Bovino:</strong> {controlToDelete.bovino_numero}
+              <br />
+              <strong>Tipo:</strong> {controlToDelete.tipo_nombre}
+              <br />
+              <strong>Fecha:</strong> {new Date(controlToDelete.ttr_fechacon).toLocaleDateString()}
+            </p>
+          )}
+          <p className="text-danger small">Esta acción no se puede deshacer.</p>
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setModalDeleteVisible(false)}>
+            Cancelar
+          </CButton>
+          <CButton color="danger" onClick={handleDelete} className="text-white">
+            Eliminar
           </CButton>
         </CModalFooter>
       </CModal>

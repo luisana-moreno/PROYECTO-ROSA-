@@ -25,7 +25,7 @@ const ClientTable = ({
   setDeleteVisibleClient,
   activeTab,
   setActiveTab,
-  onReactivate,
+  openReactivateModal,
 }) => {
   // Estado local para sub-tabs (Natural/Juridico)
   const [clientTypeTab, setClientTypeTab] = useState(1)
@@ -161,7 +161,7 @@ const ClientTable = ({
                         color="success"
                         size="sm"
                         className="text-white"
-                        onClick={() => onReactivate(client)}
+                        onClick={() => openReactivateModal(client)}
                         title="Reactivar"
                       >
                         Reactivar
@@ -228,7 +228,7 @@ const ClientTable = ({
                         color="success"
                         size="sm"
                         className="text-white"
-                        onClick={() => onReactivate(client)}
+                        onClick={() => openReactivateModal(client)}
                         title="Reactivar"
                       >
                         Reactivar

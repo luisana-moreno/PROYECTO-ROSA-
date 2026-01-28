@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { cattleService } from 'src/api/cattleService'
 import { employeeService } from 'src/api/employeeService'
-import { pastureService } from 'src/api/pastureService' // Importar pastureService
+import { pastureService } from 'src/api/pastureService'
+import { settingsService } from 'src/api/settingsService'
 
 export const useSettings = () => {
   const [razas, setRazas] = useState([])
@@ -9,8 +10,17 @@ export const useSettings = () => {
   const [etapas, setEtapas] = useState([])
   const [estados, setEstados] = useState([])
   const [cargos, setCargos] = useState([])
-  const [estadosPotrero, setEstadosPotrero] = useState([]) // Nuevo estado
-  const [tiposMantenimiento, setTiposMantenimiento] = useState([]) // Nuevo estado
+  const [estadosPotrero, setEstadosPotrero] = useState([])
+  const [tiposMantenimiento, setTiposMantenimiento] = useState([])
+  // Nuevos estados para Settings extendidos
+  const [tiposVacuna, setTiposVacuna] = useState([])
+  const [tratamientos, setTratamientos] = useState([])
+  const [categoriasInsumo, setCategoriasInsumo] = useState([])
+  const [tiposMovimiento, setTiposMovimiento] = useState([])
+  const [tiposPago, setTiposPago] = useState([])
+  const [tiposVenta, setTiposVenta] = useState([])
+  const [estadosFactura, setEstadosFactura] = useState([])
+  const [tiposAsistencia, setTiposAsistencia] = useState([])
   const [toast, setToast] = useState({ show: false, message: '', color: 'success' })
 
   const showToast = (message, color = 'success') => {
@@ -100,14 +110,208 @@ export const useSettings = () => {
     }
   }
 
+  // --- Fetch functions for NEW Settings ---
+  const fetchTiposVacuna = async () => {
+    try {
+      const data = await settingsService.getTiposVacuna()
+      setTiposVacuna(data)
+    } catch (error) {
+      console.error('Error fetching tipos de vacuna:', error)
+    }
+  }
+
+  const fetchTratamientos = async () => {
+    try {
+      const data = await settingsService.getTratamientos()
+      setTratamientos(data)
+    } catch (error) {
+      console.error('Error fetching tratamientos:', error)
+    }
+  }
+
+  const fetchCategoriasInsumo = async () => {
+    try {
+      const data = await settingsService.getCategoriasInsumo()
+      setCategoriasInsumo(data)
+    } catch (error) {
+      console.error('Error fetching categorías de insumo:', error)
+    }
+  }
+
+  const fetchTiposMovimiento = async () => {
+    try {
+      const data = await settingsService.getTiposMovimiento()
+      setTiposMovimiento(data)
+    } catch (error) {
+      console.error('Error fetching tipos de movimiento:', error)
+    }
+  }
+
+  const fetchTiposPago = async () => {
+    try {
+      const data = await settingsService.getTiposPago()
+      setTiposPago(data)
+    } catch (error) {
+      console.error('Error fetching tipos de pago:', error)
+    }
+  }
+
+  const fetchTiposVenta = async () => {
+    try {
+      const data = await settingsService.getTiposVenta()
+      setTiposVenta(data)
+    } catch (error) {
+      console.error('Error fetching tipos de venta:', error)
+    }
+  }
+
+  const fetchEstadosFactura = async () => {
+    try {
+      const data = await settingsService.getEstadosFactura()
+      setEstadosFactura(data)
+    } catch (error) {
+      console.error('Error fetching estados de factura:', error)
+    }
+  }
+
+  const fetchTiposAsistencia = async () => {
+    try {
+      const data = await settingsService.getTiposAsistencia()
+      setTiposAsistencia(data)
+    } catch (error) {
+      console.error('Error fetching tipos de asistencia:', error)
+    }
+  }
+
+  // --- CRUD for Tipos de Vacuna ---
+  const createTipoVacuna = async (nombre) => {
+    await settingsService.createTipoVacuna(nombre)
+    fetchTiposVacuna()
+  }
+  const updateTipoVacuna = async (id, nombre) => {
+    await settingsService.updateTipoVacuna(id, nombre)
+    fetchTiposVacuna()
+  }
+  const deleteTipoVacuna = async (id) => {
+    await settingsService.deleteTipoVacuna(id)
+    fetchTiposVacuna()
+  }
+
+  // --- CRUD for Tratamientos ---
+  const createTratamiento = async (nombre) => {
+    await settingsService.createTratamiento(nombre)
+    fetchTratamientos()
+  }
+  const updateTratamiento = async (id, nombre) => {
+    await settingsService.updateTratamiento(id, nombre)
+    fetchTratamientos()
+  }
+  const deleteTratamiento = async (id) => {
+    await settingsService.deleteTratamiento(id)
+    fetchTratamientos()
+  }
+
+  // --- CRUD for Categorías de Insumo ---
+  const createCategoriaInsumo = async (nombre) => {
+    await settingsService.createCategoriaInsumo(nombre)
+    fetchCategoriasInsumo()
+  }
+  const updateCategoriaInsumo = async (id, nombre) => {
+    await settingsService.updateCategoriaInsumo(id, nombre)
+    fetchCategoriasInsumo()
+  }
+  const deleteCategoriaInsumo = async (id) => {
+    await settingsService.deleteCategoriaInsumo(id)
+    fetchCategoriasInsumo()
+  }
+
+  // --- CRUD for Tipos de Movimiento ---
+  const createTipoMovimiento = async (nombre) => {
+    await settingsService.createTipoMovimiento(nombre)
+    fetchTiposMovimiento()
+  }
+  const updateTipoMovimiento = async (id, nombre) => {
+    await settingsService.updateTipoMovimiento(id, nombre)
+    fetchTiposMovimiento()
+  }
+  const deleteTipoMovimiento = async (id) => {
+    await settingsService.deleteTipoMovimiento(id)
+    fetchTiposMovimiento()
+  }
+
+  // --- CRUD for Tipos de Pago ---
+  const createTipoPago = async (nombre) => {
+    await settingsService.createTipoPago(nombre)
+    fetchTiposPago()
+  }
+  const updateTipoPago = async (id, nombre) => {
+    await settingsService.updateTipoPago(id, nombre)
+    fetchTiposPago()
+  }
+  const deleteTipoPago = async (id) => {
+    await settingsService.deleteTipoPago(id)
+    fetchTiposPago()
+  }
+
+  // --- CRUD for Tipos de Venta ---
+  const createTipoVenta = async (nombre) => {
+    await settingsService.createTipoVenta(nombre)
+    fetchTiposVenta()
+  }
+  const updateTipoVenta = async (id, nombre) => {
+    await settingsService.updateTipoVenta(id, nombre)
+    fetchTiposVenta()
+  }
+  const deleteTipoVenta = async (id) => {
+    await settingsService.deleteTipoVenta(id)
+    fetchTiposVenta()
+  }
+
+  // --- CRUD for Estados de Factura ---
+  const createEstadoFactura = async (nombre) => {
+    await settingsService.createEstadoFactura(nombre)
+    fetchEstadosFactura()
+  }
+  const updateEstadoFactura = async (id, nombre) => {
+    await settingsService.updateEstadoFactura(id, nombre)
+    fetchEstadosFactura()
+  }
+  const deleteEstadoFactura = async (id) => {
+    await settingsService.deleteEstadoFactura(id)
+    fetchEstadosFactura()
+  }
+
+  // --- CRUD for Tipos de Asistencia ---
+  const createTipoAsistencia = async (nombre) => {
+    await settingsService.createTipoAsistencia(nombre)
+    fetchTiposAsistencia()
+  }
+  const updateTipoAsistencia = async (id, nombre) => {
+    await settingsService.updateTipoAsistencia(id, nombre)
+    fetchTiposAsistencia()
+  }
+  const deleteTipoAsistencia = async (id) => {
+    await settingsService.deleteTipoAsistencia(id)
+    fetchTiposAsistencia()
+  }
+
   useEffect(() => {
     fetchRazas()
     fetchColores()
     fetchEtapas()
     fetchEstados()
     fetchCargos()
-    fetchEstadosPotrero() // Cargar estados de potrero
-    fetchTiposMantenimiento() // Cargar tipos de mantenimiento
+    fetchEstadosPotrero()
+    fetchTiposMantenimiento()
+    // Cargar nuevos datos de settings
+    fetchTiposVacuna()
+    fetchTratamientos()
+    fetchCategoriasInsumo()
+    fetchTiposMovimiento()
+    fetchTiposPago()
+    fetchTiposVenta()
+    fetchEstadosFactura()
+    fetchTiposAsistencia()
   }, [])
 
   // --- CRUD functions for Razas ---
@@ -408,5 +612,41 @@ export const useSettings = () => {
     deleteTipoMantenimiento,
     toast,
     showToast,
+    // Nuevos settings - Sanidad
+    tiposVacuna,
+    createTipoVacuna,
+    updateTipoVacuna,
+    deleteTipoVacuna,
+    tratamientos,
+    createTratamiento,
+    updateTratamiento,
+    deleteTratamiento,
+    // Nuevos settings - Inventario
+    categoriasInsumo,
+    createCategoriaInsumo,
+    updateCategoriaInsumo,
+    deleteCategoriaInsumo,
+    tiposMovimiento,
+    createTipoMovimiento,
+    updateTipoMovimiento,
+    deleteTipoMovimiento,
+    // Nuevos settings - Finanzas
+    tiposPago,
+    createTipoPago,
+    updateTipoPago,
+    deleteTipoPago,
+    tiposVenta,
+    createTipoVenta,
+    updateTipoVenta,
+    deleteTipoVenta,
+    estadosFactura,
+    createEstadoFactura,
+    updateEstadoFactura,
+    deleteEstadoFactura,
+    // Nuevos settings - Asistencia
+    tiposAsistencia,
+    createTipoAsistencia,
+    updateTipoAsistencia,
+    deleteTipoAsistencia,
   }
 }

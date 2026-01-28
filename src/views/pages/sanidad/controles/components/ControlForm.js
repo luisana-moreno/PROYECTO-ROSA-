@@ -15,6 +15,7 @@ import CIcon from '@coreui/icons-react'
 import { cilPlus } from '@coreui/icons'
 import MastitisDetalle from '../MastitisDetalle'
 import { getIconByCode, getColorByCode, getOpcionesResultado } from '../utils'
+import SearchableSelect from './SearchableSelect'
 
 const ControlForm = ({
   tiposControl,
@@ -103,40 +104,36 @@ const ControlForm = ({
               {aplicacion === 'INDIVIDUAL' ? (
                 <>
                   <CFormLabel htmlFor="bovino">Bovino *</CFormLabel>
-                  <CFormSelect
+                  <SearchableSelect
                     id="bovino"
                     value={formData.ttr_idbovino}
-                    onChange={(e) => {
-                      setFormData({ ...formData, ttr_idbovino: e.target.value })
-                      onBovinoChange && onBovinoChange(e.target.value)
+                    onChange={(val) => {
+                      setFormData({ ...formData, ttr_idbovino: val })
+                      onBovinoChange && onBovinoChange(val)
                     }}
-                  >
-                    <option value="">Seleccione un bovino...</option>
-                    {bovinos.map((bovino) => (
-                      <option key={bovino.ttr_idbovino} value={bovino.ttr_idbovino}>
-                        N°- {bovino.ttr_numerobv}
-                      </option>
-                    ))}
-                  </CFormSelect>
+                    options={bovinos.map((b) => ({
+                      value: b.ttr_idbovino,
+                      label: `N°- ${b.ttr_numerobv}`,
+                    }))}
+                    placeholder="Buscar bovino..."
+                  />
                 </>
               ) : (
                 <>
                   <CFormLabel htmlFor="loteSelect">Lote *</CFormLabel>
-                  <CFormSelect
+                  <SearchableSelect
                     id="loteSelect"
                     value={formData.ttr_idlote}
-                    onChange={(e) => {
-                      setFormData({ ...formData, ttr_idlote: e.target.value })
-                      onLoteChange && onLoteChange(e.target.value)
+                    onChange={(val) => {
+                      setFormData({ ...formData, ttr_idlote: val })
+                      onLoteChange && onLoteChange(val)
                     }}
-                  >
-                    <option value="">Seleccione un lote...</option>
-                    {lotes.map((lote) => (
-                      <option key={lote.tma_idlote} value={lote.tma_idlote}>
-                        {lote.tma_nomlote} ({lote.cantidad_bovinos || 0} bovinos)
-                      </option>
-                    ))}
-                  </CFormSelect>
+                    options={lotes.map((l) => ({
+                      value: l.tma_idlote,
+                      label: `${l.tma_nomlote} (${l.cantidad_bovinos || 0} bovinos)`,
+                    }))}
+                    placeholder="Buscar lote..."
+                  />
                 </>
               )}
             </CCol>
@@ -153,18 +150,16 @@ const ControlForm = ({
 
             <CCol md={3}>
               <CFormLabel htmlFor="empleado">Empleado *</CFormLabel>
-              <CFormSelect
+              <SearchableSelect
                 id="empleado"
                 value={formData.ttr_idempldo}
-                onChange={(e) => setFormData({ ...formData, ttr_idempldo: e.target.value })}
-              >
-                <option value="">Seleccione...</option>
-                {empleados.map((empleado) => (
-                  <option key={empleado.ttr_idemplo} value={empleado.ttr_idemplo}>
-                    {empleado.ttr_nombrel} {empleado.ttr_apellid}
-                  </option>
-                ))}
-              </CFormSelect>
+                onChange={(val) => setFormData({ ...formData, ttr_idempldo: val })}
+                options={empleados.map((e) => ({
+                  value: e.ttr_idemplo,
+                  label: `${e.ttr_nombrel} ${e.ttr_apellid}`,
+                }))}
+                placeholder="Buscar empleado..."
+              />
             </CCol>
           </CRow>
 
@@ -252,9 +247,25 @@ const ControlForm = ({
                 onChange={(e) => setFormData({ ...formData, ttr_viaadmin: e.target.value })}
               >
                 <option value="">Seleccione...</option>
-                <option value="Intramamaria">Intramamaria</option>
-                <option value="Tópico">Tópico</option>
-                <option value="Inyectable">Inyectable</option>
+                {tipoSeleccionado?.tma_codigo === 'MASTITIS' ? (
+                  <>
+                    <option value="Intramamaria">Intramamaria</option>
+                    <option value="Tópico">Tópico</option>
+                    <option value="Inyectable">Inyectable</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="Intramuscular">Intramuscular</option>
+                    <option value="Subcutánea">Subcutánea</option>
+                    <option value="Oral">Oral</option>
+                    <option value="Intravenosa">Intravenosa</option>
+                    <option value="Intrauterina">Intrauterina</option>
+                    <option value="Tópico">Tópico</option>
+                    <option value="Intramamaria">Intramamaria</option>
+                    <option value="Intranasal">Intranasal</option>
+                    <option value="Inyectable">Inyectable</option>
+                  </>
+                )}
               </CFormSelect>
             </CCol>
           </CRow>

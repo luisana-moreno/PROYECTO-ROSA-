@@ -13,7 +13,10 @@ import {
 import GeneralSettings from './components/GeneralSettings'
 import PositionSettings from './components/PositionSettings'
 import BovineSettings from './components/BovineSettings'
-import PastureSettings from './components/PastureSettings' // Importar el nuevo componente
+import PastureSettings from './components/PastureSettings'
+import SanidadSettings from './components/SanidadSettings'
+import InventarioSettings from './components/InventarioSettings'
+import FinanzasSettings from './components/FinanzasSettings'
 import { useSettings } from './hooks/useSettings'
 
 const Settings = () => {
@@ -24,8 +27,8 @@ const Settings = () => {
     etapas,
     estados,
     cargos,
-    estadosPotrero, // Nuevos estados para potreros
-    tiposMantenimiento, // Nuevos tipos de mantenimiento para potreros
+    estadosPotrero,
+    tiposMantenimiento,
     createRaza,
     updateRaza,
     deleteRaza,
@@ -41,12 +44,41 @@ const Settings = () => {
     createCargo,
     updateCargo,
     deleteCargo,
-    createEstadoPotrero, // Nuevas funciones CRUD para estados de potrero
+    createEstadoPotrero,
     updateEstadoPotrero,
     deleteEstadoPotrero,
-    createTipoMantenimiento, // Nuevas funciones CRUD para tipos de mantenimiento
+    createTipoMantenimiento,
     updateTipoMantenimiento,
     deleteTipoMantenimiento,
+    // Nuevos settings
+    tiposVacuna,
+    createTipoVacuna,
+    updateTipoVacuna,
+    deleteTipoVacuna,
+    tratamientos,
+    createTratamiento,
+    updateTratamiento,
+    deleteTratamiento,
+    categoriasInsumo,
+    createCategoriaInsumo,
+    updateCategoriaInsumo,
+    deleteCategoriaInsumo,
+    tiposMovimiento,
+    createTipoMovimiento,
+    updateTipoMovimiento,
+    deleteTipoMovimiento,
+    tiposPago,
+    createTipoPago,
+    updateTipoPago,
+    deleteTipoPago,
+    tiposVenta,
+    createTipoVenta,
+    updateTipoVenta,
+    deleteTipoVenta,
+    estadosFactura,
+    createEstadoFactura,
+    updateEstadoFactura,
+    deleteEstadoFactura,
   } = useSettings()
 
   return (
@@ -63,17 +95,35 @@ const Settings = () => {
           </CNavItem>
           <CNavItem>
             <CNavLink active={activeTab === 'bovines'} onClick={() => setActiveTab('bovines')}>
-              Configuración de Bovinos
+              Bovinos
             </CNavLink>
           </CNavItem>
           <CNavItem>
             <CNavLink active={activeTab === 'pastures'} onClick={() => setActiveTab('pastures')}>
-              Configuración de Potreros
+              Potreros
             </CNavLink>
           </CNavItem>
           <CNavItem>
             <CNavLink active={activeTab === 'positions'} onClick={() => setActiveTab('positions')}>
-              Cargos de Empleado
+              Cargos
+            </CNavLink>
+          </CNavItem>
+          <CNavItem>
+            <CNavLink active={activeTab === 'sanidad'} onClick={() => setActiveTab('sanidad')}>
+              Sanidad
+            </CNavLink>
+          </CNavItem>
+          <CNavItem>
+            <CNavLink
+              active={activeTab === 'inventario'}
+              onClick={() => setActiveTab('inventario')}
+            >
+              Inventario
+            </CNavLink>
+          </CNavItem>
+          <CNavItem>
+            <CNavLink active={activeTab === 'finanzas'} onClick={() => setActiveTab('finanzas')}>
+              Finanzas
             </CNavLink>
           </CNavItem>
         </CNav>
@@ -120,6 +170,46 @@ const Settings = () => {
               createCargo={createCargo}
               updateCargo={updateCargo}
               deleteCargo={deleteCargo}
+            />
+          </CTabPane>
+          <CTabPane visible={activeTab === 'sanidad'}>
+            <SanidadSettings
+              tiposVacuna={tiposVacuna}
+              createTipoVacuna={createTipoVacuna}
+              updateTipoVacuna={updateTipoVacuna}
+              deleteTipoVacuna={deleteTipoVacuna}
+              tratamientos={tratamientos}
+              createTratamiento={createTratamiento}
+              updateTratamiento={updateTratamiento}
+              deleteTratamiento={deleteTratamiento}
+            />
+          </CTabPane>
+          <CTabPane visible={activeTab === 'inventario'}>
+            <InventarioSettings
+              categoriasInsumo={categoriasInsumo}
+              createCategoriaInsumo={createCategoriaInsumo}
+              updateCategoriaInsumo={updateCategoriaInsumo}
+              deleteCategoriaInsumo={deleteCategoriaInsumo}
+              tiposMovimiento={tiposMovimiento}
+              createTipoMovimiento={createTipoMovimiento}
+              updateTipoMovimiento={updateTipoMovimiento}
+              deleteTipoMovimiento={deleteTipoMovimiento}
+            />
+          </CTabPane>
+          <CTabPane visible={activeTab === 'finanzas'}>
+            <FinanzasSettings
+              tiposPago={tiposPago}
+              createTipoPago={createTipoPago}
+              updateTipoPago={updateTipoPago}
+              deleteTipoPago={deleteTipoPago}
+              tiposVenta={tiposVenta}
+              createTipoVenta={createTipoVenta}
+              updateTipoVenta={updateTipoVenta}
+              deleteTipoVenta={deleteTipoVenta}
+              estadosFactura={estadosFactura}
+              createEstadoFactura={createEstadoFactura}
+              updateEstadoFactura={updateEstadoFactura}
+              deleteEstadoFactura={deleteEstadoFactura}
             />
           </CTabPane>
         </CTabContent>

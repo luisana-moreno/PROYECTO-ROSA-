@@ -119,7 +119,8 @@ const AddCattleModal = ({
     }
   }
 
-  const nextStep = async () => {
+  const nextStep = async (e) => {
+    if (e) e.preventDefault()
     console.log('🔄 nextStep llamado - Paso actual:', currentStep)
     const isValid = await validateStep(currentStep)
     console.log('✓ Validación paso', currentStep, ':', isValid ? 'VÁLIDO' : 'INVÁLIDO')
@@ -676,7 +677,7 @@ const AddCattleModal = ({
               </CButton>
             )}
             {currentStep < totalSteps ? (
-              <CButton color="success" onClick={nextStep} type="button">
+              <CButton color="success" onClick={(e) => nextStep(e)} type="button">
                 Siguiente
                 <CIcon icon={cilArrowRight} className="ms-1" />
               </CButton>

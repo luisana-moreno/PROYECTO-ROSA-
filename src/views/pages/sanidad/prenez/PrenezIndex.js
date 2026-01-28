@@ -46,6 +46,7 @@ import {
   agregarTratamientosPostParto,
 } from '../../../../api/sanidadService'
 import { cattleService } from '../../../../api/cattleService'
+import { toast } from 'react-toastify'
 
 const PrenezIndex = () => {
   const [preneces, setPreneces] = useState([])
@@ -53,7 +54,9 @@ const PrenezIndex = () => {
   const [showModal, setShowModal] = useState(false)
   const [showMastitisModal, setShowMastitisModal] = useState(false)
   const [showPartoModal, setShowPartoModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [selectedPrenez, setSelectedPrenez] = useState(null)
+  const [prenezToDelete, setPrenezToDelete] = useState(null)
   const [filter, setFilter] = useState('activas') // todas, activas
   const [loading, setLoading] = useState(false)
 
@@ -106,9 +109,10 @@ const PrenezIndex = () => {
       setShowModal(false)
       loadData()
       resetForm()
+      toast.success('Preñez registrada exitosamente')
     } catch (error) {
       console.error('Error al crear preñez:', error)
-      alert('Error al crear preñez: ' + error.message)
+      toast.error('Error al crear preñez: ' + error.message)
     }
   }
 
@@ -116,20 +120,13 @@ const PrenezIndex = () => {
     try {
       setLoading(true)
       await agregarTratamientoMastitisAutomatico(selectedPrenez, mastitisData.fechaInicio)
-      alert(
-        '✅ Tratamiento de Mastitis programado exitosamente!\n\n' +
-          '• Dosis 1: ' +
-          mastitisData.fechaInicio +
-          '\n' +
-          '• Dosis 2: +15 días\n' +
-          '• Próximo refuerzo: +6 meses',
-      )
+      toast.success('Tratamiento de Mastitis programado correctamente.')
       setShowMastitisModal(false)
       setMastitisData({ fechaInicio: new Date().toISOString().split('T')[0] })
       loadData()
     } catch (error) {
       console.error('Error al agregar tratamiento de Mastitis:', error)
-      alert('Error: ' + error.message)
+      toast.error('Error: ' + error.message)
     } finally {
       setLoading(false)
     }
@@ -181,20 +178,28 @@ const PrenezIndex = () => {
       loadData()
     } catch (error) {
       console.error('Error al registrar parto:', error)
-      alert('Error: ' + error.message)
+      toast.error('Error: ' + error.message)
     } finally {
       setLoading(false)
     }
   }
 
-  const handleDelete = async (id) => {
-    if (window.confirm('¿Está seguro de eliminar esta preñez?')) {
-      try {
-        await deletePrenez(id)
-        loadData()
-      } catch (error) {
-        console.error('Error al eliminar preñez:', error)
-      }
+  const handleOpenDeleteModal = (prenez) => {
+    setPrenezToDelete(prenez)
+    setShowDeleteModal(true)
+  }
+
+  const handleDelete = async () => {
+    if (!prenezToDelete) return
+    try {
+      await deletePrenez(prenezToDelete.ttr_idprenez)
+      loadData()
+      toast.success('Preñez eliminada correctamente')
+      setShowDeleteModal(false)
+      setPrenezToDelete(null)
+    } catch (error) {
+      console.error('Error al eliminar preñez:', error)
+      toast.error('Error al eliminar preñez')
     }
   }
 
@@ -347,10 +352,7 @@ const PrenezIndex = () => {
                                 <CIcon icon={cilBaby} />
                               </CButton>
                             )}
-                            <CButton
-                              color="danger"
-                              onClick={() => handleDelete(prenez.ttr_idprenez)}
-                            >
+                            <CButton color="danger" onClick={() => handleOpenDeleteModal(prenez)}>
                               <CIcon icon={cilTrash} />
                             </CButton>
                           </CButtonGroup>
@@ -595,6 +597,28 @@ const PrenezIndex = () => {
             onClick={() => setShowSuccessModal(false)}
           >
             Entendido
+          </CButton>
+        </CModalFooter>
+      </CModal>
+
+      {/* Modal Confirmar Eliminación */}
+      <CModal visible={showDeleteModal} onClose={() => setShowDeleteModal(false)} backdrop="static">
+        <CModalHeader>
+          <CModalTitle>Confirmar Eliminación</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          <p>
+            ¿Está seguro de que desea eliminar la preñez del bovino{' '}
+            <strong>#{prenezToDelete?.numero_bovino}</strong>?
+          </p>
+          <p className="text-muted small">Esta acción no se puede deshacer.</p>
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setShowDeleteModal(false)}>
+            Cancelar
+          </CButton>
+          <CButton color="danger" onClick={handleDelete} className="text-white">
+            Eliminar
           </CButton>
         </CModalFooter>
       </CModal>

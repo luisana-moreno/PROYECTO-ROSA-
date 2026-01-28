@@ -44,13 +44,16 @@ import {
   addBovinoVisita,
 } from '../../../../api/sanidadService'
 import { cattleService } from '../../../../api/cattleService'
+import { toast } from 'react-toastify'
 
 const VisitasIndex = () => {
   const [visitas, setVisitas] = useState([])
   const [bovinos, setBovinos] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [showBovinosModal, setShowBovinosModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [selectedVisita, setSelectedVisita] = useState(null)
+  const [visitaToDelete, setVisitaToDelete] = useState(null)
   const [bovinosVisita, setBovinosVisita] = useState([])
 
   const [formData, setFormData] = useState({
@@ -92,19 +95,29 @@ const VisitasIndex = () => {
       setShowModal(false)
       loadData()
       resetForm()
+      toast.success('Visita registrada correctamente.')
     } catch (error) {
       console.error('Error al crear visita:', error)
+      toast.error('Error al crear visita.')
     }
   }
 
-  const handleDelete = async (id) => {
-    if (window.confirm('¿Está seguro de eliminar esta visita?')) {
-      try {
-        await deleteVisitaVeterinaria(id)
-        loadData()
-      } catch (error) {
-        console.error('Error al eliminar visita:', error)
-      }
+  const handleOpenDeleteModal = (visita) => {
+    setVisitaToDelete(visita)
+    setShowDeleteModal(true)
+  }
+
+  const handleDelete = async () => {
+    if (!visitaToDelete) return
+    try {
+      await deleteVisitaVeterinaria(visitaToDelete.ttr_idvisvet)
+      loadData()
+      toast.success('Visita eliminada correctamente.')
+      setShowDeleteModal(false)
+      setVisitaToDelete(null)
+    } catch (error) {
+      console.error('Error al eliminar visita:', error)
+      toast.error('Error al eliminar visita.')
     }
   }
 
@@ -131,8 +144,10 @@ const VisitasIndex = () => {
         estadoReproductivo: 'Normal',
         tratamientoAplicado: '',
       })
+      toast.success('Bovino agregado a la visita.')
     } catch (error) {
       console.error('Error al agregar bovino:', error)
+      toast.error('Error al agregar bovino.')
     }
   }
 
@@ -214,7 +229,7 @@ const VisitasIndex = () => {
                           <CButton
                             color="danger"
                             size="sm"
-                            onClick={() => handleDelete(visita.ttr_idvisvet)}
+                            onClick={() => handleOpenDeleteModal(visita)}
                           >
                             <CIcon icon={cilTrash} />
                           </CButton>
@@ -426,6 +441,28 @@ const VisitasIndex = () => {
         <CModalFooter>
           <CButton color="secondary" onClick={() => setShowBovinosModal(false)}>
             Cerrar
+          </CButton>
+        </CModalFooter>
+      </CModal>
+
+      {/* Modal Confirmar Eliminación */}
+      <CModal visible={showDeleteModal} onClose={() => setShowDeleteModal(false)} backdrop="static">
+        <CModalHeader>
+          <CModalTitle>Confirmar Eliminación</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          <p>
+            ¿Está seguro de que desea eliminar la visita del{' '}
+            <strong>{visitaToDelete && formatDate(visitaToDelete.ttr_fechavis)}</strong>?
+          </p>
+          <p className="text-muted small">Esta acción no se puede deshacer.</p>
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setShowDeleteModal(false)}>
+            Cancelar
+          </CButton>
+          <CButton color="danger" onClick={handleDelete} className="text-white">
+            Eliminar
           </CButton>
         </CModalFooter>
       </CModal>
