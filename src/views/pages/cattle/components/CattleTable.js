@@ -9,10 +9,13 @@ import {
   CTableBody,
   CBadge,
   CAlert,
+  CPagination,
+  CPaginationItem,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash, cilFolder, cilCheckCircle } from '@coreui/icons'
 import { formatDateToDDMMYYYY } from 'src/utils/dateFormatter'
+import { usePagination } from '../../../../hooks/usePagination'
 
 const CattleTable = ({
   cattle,
@@ -23,6 +26,8 @@ const CattleTable = ({
   handleViewExpBov,
   setReactivateVisible,
 }) => {
+  const { currentData, currentPage, totalPages, setCurrentPage } = usePagination(cattle, 10)
+
   // Función para obtener el color del badge según el estado
   const getEstadoBadgeColor = (estadoNombre) => {
     const estadoColors = {
@@ -55,7 +60,7 @@ const CattleTable = ({
             </CTableRow>
           </CTableHead>
           <CTableBody>
-            {cattle.map((cattleItem) => (
+            {currentData.map((cattleItem) => (
               <CTableRow key={cattleItem.ttrIdbovino}>
                 <CTableDataCell className="text-center">
                   <strong className="text-black">{cattleItem?.ttrNumerobv || '-'}</strong>
@@ -178,6 +183,34 @@ const CattleTable = ({
             <span>No hay bovinos registrados en el sistema.</span>
           </div>
         </CAlert>
+      )}
+
+      {cattle.length > 0 && (
+        <div className="d-flex justify-content-center mt-3">
+          <CPagination aria-label="Navegación de bovinos">
+            <CPaginationItem
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(currentPage - 1)}
+            >
+              Anterior
+            </CPaginationItem>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <CPaginationItem
+                key={i + 1}
+                active={i + 1 === currentPage}
+                onClick={() => setCurrentPage(i + 1)}
+              >
+                {i + 1}
+              </CPaginationItem>
+            ))}
+            <CPaginationItem
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(currentPage + 1)}
+            >
+              Siguiente
+            </CPaginationItem>
+          </CPagination>
+        </div>
       )}
     </>
   )

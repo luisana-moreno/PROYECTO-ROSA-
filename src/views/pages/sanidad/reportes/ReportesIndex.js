@@ -18,7 +18,10 @@ import {
   CProgress,
   CProgressBar,
   CWidgetStatsF,
+  CPagination,
+  CPaginationItem,
 } from '@coreui/react'
+import { usePagination } from '../../../../hooks/usePagination'
 import CIcon from '@coreui/icons-react'
 import {
   cilChartPie,
@@ -37,6 +40,7 @@ import {
   getDashboardSanidad,
 } from '../../../../api/sanidadService'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 const ReportesIndex = () => {
   const navigate = useNavigate()
@@ -51,6 +55,11 @@ const ReportesIndex = () => {
     tratamientosProximos: 0,
     proximaVisita: null,
   })
+
+  // Pagination hooks
+  const pagCumplimiento = usePagination(cumplimiento || [], 5)
+  const pagVacunas = usePagination(vacunasProximas || [], 5)
+  const pagAtencion = usePagination(bovinosAtencion || [], 5)
 
   const [diasFiltro, setDiasFiltro] = useState(30)
   const [loading, setLoading] = useState(true)
@@ -75,6 +84,7 @@ const ReportesIndex = () => {
       setDashboardStats(stats)
     } catch (error) {
       console.error('Error al cargar reportes:', error)
+      toast.error('Error al cargar reportes de sanidad.')
     } finally {
       setLoading(false)
     }
@@ -194,7 +204,7 @@ const ReportesIndex = () => {
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {cumplimiento.map((item, index) => (
+                  {pagCumplimiento.currentData.map((item, index) => (
                     <CTableRow key={index}>
                       <CTableDataCell className="fw-bold">{item.vacuna}</CTableDataCell>
                       <CTableDataCell className="text-center">
@@ -228,6 +238,33 @@ const ReportesIndex = () => {
                 <CAlert color="info" className="border-0 shadow-sm">
                   No hay datos de cumplimiento disponibles para mostrar.
                 </CAlert>
+              )}
+              {pagCumplimiento.pageCount > 1 && (
+                <div className="d-flex justify-content-center mt-3">
+                  <CPagination>
+                    <CPaginationItem
+                      disabled={pagCumplimiento.currentPage === 1}
+                      onClick={() => pagCumplimiento.prevPage()}
+                    >
+                      Anterior
+                    </CPaginationItem>
+                    {pagCumplimiento.getPaginationGroup().map((item) => (
+                      <CPaginationItem
+                        key={item}
+                        active={pagCumplimiento.currentPage === item}
+                        onClick={() => pagCumplimiento.goToPage(item)}
+                      >
+                        {item}
+                      </CPaginationItem>
+                    ))}
+                    <CPaginationItem
+                      disabled={pagCumplimiento.currentPage === pagCumplimiento.pageCount}
+                      onClick={() => pagCumplimiento.nextPage()}
+                    >
+                      Siguiente
+                    </CPaginationItem>
+                  </CPagination>
+                </div>
               )}
             </CCardBody>
           </CCard>
@@ -269,7 +306,7 @@ const ReportesIndex = () => {
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {vacunasProximas.map((vacuna) => {
+                  {pagVacunas.currentData.map((vacuna) => {
                     const diasRestantes = getDiasRestantes(vacuna.ttr_proxfech)
                     return (
                       <CTableRow key={vacuna.ttr_idvacuna}>
@@ -310,6 +347,33 @@ const ReportesIndex = () => {
                   No hay vacunas pendientes para el período seleccionado.
                 </CAlert>
               )}
+              {pagVacunas.pageCount > 1 && (
+                <div className="d-flex justify-content-center mt-3">
+                  <CPagination>
+                    <CPaginationItem
+                      disabled={pagVacunas.currentPage === 1}
+                      onClick={() => pagVacunas.prevPage()}
+                    >
+                      Anterior
+                    </CPaginationItem>
+                    {pagVacunas.getPaginationGroup().map((item) => (
+                      <CPaginationItem
+                        key={item}
+                        active={pagVacunas.currentPage === item}
+                        onClick={() => pagVacunas.goToPage(item)}
+                      >
+                        {item}
+                      </CPaginationItem>
+                    ))}
+                    <CPaginationItem
+                      disabled={pagVacunas.currentPage === pagVacunas.pageCount}
+                      onClick={() => pagVacunas.nextPage()}
+                    >
+                      Siguiente
+                    </CPaginationItem>
+                  </CPagination>
+                </div>
+              )}
             </CCardBody>
           </CCard>
         </CCol>
@@ -334,7 +398,7 @@ const ReportesIndex = () => {
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {bovinosAtencion.map((bovino, index) => {
+                  {pagAtencion.currentData.map((bovino, index) => {
                     const diasAtrasado = Math.abs(getDiasRestantes(bovino.fecha_pendiente))
                     return (
                       <CTableRow key={index}>
@@ -362,6 +426,33 @@ const ReportesIndex = () => {
                   <CIcon icon={cilCheckCircle} className="me-2" />
                   ¡Excelente! No hay bovinos con atención pendiente.
                 </CAlert>
+              )}
+              {pagAtencion.pageCount > 1 && (
+                <div className="d-flex justify-content-center mt-3">
+                  <CPagination>
+                    <CPaginationItem
+                      disabled={pagAtencion.currentPage === 1}
+                      onClick={() => pagAtencion.prevPage()}
+                    >
+                      Anterior
+                    </CPaginationItem>
+                    {pagAtencion.getPaginationGroup().map((item) => (
+                      <CPaginationItem
+                        key={item}
+                        active={pagAtencion.currentPage === item}
+                        onClick={() => pagAtencion.goToPage(item)}
+                      >
+                        {item}
+                      </CPaginationItem>
+                    ))}
+                    <CPaginationItem
+                      disabled={pagAtencion.currentPage === pagAtencion.pageCount}
+                      onClick={() => pagAtencion.nextPage()}
+                    >
+                      Siguiente
+                    </CPaginationItem>
+                  </CPagination>
+                </div>
               )}
             </CCardBody>
           </CCard>

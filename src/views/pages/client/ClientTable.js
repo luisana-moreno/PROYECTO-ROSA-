@@ -14,9 +14,13 @@ import {
   CTableRow,
   CAlert,
   CBadge,
+  CPagination,
+  CPaginationItem,
+  CFormSelect,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash, cilUser, cilBuilding } from '@coreui/icons'
+import { usePagination } from '../../../hooks/usePagination'
 
 const ClientTable = ({
   clients,
@@ -32,6 +36,9 @@ const ClientTable = ({
 
   const naturalClients = clients.filter((client) => client.client_type === 'Person')
   const juridicalClients = clients.filter((client) => client.client_type === 'Company')
+
+  const naturalPagination = usePagination(naturalClients, 10)
+  const juridicalPagination = usePagination(juridicalClients, 10)
 
   const handleEdit = (client) => {
     setCurrentClient({
@@ -124,7 +131,7 @@ const ClientTable = ({
               </CTableRow>
             </CTableHead>
             <CTableBody>
-              {naturalClients.map((client) => (
+              {naturalPagination.currentData.map((client) => (
                 <CTableRow key={client.ttr_idclient}>
                   <CTableDataCell>
                     <strong>
@@ -172,6 +179,37 @@ const ClientTable = ({
               ))}
             </CTableBody>
           </CTable>
+          {naturalClients.length > 0 && (
+            <div className="d-flex justify-content-center mt-3">
+              <CPagination>
+                <CPaginationItem
+                  disabled={naturalPagination.currentPage === 1}
+                  onClick={() =>
+                    naturalPagination.setCurrentPage(naturalPagination.currentPage - 1)
+                  }
+                >
+                  Anterior
+                </CPaginationItem>
+                {[...Array(naturalPagination.totalPages)].map((_, i) => (
+                  <CPaginationItem
+                    key={i + 1}
+                    active={i + 1 === naturalPagination.currentPage}
+                    onClick={() => naturalPagination.setCurrentPage(i + 1)}
+                  >
+                    {i + 1}
+                  </CPaginationItem>
+                ))}
+                <CPaginationItem
+                  disabled={naturalPagination.currentPage === naturalPagination.totalPages}
+                  onClick={() =>
+                    naturalPagination.setCurrentPage(naturalPagination.currentPage + 1)
+                  }
+                >
+                  Siguiente
+                </CPaginationItem>
+              </CPagination>
+            </div>
+          )}
           {naturalClients.length === 0 && (
             <CAlert color="info">
               No hay clientes naturales {activeTab === 'active' ? 'activos' : 'inactivos'}.
@@ -193,7 +231,7 @@ const ClientTable = ({
               </CTableRow>
             </CTableHead>
             <CTableBody>
-              {juridicalClients.map((client) => (
+              {juridicalPagination.currentData.map((client) => (
                 <CTableRow key={client.ttr_idclient}>
                   <CTableDataCell>
                     <strong>{client?.ttr_nomcompa || '-'}</strong>
@@ -239,6 +277,37 @@ const ClientTable = ({
               ))}
             </CTableBody>
           </CTable>
+          {juridicalClients.length > 0 && (
+            <div className="d-flex justify-content-center mt-3">
+              <CPagination>
+                <CPaginationItem
+                  disabled={juridicalPagination.currentPage === 1}
+                  onClick={() =>
+                    juridicalPagination.setCurrentPage(juridicalPagination.currentPage - 1)
+                  }
+                >
+                  Anterior
+                </CPaginationItem>
+                {[...Array(juridicalPagination.totalPages)].map((_, i) => (
+                  <CPaginationItem
+                    key={i + 1}
+                    active={i + 1 === juridicalPagination.currentPage}
+                    onClick={() => juridicalPagination.setCurrentPage(i + 1)}
+                  >
+                    {i + 1}
+                  </CPaginationItem>
+                ))}
+                <CPaginationItem
+                  disabled={juridicalPagination.currentPage === juridicalPagination.totalPages}
+                  onClick={() =>
+                    juridicalPagination.setCurrentPage(juridicalPagination.currentPage + 1)
+                  }
+                >
+                  Siguiente
+                </CPaginationItem>
+              </CPagination>
+            </div>
+          )}
           {juridicalClients.length === 0 && (
             <CAlert color="info">
               No hay clientes jurídicos {activeTab === 'active' ? 'activos' : 'inactivos'}.

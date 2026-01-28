@@ -124,7 +124,7 @@ export const useClients = () => {
           email: '',
         })
         setVisibleClient(false)
-        toast.success('Cliente agregado exitosamente!')
+        toast.success('Cliente registrado correctamente.')
       }
     } catch (error) {
       // Manejo de errores de validación del backend
@@ -175,7 +175,7 @@ export const useClients = () => {
           ),
         )
         setEditVisibleClient(false)
-        toast.success('Cliente actualizado exitosamente!')
+        toast.info('Cliente actualizado correctamente.')
       }
     } catch (error) {
       // Manejo de errores de validación del backend
@@ -209,7 +209,7 @@ export const useClients = () => {
       setClients(clients.filter((c) => c.ttr_idclient !== currentClient.ttr_idclient))
       setReactivateVisibleClient(false)
       setReactivateConfirmationClient('')
-      toast.success('Cliente reactivado exitosamente!')
+      toast.info('Cliente reactivado correctamente.')
     } catch (error) {
       toast.error('Error al reactivar cliente: ' + (error.message || 'Error desconocido.'))
     }
@@ -233,7 +233,7 @@ export const useClients = () => {
           activeTab === 'active'
             ? 'Cliente desactivado exitosamente!'
             : 'Cliente eliminado permanentemente (simulado)' // Backend is just soft delete, unless I implement hard delete. But schema says soft delete.
-        toast.success(msg)
+        toast.error(msg)
       } catch (error) {
         toast.error('Error al procesar cliente: ' + (error.message || 'Error desconocido.'))
       }

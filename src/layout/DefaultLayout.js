@@ -24,7 +24,7 @@ const DefaultLayout = () => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="colored"
+        theme="light"
       />
     </div>
   )

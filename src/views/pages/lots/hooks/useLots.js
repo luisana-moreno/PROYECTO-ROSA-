@@ -105,7 +105,7 @@ const useLots = () => {
       )
       setFormData({ nombre: '' })
       setEditingLot(null)
-      toast.success('Lote actualizado exitosamente')
+      toast.info('Lote actualizado correctamente.')
     } catch (error) {
       toast.error(error.message || 'Error al actualizar el lote')
     } finally {
@@ -177,7 +177,7 @@ const useLots = () => {
       setLoading(true)
       try {
         await lotService.removeBovineFromLot(idLote, idBovino)
-        toast.success('Bovino desasociado del lote correctamente.')
+        toast.error('Bovino desasociado del lote correctamente.')
         await fetchAllLots()
         await fetchActiveBovinesInLot(idLote) // Refrescar bovinos activos para el lote
         await fetchAllBovines() // Refrescar la lista de todos los bovinos
@@ -195,7 +195,7 @@ const useLots = () => {
       setLoading(true)
       try {
         await lotService.updateBovineLotAssignment(idBovLotPotr, assignmentData)
-        toast.success('Asignación de bovino en lote actualizada correctamente.')
+        toast.info('Asignación de bovino en lote actualizada correctamente.')
         await fetchAllLots()
         await fetchActiveBovinesInLot(assignmentData.id) // Usar assignmentData.id (mapeado de tmaIdLote)
         await fetchAllBovines() // Refrescar la lista de todos los bovinos

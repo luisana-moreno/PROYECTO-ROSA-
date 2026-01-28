@@ -24,6 +24,8 @@ import {
   CFormTextarea,
   CAlert,
   CFormSelect,
+  CPagination,
+  CPaginationItem,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -34,6 +36,7 @@ import {
   cilCheckCircle,
   cilPencil,
   cilSpreadsheet,
+  cilWarning,
 } from '@coreui/icons'
 import {
   getVisitasVeterinarias,
@@ -45,9 +48,11 @@ import {
 } from '../../../../api/sanidadService'
 import { cattleService } from '../../../../api/cattleService'
 import { toast } from 'react-toastify'
+import { usePagination } from '../../../../hooks/usePagination'
 
 const VisitasIndex = () => {
   const [visitas, setVisitas] = useState([])
+  const { currentData, currentPage, totalPages, setCurrentPage } = usePagination(visitas, 10)
   const [bovinos, setBovinos] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [showBovinosModal, setShowBovinosModal] = useState(false)
@@ -112,7 +117,7 @@ const VisitasIndex = () => {
     try {
       await deleteVisitaVeterinaria(visitaToDelete.ttr_idvisvet)
       loadData()
-      toast.success('Visita eliminada correctamente.')
+      toast.error('Visita eliminada correctamente.')
       setShowDeleteModal(false)
       setVisitaToDelete(null)
     } catch (error) {
@@ -198,7 +203,7 @@ const VisitasIndex = () => {
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {visitas.map((visita) => {
+                  {currentData.map((visita) => {
                     const diasRestantes = getDiasRestantes(visita.ttr_proxfech)
                     return (
                       <CTableRow key={visita.ttr_idvisvet}>
@@ -239,6 +244,33 @@ const VisitasIndex = () => {
                   })}
                 </CTableBody>
               </CTable>
+              {visitas.length > 0 && (
+                <div className="d-flex justify-content-center mt-3">
+                  <CPagination aria-label="Navegación de visitas">
+                    <CPaginationItem
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                    >
+                      Anterior
+                    </CPaginationItem>
+                    {Array.from({ length: totalPages }, (_, i) => (
+                      <CPaginationItem
+                        key={i + 1}
+                        active={i + 1 === currentPage}
+                        onClick={() => setCurrentPage(i + 1)}
+                      >
+                        {i + 1}
+                      </CPaginationItem>
+                    ))}
+                    <CPaginationItem
+                      disabled={currentPage === totalPages}
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                    >
+                      Siguiente
+                    </CPaginationItem>
+                  </CPagination>
+                </div>
+              )}
 
               {visitas.length === 0 && (
                 <CAlert color="info" className="mt-3 border-0 shadow-sm">
@@ -446,23 +478,34 @@ const VisitasIndex = () => {
       </CModal>
 
       {/* Modal Confirmar Eliminación */}
-      <CModal visible={showDeleteModal} onClose={() => setShowDeleteModal(false)} backdrop="static">
+      <CModal
+        visible={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        backdrop="static"
+        alignment="center"
+      >
         <CModalHeader>
-          <CModalTitle>Confirmar Eliminación</CModalTitle>
+          <CModalTitle>
+            <CIcon icon={cilWarning} className="me-2" style={{ color: '#dc3545' }} />
+            Eliminar Visita
+          </CModalTitle>
         </CModalHeader>
         <CModalBody>
+          <CAlert color="danger">
+            <strong>¡Advertencia!</strong> Esta acción no se puede deshacer.
+          </CAlert>
           <p>
             ¿Está seguro de que desea eliminar la visita del{' '}
             <strong>{visitaToDelete && formatDate(visitaToDelete.ttr_fechavis)}</strong>?
           </p>
-          <p className="text-muted small">Esta acción no se puede deshacer.</p>
         </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setShowDeleteModal(false)}>
             Cancelar
           </CButton>
           <CButton color="danger" onClick={handleDelete} className="text-white">
-            Eliminar
+            <CIcon icon={cilTrash} className="me-2" />
+            Eliminar Visita
           </CButton>
         </CModalFooter>
       </CModal>

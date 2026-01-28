@@ -259,7 +259,7 @@ export const useEmployees = () => {
         setReactivateVisible(false)
         setReactivateConfirmation('')
         setFilterStatus('ACTIVO') // Switch back to active tab to see the result
-        toast.success('Empleado reactivado exitosamente')
+        toast.info('Empleado reactivado correctamente.')
       } catch (error) {
         toast.error(error.message || 'Error al reactivar empleado.')
       }

@@ -11,23 +11,25 @@ import {
   CPaginationItem,
   CBadge,
   CAlert,
+  CFormSelect,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash, cilCheckCircle } from '@coreui/icons'
 import { formatDateToDDMMYYYY } from 'src/utils/dateFormatter'
+import { usePagination } from '../../../../hooks/usePagination'
 
 const EmployeesTable = ({
   employees,
-  indexOfFirstEmployee,
   setEditVisible,
   setDeleteVisible,
   setReactivateVisible,
   setViewVisible,
   setCurrentEmployee,
-  employeesPerPage,
-  currentPage,
-  paginate,
 }) => {
+  // Use pagination hook
+  const { currentData, currentPage, totalPages, setCurrentPage } = usePagination(employees, 10)
+  const indexOfFirstEmployee = (currentPage - 1) * 10
+
   // Función para obtener el color del badge según el cargo
   const getPositionBadgeColor = (positionName) => {
     const positionColors = {
@@ -54,7 +56,7 @@ const EmployeesTable = ({
           </CTableRow>
         </CTableHead>
         <CTableBody>
-          {employees.map((employee, index) => (
+          {currentData.map((employee, index) => (
             <CTableRow key={employee.ttr_idemplo || employee.id || index}>
               <CTableDataCell>{indexOfFirstEmployee + index + 1}</CTableDataCell>
               <CTableDataCell>
@@ -129,24 +131,27 @@ const EmployeesTable = ({
       )}
 
       {/* Paginación */}
-      {employees.length > employeesPerPage && (
+      {employees.length > 0 && (
         <div className="d-flex justify-content-center mt-3">
           <CPagination aria-label="Navegación de empleados">
-            <CPaginationItem disabled={currentPage === 1} onClick={() => paginate(currentPage - 1)}>
+            <CPaginationItem
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(currentPage - 1)}
+            >
               Anterior
             </CPaginationItem>
-            {Array.from({ length: Math.ceil(employees.length / employeesPerPage) }, (_, i) => (
+            {Array.from({ length: totalPages }, (_, i) => (
               <CPaginationItem
                 key={i + 1}
                 active={i + 1 === currentPage}
-                onClick={() => paginate(i + 1)}
+                onClick={() => setCurrentPage(i + 1)}
               >
                 {i + 1}
               </CPaginationItem>
             ))}
             <CPaginationItem
-              disabled={currentPage === Math.ceil(employees.length / employeesPerPage)}
-              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(currentPage + 1)}
             >
               Siguiente
             </CPaginationItem>

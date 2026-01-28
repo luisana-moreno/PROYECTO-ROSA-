@@ -166,7 +166,7 @@ const usePastureActivity = () => {
       setLoading(true)
       try {
         await pastureService.finalizarRotacion(data)
-        toast.success('Rotación finalizada. Potrero en recuperación.')
+        toast.info('Rotación finalizada. Potrero en recuperación.')
         fetchInitialData() // Recargar para ver cambio de estado
       } catch (error) {
         console.error(error)
@@ -184,7 +184,7 @@ const usePastureActivity = () => {
       setLoading(true)
       try {
         await pastureService.liberarPotrero(pastureId)
-        toast.success('Potrero liberado y disponible.')
+        toast.info('Potrero liberado y disponible.')
         fetchInitialData() // Recargar para ver cambio de estado
       } catch (error) {
         console.error(error)

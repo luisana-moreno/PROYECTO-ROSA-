@@ -64,7 +64,7 @@ export const useInventory = () => {
   const handleEditItem = async (id, formData) => {
     const response = await insumosService.updateInsumo(id, formData)
     if (response) {
-      toast.success('Insumo actualizado correctamente')
+      toast.info('Insumo actualizado correctamente.')
       setEditVisible(false)
       setCurrentRecord(null)
       fetchData()
@@ -83,7 +83,7 @@ export const useInventory = () => {
 
     const response = await insumosService.deleteInsumo(currentRecord.ttr_idinsumo)
     if (response) {
-      toast.success('Insumo eliminado correctamente')
+      toast.error('Insumo eliminado correctamente.')
       setDeleteVisible(false)
       setCurrentRecord(null)
       setDeleteConfirmation('')

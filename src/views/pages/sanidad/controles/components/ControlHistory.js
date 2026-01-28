@@ -201,7 +201,7 @@ const ControlHistory = ({
         ...editFormData,
       }
       await updateControl(editingControl.ttr_idcontsa, dataToUpdate)
-      toast.success('Control actualizado')
+      toast.info('Control actualizado correctamente.')
       setModalEditarVisible(false)
       setEditingControl(null)
       cargarData()
@@ -220,7 +220,7 @@ const ControlHistory = ({
     if (!controlToDelete) return
     try {
       await deleteControl(controlToDelete.ttr_idcontsa)
-      toast.success('Registro eliminado correctamente.')
+      toast.error('Registro eliminado correctamente.')
       setModalDeleteVisible(false)
       setControlToDelete(null)
       cargarData()

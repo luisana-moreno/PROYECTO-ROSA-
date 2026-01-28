@@ -165,7 +165,7 @@ export const useUsers = () => {
         setReactivateVisible(false)
         setReactivateConfirmation('')
         setFilterStatus('ACTIVO') // Switch back to active tab
-        toast.success('Usuario reactivado exitosamente')
+        toast.info('Usuario reactivado correctamente.')
       } catch (error) {
         toast.error(error.message || 'Error al reactivar usuario.')
       }

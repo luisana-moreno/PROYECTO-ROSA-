@@ -25,9 +25,10 @@ import {
   CFormLabel,
   CFormSelect,
   CFormInput,
+  CAlert,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilPlus, cilTrash } from '@coreui/icons'
+import { cilPlus, cilTrash, cilWarning } from '@coreui/icons'
 import { toast } from 'react-toastify'
 import { formatDateToYYYYMMDD, formatDateToDDMMYYYY } from '../../../../utils/dateFormatter'
 import CustomTableModal from '../../../../components/CustomTableModal'
@@ -51,6 +52,9 @@ const LotDetailsModal = ({
   const [assignmentDate, setAssignmentDate] = useState(formatDateToYYYYMMDD(new Date()))
   const [visibleCattleSelectionModal, setVisibleCattleSelectionModal] = useState(false)
   const [selectedPastureId, setSelectedPastureId] = useState('')
+  // Estado para modal de confirmación de desasociación
+  const [showRemoveModal, setShowRemoveModal] = useState(false)
+  const [bovineToRemove, setBovineToRemove] = useState(null)
 
   useEffect(() => {
     if (visible && lot) {
@@ -87,14 +91,20 @@ const LotDetailsModal = ({
     setSelectedPastureId('')
   }
 
-  const handleRemoveBovine = async (idBovino) => {
+  const handleRemoveBovine = (bovine) => {
     if (!lot) {
       toast.error('No se ha seleccionado un lote.')
       return
     }
-    if (window.confirm('¿Está seguro de desasociar este bovino del lote?')) {
-      await removeBovineFromLot(lot.id, idBovino)
-    }
+    setBovineToRemove(bovine)
+    setShowRemoveModal(true)
+  }
+
+  const confirmRemoveBovine = async () => {
+    if (!bovineToRemove) return
+    await removeBovineFromLot(lot.id, bovineToRemove.idBovino)
+    setShowRemoveModal(false)
+    setBovineToRemove(null)
   }
 
   const handleSelectBovinesFromModal = (selected) => {
@@ -176,7 +186,7 @@ const LotDetailsModal = ({
                           <CButton
                             color="danger"
                             size="sm"
-                            onClick={() => handleRemoveBovine(bovine.idBovino)}
+                            onClick={() => handleRemoveBovine(bovine)}
                             disabled={loading}
                           >
                             <CIcon icon={cilTrash} className="me-1" />
@@ -335,6 +345,45 @@ const LotDetailsModal = ({
         title="Seleccionar Bovinos"
         searchPlaceholder="Buscar bovinos..."
       />
+
+      {/* Modal Confirmar Desasociación de Bovino */}
+      <CModal
+        visible={showRemoveModal}
+        onClose={() => setShowRemoveModal(false)}
+        backdrop="static"
+        alignment="center"
+      >
+        <CModalHeader>
+          <CModalTitle>
+            <CIcon icon={cilWarning} className="me-2" style={{ color: '#dc3545' }} />
+            Desasociar Bovino
+          </CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          <CAlert color="danger">
+            <strong>¡Advertencia!</strong> Esta acción desasociará al bovino del lote.
+          </CAlert>
+          <p>
+            ¿Está seguro de que desea desasociar al bovino{' '}
+            <strong>#{bovineToRemove?.numeroBovino}</strong> del lote <strong>{lot?.nombre}</strong>
+            ?
+          </p>
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setShowRemoveModal(false)}>
+            Cancelar
+          </CButton>
+          <CButton
+            color="danger"
+            onClick={confirmRemoveBovine}
+            className="text-white"
+            disabled={loading}
+          >
+            <CIcon icon={cilTrash} className="me-2" />
+            Desasociar Bovino
+          </CButton>
+        </CModalFooter>
+      </CModal>
     </>
   )
 }

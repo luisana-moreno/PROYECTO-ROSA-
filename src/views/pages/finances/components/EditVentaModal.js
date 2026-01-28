@@ -46,7 +46,7 @@ const EditVentaModal = ({ visible, onClose, venta, onUpdateSuccess }) => {
     setLoading(true)
     try {
       await ventasService.updateEstadoVenta(venta.ttr_idfactur, idEstado)
-      toast.success('Estado actualizado correctamente')
+      toast.info('Estado actualizado correctamente.')
       if (onUpdateSuccess) onUpdateSuccess()
       onClose()
     } catch (error) {

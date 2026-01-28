@@ -207,7 +207,7 @@ export const useCattle = () => {
         setReactivateVisible(false)
         setReactivateConfirmation('')
         setFilterStatus('3') // Switch back to active tab
-        toast.success('Bovino reactivado exitosamente')
+        toast.info('Bovino reactivado correctamente.')
       } catch (error) {
         console.error('Error reactivating cattle:', error)
         toast.error(error.message || 'Error al reactivar bovino')

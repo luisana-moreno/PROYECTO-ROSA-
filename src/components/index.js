@@ -8,7 +8,7 @@ import DocsComponents from './DocsComponents'
 import DocsIcons from './DocsIcons'
 import DocsLink from './DocsLink'
 import DocsExample from './DocsExample'
-import CustomTableModal from './CustomTableModal' // Importa el nuevo componente
+import CustomTableModal from './CustomTableModal'
 
 export {
   AppBreadcrumb,
@@ -21,5 +21,5 @@ export {
   DocsIcons,
   DocsLink,
   DocsExample,
-  CustomTableModal, // Exporta el nuevo componente
+  CustomTableModal,
 }

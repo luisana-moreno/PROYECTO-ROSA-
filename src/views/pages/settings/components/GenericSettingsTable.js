@@ -17,10 +17,13 @@ import {
   CModalFooter,
   CFormInput,
   CSpinner,
+  CPagination,
+  CPaginationItem,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPlus, cilPencil, cilTrash } from '@coreui/icons'
 import { toast } from 'react-toastify'
+import { usePagination } from '../../../../hooks/usePagination'
 
 const GenericSettingsTable = ({
   title,
@@ -30,6 +33,7 @@ const GenericSettingsTable = ({
   onDelete,
   itemLabel = 'elemento',
 }) => {
+  const { currentData, currentPage, totalPages, setCurrentPage } = usePagination(items, 10)
   const [visibleAdd, setVisibleAdd] = useState(false)
   const [visibleEdit, setVisibleEdit] = useState(false)
   const [visibleDelete, setVisibleDelete] = useState(false)
@@ -84,7 +88,7 @@ const GenericSettingsTable = ({
       await onDelete(currentItem.id)
       setVisibleDelete(false)
       setDeleteConfirmation('')
-      toast.success(`${itemLabel} eliminado`)
+      toast.error(`${itemLabel} eliminado correctamente.`)
     } catch (error) {
       toast.error(error.message || `Error al eliminar ${itemLabel}`)
     } finally {
@@ -118,7 +122,7 @@ const GenericSettingsTable = ({
                 </CTableDataCell>
               </CTableRow>
             ) : (
-              items.map((item) => (
+              currentData.map((item) => (
                 <CTableRow key={item.id}>
                   <CTableDataCell>{item.id}</CTableDataCell>
                   <CTableDataCell>{item.nombre}</CTableDataCell>
@@ -153,6 +157,33 @@ const GenericSettingsTable = ({
             )}
           </CTableBody>
         </CTable>
+        {items.length > 0 && (
+          <div className="d-flex justify-content-center mt-3">
+            <CPagination aria-label="Navegación de configuración">
+              <CPaginationItem
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(currentPage - 1)}
+              >
+                Anterior
+              </CPaginationItem>
+              {Array.from({ length: totalPages }, (_, i) => (
+                <CPaginationItem
+                  key={i + 1}
+                  active={i + 1 === currentPage}
+                  onClick={() => setCurrentPage(i + 1)}
+                >
+                  {i + 1}
+                </CPaginationItem>
+              ))}
+              <CPaginationItem
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(currentPage + 1)}
+              >
+                Siguiente
+              </CPaginationItem>
+            </CPagination>
+          </div>
+        )}
 
         {/* Modal Agregar */}
         <CModal visible={visibleAdd} onClose={() => setVisibleAdd(false)}>

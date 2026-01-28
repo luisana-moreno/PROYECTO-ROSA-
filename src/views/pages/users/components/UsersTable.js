@@ -11,9 +11,11 @@ import {
   CPaginationItem,
   CBadge,
   CAlert,
+  CFormSelect,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash, cilCheckCircle } from '@coreui/icons'
+import { usePagination } from '../../../../hooks/usePagination'
 
 const UsersTable = ({
   users,
@@ -22,16 +24,8 @@ const UsersTable = ({
   setDeleteVisible,
   setReactivateVisible,
 }) => {
-  const [currentPage, setCurrentPage] = useState(1)
-  const [usersPerPage] = useState(10)
-
-  // Obtener usuarios actuales
-  const indexOfLastUser = currentPage * usersPerPage
-  const indexOfFirstUser = indexOfLastUser - usersPerPage
-  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser)
-
-  // Cambiar de página
-  const paginate = (pageNumber) => setCurrentPage(pageNumber)
+  const { currentData, currentPage, totalPages, setCurrentPage } = usePagination(users, 10)
+  const indexOfFirstUser = (currentPage - 1) * 10
 
   // Función para obtener el color del badge según el rol
   const getRoleBadgeColor = (roleName) => {
@@ -58,7 +52,7 @@ const UsersTable = ({
           </CTableRow>
         </CTableHead>
         <CTableBody>
-          {currentUsers.map((usr, index) => (
+          {currentData.map((usr, index) => (
             <CTableRow key={usr.ttr_idusuar}>
               <CTableDataCell>{indexOfFirstUser + index + 1}</CTableDataCell>
               <CTableDataCell>
@@ -131,24 +125,27 @@ const UsersTable = ({
       )}
 
       {/* Paginación */}
-      {users.length > usersPerPage && (
+      {users.length > 0 && (
         <div className="d-flex justify-content-center mt-3">
           <CPagination aria-label="Navegación de usuarios">
-            <CPaginationItem disabled={currentPage === 1} onClick={() => paginate(currentPage - 1)}>
+            <CPaginationItem
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(currentPage - 1)}
+            >
               Anterior
             </CPaginationItem>
-            {Array.from({ length: Math.ceil(users.length / usersPerPage) }, (_, i) => (
+            {Array.from({ length: totalPages }, (_, i) => (
               <CPaginationItem
                 key={i + 1}
                 active={i + 1 === currentPage}
-                onClick={() => paginate(i + 1)}
+                onClick={() => setCurrentPage(i + 1)}
               >
                 {i + 1}
               </CPaginationItem>
             ))}
             <CPaginationItem
-              disabled={currentPage === Math.ceil(users.length / usersPerPage)}
-              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(currentPage + 1)}
             >
               Siguiente
             </CPaginationItem>

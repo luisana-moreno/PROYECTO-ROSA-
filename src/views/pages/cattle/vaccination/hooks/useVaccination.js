@@ -318,7 +318,7 @@ const useVaccination = () => {
     if (deleteConfirmation === 'confirmar' && selectedEventId !== null) {
       try {
         await vaccinationService.deleteRegistroMedico(selectedEventId)
-        toast.success('Evento eliminado correctamente') // Cambiado a toast.success
+        toast.error('Evento eliminado correctamente.')
         setConfirmDelete(false)
         setVisibleVaccinationDetailsModal(false) // Cerrar el modal de detalles
         closeModal() // Cerrar el modal principal si estaba abierto

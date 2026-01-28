@@ -25,6 +25,8 @@ import {
   CFormTextarea,
   CAlert,
   CButtonGroup,
+  CPagination,
+  CPaginationItem,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -35,6 +37,7 @@ import {
   cilCalendar,
   cilMedicalCross,
   cilBaby,
+  cilWarning,
 } from '@coreui/icons'
 import {
   getPreneces,
@@ -47,9 +50,11 @@ import {
 } from '../../../../api/sanidadService'
 import { cattleService } from '../../../../api/cattleService'
 import { toast } from 'react-toastify'
+import { usePagination } from '../../../../hooks/usePagination'
 
 const PrenezIndex = () => {
   const [preneces, setPreneces] = useState([])
+  const { currentData, currentPage, totalPages, setCurrentPage } = usePagination(preneces, 10)
   const [bovinos, setBovinos] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [showMastitisModal, setShowMastitisModal] = useState(false)
@@ -194,7 +199,7 @@ const PrenezIndex = () => {
     try {
       await deletePrenez(prenezToDelete.ttr_idprenez)
       loadData()
-      toast.success('Preñez eliminada correctamente')
+      toast.error('Preñez eliminada correctamente.')
       setShowDeleteModal(false)
       setPrenezToDelete(null)
     } catch (error) {
@@ -287,7 +292,7 @@ const PrenezIndex = () => {
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {preneces.map((prenez) => {
+                  {currentData.map((prenez) => {
                     const diasRestantes = getDiasRestantes(prenez.ttr_fechaestp)
                     const puedeAplicarMastitis =
                       prenez.ttr_estadopre === 'Confirmada' && diasRestantes <= 60
@@ -362,6 +367,33 @@ const PrenezIndex = () => {
                   })}
                 </CTableBody>
               </CTable>
+              {preneces.length > 0 && (
+                <div className="d-flex justify-content-center mt-3">
+                  <CPagination aria-label="Navegación de preñeces">
+                    <CPaginationItem
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                    >
+                      Anterior
+                    </CPaginationItem>
+                    {Array.from({ length: totalPages }, (_, i) => (
+                      <CPaginationItem
+                        key={i + 1}
+                        active={i + 1 === currentPage}
+                        onClick={() => setCurrentPage(i + 1)}
+                      >
+                        {i + 1}
+                      </CPaginationItem>
+                    ))}
+                    <CPaginationItem
+                      disabled={currentPage === totalPages}
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                    >
+                      Siguiente
+                    </CPaginationItem>
+                  </CPagination>
+                </div>
+              )}
 
               {preneces.length === 0 && (
                 <CAlert color="info" className="mt-3 border-0 shadow-sm">
@@ -602,23 +634,34 @@ const PrenezIndex = () => {
       </CModal>
 
       {/* Modal Confirmar Eliminación */}
-      <CModal visible={showDeleteModal} onClose={() => setShowDeleteModal(false)} backdrop="static">
+      <CModal
+        visible={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        backdrop="static"
+        alignment="center"
+      >
         <CModalHeader>
-          <CModalTitle>Confirmar Eliminación</CModalTitle>
+          <CModalTitle>
+            <CIcon icon={cilWarning} className="me-2" style={{ color: '#dc3545' }} />
+            Eliminar Preñez
+          </CModalTitle>
         </CModalHeader>
         <CModalBody>
+          <CAlert color="danger">
+            <strong>¡Advertencia!</strong> Esta acción no se puede deshacer.
+          </CAlert>
           <p>
             ¿Está seguro de que desea eliminar la preñez del bovino{' '}
             <strong>#{prenezToDelete?.numero_bovino}</strong>?
           </p>
-          <p className="text-muted small">Esta acción no se puede deshacer.</p>
         </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setShowDeleteModal(false)}>
             Cancelar
           </CButton>
           <CButton color="danger" onClick={handleDelete} className="text-white">
-            Eliminar
+            <CIcon icon={cilTrash} className="me-2" />
+            Eliminar Preñez
           </CButton>
         </CModalFooter>
       </CModal>

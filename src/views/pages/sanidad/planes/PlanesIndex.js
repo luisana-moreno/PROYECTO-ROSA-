@@ -24,6 +24,8 @@ import {
   CFormSelect,
   CFormTextarea,
   CAlert,
+  CPagination,
+  CPaginationItem,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -35,6 +37,7 @@ import {
   cilCalendar,
   cilFilter,
   cilSearch,
+  cilWarning,
 } from '@coreui/icons'
 import {
   getPlanesVacunacion,
@@ -45,11 +48,16 @@ import {
   togglePlanActivo,
   getTiposVacuna, // Añadido
 } from '../../../../api/sanidadService'
+import { toast } from 'react-toastify'
+import { usePagination } from '../../../../hooks/usePagination'
 
 const PlanesIndex = () => {
   const [planes, setPlanes] = useState([])
+  const { currentData, currentPage, totalPages, setCurrentPage } = usePagination(planes, 10)
   const [tiposVacuna, setTiposVacuna] = useState([])
   const [showModal, setShowModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [planToDelete, setPlanToDelete] = useState(null)
   const [editingPlan, setEditingPlan] = useState(null)
   const [filter, setFilter] = useState('todos') // todos, activos
 
@@ -84,6 +92,7 @@ const PlanesIndex = () => {
       setTiposVacuna(tiposData)
     } catch (error) {
       console.error('Error al cargar datos:', error)
+      toast.error('Error al cargar planes de vacunación.')
     }
   }
 
@@ -92,14 +101,17 @@ const PlanesIndex = () => {
     try {
       if (editingPlan) {
         await updatePlanVacunacion(editingPlan.ttr_idplanva, formData)
+        toast.info('Plan actualizado correctamente.')
       } else {
         await createPlanVacunacion(formData)
+        toast.success('Plan creado correctamente.')
       }
       setShowModal(false)
       loadData()
       resetForm()
     } catch (error) {
       console.error('Error al guardar plan:', error)
+      toast.error('Error al guardar plan.')
     }
   }
 
@@ -118,23 +130,33 @@ const PlanesIndex = () => {
     setShowModal(true)
   }
 
-  const handleDelete = async (id) => {
-    if (window.confirm('¿Está seguro de eliminar este plan?')) {
-      try {
-        await deletePlanVacunacion(id)
-        loadData()
-      } catch (error) {
-        console.error('Error al eliminar plan:', error)
-      }
+  const openDeleteModal = (plan) => {
+    setPlanToDelete(plan)
+    setShowDeleteModal(true)
+  }
+
+  const handleDelete = async () => {
+    if (!planToDelete) return
+    try {
+      await deletePlanVacunacion(planToDelete.ttr_idplanva)
+      toast.error('Plan eliminado correctamente.')
+      setShowDeleteModal(false)
+      setPlanToDelete(null)
+      loadData()
+    } catch (error) {
+      console.error('Error al eliminar plan:', error)
+      toast.error('Error al eliminar plan.')
     }
   }
 
   const handleToggleActivo = async (id, activo) => {
     try {
       await togglePlanActivo(id, !activo)
+      toast.info(activo ? 'Plan desactivado.' : 'Plan activado.')
       loadData()
     } catch (error) {
       console.error('Error al cambiar estado:', error)
+      toast.error('Error al cambiar estado del plan.')
     }
   }
 
@@ -212,7 +234,7 @@ const PlanesIndex = () => {
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {planes.map((plan) => (
+                  {currentData.map((plan) => (
                     <CTableRow key={plan.ttr_idplanva}>
                       <CTableDataCell className="fw-semibold">{plan.ttr_nomplan}</CTableDataCell>
                       <CTableDataCell>{plan.nombre_vacuna}</CTableDataCell>
@@ -249,7 +271,7 @@ const PlanesIndex = () => {
                           color="danger"
                           size="sm"
                           title="Eliminar"
-                          onClick={() => handleDelete(plan.ttr_idplanva)}
+                          onClick={() => openDeleteModal(plan)}
                         >
                           <CIcon icon={cilTrash} />
                         </CButton>
@@ -258,6 +280,33 @@ const PlanesIndex = () => {
                   ))}
                 </CTableBody>
               </CTable>
+              {planes.length > 0 && (
+                <div className="d-flex justify-content-center mt-3">
+                  <CPagination aria-label="Navegación de planes">
+                    <CPaginationItem
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                    >
+                      Anterior
+                    </CPaginationItem>
+                    {Array.from({ length: totalPages }, (_, i) => (
+                      <CPaginationItem
+                        key={i + 1}
+                        active={i + 1 === currentPage}
+                        onClick={() => setCurrentPage(i + 1)}
+                      >
+                        {i + 1}
+                      </CPaginationItem>
+                    ))}
+                    <CPaginationItem
+                      disabled={currentPage === totalPages}
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                    >
+                      Siguiente
+                    </CPaginationItem>
+                  </CPagination>
+                </div>
+              )}
 
               {planes.length === 0 && (
                 <CAlert color="info" className="mt-3 border-0 shadow-sm">
@@ -393,6 +442,38 @@ const PlanesIndex = () => {
             </CButton>
           </CModalFooter>
         </CForm>
+      </CModal>
+
+      {/* Modal Confirmar Eliminación */}
+      <CModal
+        visible={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        backdrop="static"
+        alignment="center"
+      >
+        <CModalHeader>
+          <CModalTitle>
+            <CIcon icon={cilWarning} className="me-2" style={{ color: '#dc3545' }} />
+            Eliminar Plan
+          </CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          <CAlert color="danger">
+            <strong>¡Advertencia!</strong> Esta acción no se puede deshacer.
+          </CAlert>
+          <p>
+            ¿Está seguro de que desea eliminar el plan <strong>{planToDelete?.ttr_nomplan}</strong>?
+          </p>
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setShowDeleteModal(false)}>
+            Cancelar
+          </CButton>
+          <CButton color="danger" onClick={handleDelete} className="text-white">
+            <CIcon icon={cilTrash} className="me-2" />
+            Eliminar Plan
+          </CButton>
+        </CModalFooter>
       </CModal>
     </>
   )

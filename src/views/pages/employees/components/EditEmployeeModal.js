@@ -157,7 +157,7 @@ const EditEmployeeModal = ({
   const handlePhotoUpload = async (file) => {
     try {
       await employeeService.uploadPhoto(currentEmployee.id, file)
-      toast.success('Foto subida exitosamente')
+      toast.info('Foto subida correctamente.')
     } catch (error) {
       toast.error(error.message || 'Error al subir foto')
       throw error
@@ -167,7 +167,7 @@ const EditEmployeeModal = ({
   const handlePhotoDelete = async () => {
     try {
       await employeeService.deletePhoto(currentEmployee.id)
-      toast.success('Foto eliminada exitosamente')
+      toast.error('Foto eliminada correctamente.')
     } catch (error) {
       toast.error(error.message || 'Error al eliminar foto')
       throw error
