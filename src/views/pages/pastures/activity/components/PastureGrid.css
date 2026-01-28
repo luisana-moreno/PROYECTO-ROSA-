@@ -37,3 +37,14 @@
   color: #666;
   font-size: 0.75rem;
 }
+
+/* Force Cyan for Info status */
+.pasture-card.border-info {
+  border-color: #145491 !important;
+}
+
+.pasture-card .badge.text-bg-info,
+.pasture-card .badge.bg-info {
+  background-color: #286dad !important;
+  color: #ffffff !important;
+}

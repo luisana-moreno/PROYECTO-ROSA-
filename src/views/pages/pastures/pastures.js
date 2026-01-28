@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import CIcon from '@coreui/icons-react'
 import { cilPlus, cilList, cilGrid } from '@coreui/icons'
 import { CCard, CCardHeader, CCardBody, CButton, CAlert } from '@coreui/react'
+import { toast } from 'react-toastify'
 
 import { usePastures } from './hooks/usePastures'
 // import { pastureService } from 'src/api/pastureService' // pastureService might be unused inside the component now if usePastures handles it, but let's check. Actually I removed explicit calls to pastureService in previous step so it might be unused too.
@@ -34,8 +36,6 @@ const Pastures = () => {
     handleAddPasture,
     handleEditPasture,
     handleDeletePasture,
-    toast,
-    showToast,
     searchTerm,
     setSearchTerm,
     filterEstadoPotrero,
@@ -47,6 +47,7 @@ const Pastures = () => {
 
   // --- Estados para Dashboard y Rotación ---
   const [mantenimientoModalVisible, setMantenimientoModalVisible] = useState(false)
+  const navigate = useNavigate()
 
   return (
     <CCard className="mb-4 shadow-sm border-0">
@@ -56,7 +57,12 @@ const Pastures = () => {
           <p className="text-muted small mb-0">Administración de inventario de pasturas</p>
         </div>
         <div>
-          <CButton color="primary" variant="outline" className="me-2" href="/pastures/activity">
+          <CButton
+            color="primary"
+            variant="outline"
+            className="me-2"
+            onClick={() => navigate('/pastures/activity')}
+          >
             <CIcon icon={cilList} className="me-2" />
             Control de Actividad y Rotación
           </CButton>
@@ -128,26 +134,10 @@ const Pastures = () => {
         potreroId={null}
         pastures={pastures}
         onSuccess={() => {
-          showToast('Mantenimiento registrado exitosamente')
+          toast.success('Mantenimiento registrado exitosamente')
           // No needed reload dashboard logic here anymore as list updates separately or stays static
         }}
       />
-
-      {toast && toast.show && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: '20px',
-            right: '20px',
-            zIndex: 9999,
-            minWidth: 300,
-          }}
-        >
-          <CAlert color={toast.color} className="shadow-sm border-0">
-            {toast.message}
-          </CAlert>
-        </div>
-      )}
     </CCard>
   )
 }

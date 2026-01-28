@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { pastureService } from 'src/api/pastureService'
+import { toast } from 'react-toastify'
 
 export const usePastures = () => {
   const [visible, setVisible] = useState(false)
@@ -22,12 +23,6 @@ export const usePastures = () => {
     ttr_descripc: '', // Combinará lote y responsable
     ttr_fechamnt: new Date().toISOString().split('T')[0], // Fecha actual por defecto
   })
-  const [toast, setToast] = useState({ show: false, message: '', color: 'success' })
-
-  const showToast = (message, color = 'success') => {
-    setToast({ show: true, message, color })
-    setTimeout(() => setToast({ show: false, message: '', color: 'success' }), 2500)
-  }
 
   // Cargar potreros, estados y tipos de mantenimiento al iniciar
   useEffect(() => {
@@ -72,7 +67,7 @@ export const usePastures = () => {
         console.log('Tipos de Mantenimiento cargados:', tiposMantenimientoData)
       } catch (error) {
         console.error('Error al cargar datos iniciales:', error)
-        showToast('Error al cargar los datos iniciales.', 'danger')
+        toast.error('Error al cargar los datos iniciales.')
       }
     }
     fetchInitialData()
@@ -135,17 +130,17 @@ export const usePastures = () => {
         ttr_fechamnt: new Date().toISOString().split('T')[0],
       })
       setVisible(false)
-      showToast('Potrero agregado correctamente', 'success')
+      toast.success('Potrero agregado correctamente')
     } catch (error) {
       console.error('Error al agregar potrero:', error)
-      showToast(error.message || 'Error al agregar potrero', 'danger')
+      toast.error(error.message || 'Error al agregar potrero')
     }
   }
 
   // Editar potrero
   const handleEditPasture = async () => {
     if (!currentPasture || !currentPasture.ttr_idpotrer) {
-      showToast('No potrero seleccionado para editar.', 'warning')
+      toast.warning('No potrero seleccionado para editar.')
       return
     }
     try {
@@ -183,17 +178,17 @@ export const usePastures = () => {
         )
       }
       setEditVisible(false)
-      showToast('Potrero editado correctamente', 'info')
+      toast.info('Potrero editado correctamente')
     } catch (error) {
       console.error('Error al editar potrero:', error)
-      showToast(error.message || 'Error al editar potrero', 'danger')
+      toast.error(error.message || 'Error al editar potrero')
     }
   }
 
   // Eliminar potrero
   const handleDeletePasture = async () => {
     if (!currentPasture || !currentPasture.ttr_idpotrer) {
-      showToast('No potrero seleccionado para eliminar.', 'warning')
+      toast.warning('No potrero seleccionado para eliminar.')
       return
     }
     if (deleteConfirmation === 'confirmar') {
@@ -201,13 +196,13 @@ export const usePastures = () => {
         await pastureService.deletePotrero(currentPasture.ttr_idpotrer)
         setPastures(pastures.filter((p) => p.ttr_idpotrer !== currentPasture.ttr_idpotrer))
         setDeleteVisible(false)
-        showToast('Potrero eliminado exitosamente', 'danger')
+        toast.error('Potrero eliminado exitosamente')
       } catch (error) {
         console.error('Error al eliminar potrero:', error)
-        showToast(error.message || 'Error al eliminar potrero', 'danger')
+        toast.error(error.message || 'Error al eliminar potrero')
       }
     } else {
-      showToast('Debe escribir "confirmar" para eliminar', 'warning')
+      toast.warning('Debe escribir "confirmar" para eliminar')
     }
   }
 
@@ -230,7 +225,6 @@ export const usePastures = () => {
     handleAddPasture,
     handleEditPasture,
     handleDeletePasture,
-    showToast,
     searchTerm,
     setSearchTerm,
     filterEstadoPotrero,
