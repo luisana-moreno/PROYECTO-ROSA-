@@ -78,7 +78,7 @@ export const insumosService = {
       }
     } catch (error) {
       console.error('Error deleting insumo:', error)
-      return null
+      throw error
     }
   },
 }

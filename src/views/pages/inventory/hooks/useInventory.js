@@ -51,24 +51,34 @@ export const useInventory = () => {
 
   // CRUD Operations
   const handleAddItem = async (formData) => {
-    const response = await insumosService.createInsumo(formData)
-    if (response) {
-      toast.success('Insumo agregado correctamente')
-      setVisible(false)
-      fetchData() // Refresh list
-      return true
+    try {
+      const response = await insumosService.createInsumo(formData)
+      if (response) {
+        toast.success('Insumo agregado correctamente')
+        setVisible(false)
+        fetchData() // Refresh list
+        return true
+      }
+    } catch (error) {
+      console.error('Error adding item:', error)
+      toast.error('Error al agregar insumo')
     }
     return false
   }
 
   const handleEditItem = async (id, formData) => {
-    const response = await insumosService.updateInsumo(id, formData)
-    if (response) {
-      toast.info('Insumo actualizado correctamente.')
-      setEditVisible(false)
-      setCurrentRecord(null)
-      fetchData()
-      return true
+    try {
+      const response = await insumosService.updateInsumo(id, formData)
+      if (response) {
+        toast.info('Insumo actualizado correctamente.')
+        setEditVisible(false)
+        setCurrentRecord(null)
+        fetchData()
+        return true
+      }
+    } catch (error) {
+      console.error('Error updating item:', error)
+      toast.error('Error al actualizar insumo')
     }
     return false
   }
@@ -81,13 +91,18 @@ export const useInventory = () => {
 
     if (!currentRecord) return
 
-    const response = await insumosService.deleteInsumo(currentRecord.ttr_idinsumo)
-    if (response) {
-      toast.error('Insumo eliminado correctamente.')
-      setDeleteVisible(false)
-      setCurrentRecord(null)
-      setDeleteConfirmation('')
-      fetchData()
+    try {
+      const response = await insumosService.deleteInsumo(currentRecord.ttr_idinsumo)
+      if (response) {
+        toast.error('Insumo eliminado correctamente.')
+        setDeleteVisible(false)
+        setCurrentRecord(null)
+        setDeleteConfirmation('')
+        fetchData()
+      }
+    } catch (error) {
+      console.error('Error deleting item:', error)
+      toast.error(error.message || 'Error al eliminar insumo')
     }
   }
 

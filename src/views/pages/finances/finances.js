@@ -107,16 +107,6 @@ const Finances = () => {
                 Nueva Venta
               </CNavLink>
             </CNavItem>
-            <CNavItem>
-              <CNavLink
-                active={activeTab === 'estadisticas'}
-                onClick={() => setActiveTab('estadisticas')}
-                style={{ cursor: 'pointer' }}
-              >
-                <CIcon icon={cilChart} className="me-2" />
-                Estadísticas
-              </CNavLink>
-            </CNavItem>
           </CNav>
 
           {/* Contenido de tabs */}
