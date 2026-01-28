@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import * as sanidadService from '../../../../../api/sanidadService'
 
+const API_URL = import.meta.env.VITE_API_URL
+
 const useControlesData = () => {
   const [tiposControl, setTiposControl] = useState([])
   const [tipoSeleccionado, setTipoSeleccionado] = useState(null)
@@ -47,7 +49,7 @@ const useControlesData = () => {
 
   const cargarBovinos = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/bovinos')
+      const response = await fetch(`${API_URL}/bovinos`)
       const data = await response.json()
       setBovinos(data)
     } catch (error) {
@@ -66,7 +68,7 @@ const useControlesData = () => {
 
   const cargarEmpleados = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/empleados')
+      const response = await fetch(`${API_URL}/empleados`)
       const data = await response.json()
       setEmpleados(data)
     } catch (error) {
