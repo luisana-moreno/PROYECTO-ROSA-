@@ -27,6 +27,8 @@ import {
   CButtonGroup,
   CPagination,
   CPaginationItem,
+  CProgress,
+  CProgressBar,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -38,6 +40,7 @@ import {
   cilMedicalCross,
   cilBaby,
   cilWarning,
+  cilBell,
 } from '@coreui/icons'
 import {
   getPreneces,
@@ -47,23 +50,45 @@ import {
   deletePrenez,
   agregarTratamientoMastitisAutomatico,
   agregarTratamientosPostParto,
+  getAlertasSecado,
+  confirmarSecado,
 } from '../../../../api/sanidadService'
 import { cattleService } from '../../../../api/cattleService'
 import { toast } from 'react-toastify'
 import { usePagination } from '../../../../hooks/usePagination'
+import { useCattle } from '../../cattle/hooks/useCattle'
+import AddCattleModal from '../../cattle/components/AddCattleModal'
 
 const PrenezIndex = () => {
   const [preneces, setPreneces] = useState([])
   const { currentData, currentPage, totalPages, setCurrentPage } = usePagination(preneces, 10)
   const [bovinos, setBovinos] = useState([])
+  const [alertasSecado, setAlertasSecado] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [showMastitisModal, setShowMastitisModal] = useState(false)
   const [showPartoModal, setShowPartoModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showSecadoModal, setShowSecadoModal] = useState(false)
   const [selectedPrenez, setSelectedPrenez] = useState(null)
+  const [selectedSecado, setSelectedSecado] = useState(null)
   const [prenezToDelete, setPrenezToDelete] = useState(null)
-  const [filter, setFilter] = useState('activas') // todas, activas
+  const [filter, setFilter] = useState('activas')
   const [loading, setLoading] = useState(false)
+
+  // Hooks de useCattle para el registro de crías
+  const {
+    visible: showAddCalfModal,
+    setVisible: setShowAddCalfModal,
+    addCattleForm,
+    setAddCattleForm,
+    handleAddCattle,
+    razas,
+    colores,
+    etapas,
+    estados,
+    males,
+    females,
+  } = useCattle()
 
   const [formData, setFormData] = useState({
     idBovino: '',
@@ -96,10 +121,14 @@ const PrenezIndex = () => {
         prenecesData = await getPreneces()
       }
 
-      const bovinosData = await cattleService.getAllCattle()
+      const [bovinosData, secadoData] = await Promise.all([
+        cattleService.getAllCattle(),
+        getAlertasSecado().catch(() => []),
+      ])
 
       setPreneces(prenecesData)
       setBovinos(bovinosData)
+      setAlertasSecado(secadoData)
     } catch (error) {
       console.error('Error al cargar datos:', error)
     } finally {
@@ -124,7 +153,10 @@ const PrenezIndex = () => {
   const handleAgregarMastitis = async () => {
     try {
       setLoading(true)
-      await agregarTratamientoMastitisAutomatico(selectedPrenez, mastitisData.fechaInicio)
+      await agregarTratamientoMastitisAutomatico(
+        selectedPrenez.ttr_idprenez,
+        mastitisData.fechaInicio,
+      )
       toast.success('Tratamiento de Mastitis programado correctamente.')
       setShowMastitisModal(false)
       setMastitisData({ fechaInicio: new Date().toISOString().split('T')[0] })
@@ -144,9 +176,11 @@ const PrenezIndex = () => {
   const handleRegistrarParto = async () => {
     try {
       setLoading(true)
-      const result = await agregarTratamientosPostParto(selectedPrenez, partoData.fechaParto)
+      const result = await agregarTratamientosPostParto(
+        selectedPrenez.ttr_idprenez,
+        partoData.fechaParto,
+      )
 
-      // Preparar mensaje para el modal
       setSuccessMessage({
         title: '¡Parto Registrado Exitosamente!',
         content: (
@@ -172,18 +206,59 @@ const PrenezIndex = () => {
                 </li>
               </ul>
             </div>
+            <p className="mt-3 text-center fw-bold text-primary">¿Desea registrar la cría ahora?</p>
           </div>
         ),
       })
 
       setShowPartoModal(false)
-      setShowSuccessModal(true) // Mostrar modal de éxito
+      setShowSuccessModal(true)
 
       setPartoData({ fechaParto: new Date().toISOString().split('T')[0] })
       loadData()
     } catch (error) {
       console.error('Error al registrar parto:', error)
       toast.error('Error: ' + error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const openCalfRegistration = () => {
+    setShowSuccessModal(false)
+
+    // Preparar datos para el formulario de cría
+    const etapaBecerro =
+      etapas.find((e) => e.tmaNometab.toLowerCase().includes('becerro'))?.tmaIdetabo || ''
+
+    setAddCattleForm({
+      ...addCattleForm,
+      fechaNacimiento: partoData.fechaParto,
+      idEtapaBovino: String(etapaBecerro),
+      idMadre: selectedPrenez?.ttr_idbovino || '',
+      madreExterna: false,
+      sexo: '', // Usuario debe seleccionar
+      numeroBovino: '',
+    })
+
+    setShowAddCalfModal(true)
+    setPartoData({ fechaParto: new Date().toISOString().split('T')[0] })
+  }
+
+  const handleConfirmarSecado = async () => {
+    if (!selectedSecado) return
+    try {
+      setLoading(true)
+      await confirmarSecado(selectedSecado.ttr_idprenez)
+      toast.success(
+        `Secado confirmado. Bovino #${selectedSecado.numero_bovino} ahora es "Vaca Seca".`,
+      )
+      setShowSecadoModal(false)
+      setSelectedSecado(null)
+      loadData()
+    } catch (error) {
+      console.error('Error al confirmar secado:', error)
+      toast.error('Error al confirmar secado')
     } finally {
       setLoading(false)
     }
@@ -231,10 +306,37 @@ const PrenezIndex = () => {
     return diff
   }
 
+  // Calcular fase de gestación y progreso
+  const getGestacionInfo = (prenez) => {
+    if (!prenez.ttr_fechaini) return null
+    const fechaInicio = new Date(prenez.ttr_fechaini)
+    const hoy = new Date()
+    const diasGestacion = Math.floor((hoy - fechaInicio) / (1000 * 60 * 60 * 24))
+    const porcentaje = Math.min(Math.round((diasGestacion / 283) * 100), 100)
+
+    let fase, color
+    if (prenez.ttr_estadopre === 'En secado') {
+      fase = 'Vaca Seca'
+      color = 'warning'
+    } else if (diasGestacion >= 210) {
+      fase = 'Listo para Secado'
+      color = 'danger'
+    } else if (diasGestacion >= 150) {
+      fase = 'Gestación Avanzada'
+      color = 'info'
+    } else {
+      fase = 'Gestación'
+      color = 'success'
+    }
+
+    return { diasGestacion, porcentaje, fase, color }
+  }
+
   const getEstadoBadge = (estado) => {
     const badges = {
       Confirmada: { color: 'success', icon: cilCheckCircle },
       'En proceso': { color: 'warning', icon: cilCalendar },
+      'En secado': { color: 'dark', icon: cilWarning },
       Finalizada: { color: 'secondary', icon: cilBaby },
     }
     const badge = badges[estado] || { color: 'info', icon: cilCalendar }
@@ -248,6 +350,39 @@ const PrenezIndex = () => {
 
   return (
     <>
+      {/* ============ PANEL DE ALERTAS DE SECADO ============ */}
+      {alertasSecado.length > 0 && (
+        <CRow className="mb-3">
+          <CCol xs={12}>
+            <CAlert color="warning" className="shadow-sm border-0 d-flex align-items-center">
+              <CIcon icon={cilBell} size="xl" className="me-3 flex-shrink-0" />
+              <div className="flex-grow-1">
+                <h6 className="mb-1 fw-bold">
+                  🔔 {alertasSecado.length} vaca{alertasSecado.length > 1 ? 's' : ''} lista
+                  {alertasSecado.length > 1 ? 's' : ''} para secado
+                </h6>
+                <div className="d-flex flex-wrap gap-2">
+                  {alertasSecado.map((alerta) => (
+                    <CButton
+                      key={alerta.ttr_idprenez}
+                      color="warning"
+                      size="sm"
+                      className="text-dark fw-semibold"
+                      onClick={() => {
+                        setSelectedSecado(alerta)
+                        setShowSecadoModal(true)
+                      }}
+                    >
+                      #{alerta.numero_bovino} — {alerta.dias_gestacion} días — Secar
+                    </CButton>
+                  ))}
+                </div>
+              </div>
+            </CAlert>
+          </CCol>
+        </CRow>
+      )}
+
       <CRow>
         <CCol xs={12}>
           <CCard className="mb-4 shadow-sm border-0">
@@ -286,7 +421,7 @@ const PrenezIndex = () => {
                     <CTableHeaderCell>Bovino</CTableHeaderCell>
                     <CTableHeaderCell>Fecha Inicio</CTableHeaderCell>
                     <CTableHeaderCell>Parto Estimado</CTableHeaderCell>
-                    <CTableHeaderCell>Días Restantes</CTableHeaderCell>
+                    <CTableHeaderCell>Progreso</CTableHeaderCell>
                     <CTableHeaderCell>Estado</CTableHeaderCell>
                     <CTableHeaderCell className="text-end">Acciones</CTableHeaderCell>
                   </CTableRow>
@@ -294,10 +429,16 @@ const PrenezIndex = () => {
                 <CTableBody>
                   {currentData.map((prenez) => {
                     const diasRestantes = getDiasRestantes(prenez.ttr_fechaestp)
+                    const gestInfo = getGestacionInfo(prenez)
                     const puedeAplicarMastitis =
-                      prenez.ttr_estadopre === 'Confirmada' && diasRestantes <= 60
+                      prenez.ttr_estadopre !== 'Finalizada' && diasRestantes <= 60
                     const puedeRegistrarParto =
                       prenez.ttr_estadopre !== 'Finalizada' && diasRestantes <= 7
+                    const puedeSecar =
+                      prenez.ttr_estadopre !== 'Finalizada' &&
+                      prenez.ttr_estadopre !== 'En secado' &&
+                      gestInfo &&
+                      gestInfo.diasGestacion >= 210
 
                     return (
                       <CTableRow key={prenez.ttr_idprenez}>
@@ -306,25 +447,31 @@ const PrenezIndex = () => {
                         </CTableDataCell>
                         <CTableDataCell>{formatDate(prenez.ttr_fechaini)}</CTableDataCell>
                         <CTableDataCell>{formatDate(prenez.ttr_fechaestp)}</CTableDataCell>
-                        <CTableDataCell>
-                          {diasRestantes !== null && prenez.ttr_estadopre !== 'Finalizada' && (
-                            <CBadge
-                              color={
-                                diasRestantes < 0
-                                  ? 'danger'
-                                  : diasRestantes <= 7
-                                    ? 'warning'
-                                    : 'info'
-                              }
-                            >
-                              {diasRestantes < 0
-                                ? `Atrasado ${Math.abs(diasRestantes)} días`
-                                : diasRestantes === 0
-                                  ? 'Hoy'
-                                  : `${diasRestantes} días`}
-                            </CBadge>
-                          )}
-                          {prenez.ttr_estadopre === 'Finalizada' && (
+                        <CTableDataCell style={{ minWidth: '200px' }}>
+                          {gestInfo && prenez.ttr_estadopre !== 'Finalizada' ? (
+                            <div>
+                              <div className="d-flex justify-content-between mb-1">
+                                <small className="fw-semibold">{gestInfo.fase}</small>
+                                <small className="text-muted">
+                                  {diasRestantes > 0
+                                    ? `${diasRestantes}d para parto`
+                                    : diasRestantes === 0
+                                      ? 'Hoy'
+                                      : `${Math.abs(diasRestantes)}d atrasado`}
+                                </small>
+                              </div>
+                              <CProgress height={8}>
+                                <CProgressBar
+                                  value={gestInfo.porcentaje}
+                                  color={gestInfo.color}
+                                  animated={gestInfo.porcentaje >= 74}
+                                />
+                              </CProgress>
+                              <small className="text-muted">
+                                {gestInfo.diasGestacion} / 283 días ({gestInfo.porcentaje}%)
+                              </small>
+                            </div>
+                          ) : (
                             <span className="text-muted">
                               {prenez.ttr_fechareal && formatDate(prenez.ttr_fechareal)}
                             </span>
@@ -333,11 +480,29 @@ const PrenezIndex = () => {
                         <CTableDataCell>{getEstadoBadge(prenez.ttr_estadopre)}</CTableDataCell>
                         <CTableDataCell className="text-end">
                           <CButtonGroup size="sm">
+                            {puedeSecar && (
+                              <CButton
+                                color="dark"
+                                className="text-white"
+                                onClick={() => {
+                                  setSelectedSecado({
+                                    ttr_idprenez: prenez.ttr_idprenez,
+                                    numero_bovino: prenez.numero_bovino,
+                                    dias_gestacion: gestInfo.diasGestacion,
+                                    dias_para_parto: diasRestantes,
+                                  })
+                                  setShowSecadoModal(true)
+                                }}
+                                title="Confirmar secado"
+                              >
+                                🥛 Secar
+                              </CButton>
+                            )}
                             {puedeAplicarMastitis && (
                               <CButton
                                 color="info"
                                 onClick={() => {
-                                  setSelectedPrenez(prenez.ttr_idprenez)
+                                  setSelectedPrenez(prenez)
                                   setShowMastitisModal(true)
                                 }}
                                 title="Aplicar tratamiento de Mastitis (2 dosis)"
@@ -349,7 +514,7 @@ const PrenezIndex = () => {
                               <CButton
                                 color="warning"
                                 onClick={() => {
-                                  setSelectedPrenez(prenez.ttr_idprenez)
+                                  setSelectedPrenez(prenez)
                                   setShowPartoModal(true)
                                 }}
                                 title="Registrar parto y tratamientos post-parto"
@@ -447,9 +612,10 @@ const PrenezIndex = () => {
                   type="date"
                   value={formData.fechaEstimadaParto}
                   onChange={(e) => setFormData({ ...formData, fechaEstimadaParto: e.target.value })}
-                  placeholder="Se calculará automáticamente (+280 días)"
                 />
-                <small className="text-muted">Opcional. Se calcula automáticamente.</small>
+                <small className="text-muted">
+                  Opcional. Se calcula automáticamente (+283 días).
+                </small>
               </CCol>
               <CCol md={6}>
                 <CFormLabel>Estado</CFormLabel>
@@ -476,8 +642,8 @@ const PrenezIndex = () => {
             <CAlert color="info" className="d-flex align-items-center">
               <CIcon icon={cilCalendar} className="me-2" />
               <div>
-                <strong>Nota:</strong> La gestación bovina dura aproximadamente 280 días (9 meses).
-                La fecha de parto se calculará automáticamente si no la especificas.
+                <strong>Ciclo automático:</strong> Secado a los 210 días → Parto estimado a los 283
+                días. Recibirás alertas en cada fase.
               </div>
             </CAlert>
           </CModalBody>
@@ -490,6 +656,60 @@ const PrenezIndex = () => {
             </CButton>
           </CModalFooter>
         </CForm>
+      </CModal>
+
+      {/* ============ Modal Confirmar Secado ============ */}
+      <CModal
+        visible={showSecadoModal}
+        onClose={() => setShowSecadoModal(false)}
+        backdrop="static"
+        alignment="center"
+      >
+        <CModalHeader>
+          <CModalTitle>🥛 Confirmar Secado</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          {selectedSecado && (
+            <>
+              <p>
+                ¿Confirmar el secado de la vaca <strong>#{selectedSecado.numero_bovino}</strong>?
+              </p>
+              <CAlert color="info" className="border-0">
+                <ul className="mb-0 small">
+                  <li>
+                    <strong>Días de gestación:</strong> {selectedSecado.dias_gestacion} días
+                  </li>
+                  <li>
+                    <strong>Días para el parto:</strong> {selectedSecado.dias_para_parto} días
+                  </li>
+                </ul>
+              </CAlert>
+              <CAlert color="warning" className="border-0">
+                <strong>Al confirmar:</strong>
+                <ul className="mb-0 small mt-1">
+                  <li>
+                    El estado del bovino cambiará a <strong>"Vaca Seca"</strong>
+                  </li>
+                  <li>Se bloqueará el registro de pesaje de leche</li>
+                  <li>Iniciará la cuenta regresiva de 2 meses hasta el parto</li>
+                </ul>
+              </CAlert>
+            </>
+          )}
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setShowSecadoModal(false)}>
+            Cancelar
+          </CButton>
+          <CButton
+            color="dark"
+            onClick={handleConfirmarSecado}
+            className="text-white"
+            disabled={loading}
+          >
+            {loading ? 'Procesando...' : '🥛 Confirmar Secado'}
+          </CButton>
+        </CModalFooter>
       </CModal>
 
       {/* Modal Tratamiento Mastitis */}
@@ -612,6 +832,8 @@ const PrenezIndex = () => {
           </CButton>
         </CModalFooter>
       </CModal>
+
+      {/* Modal Éxito Post-Parto */}
       <CModal
         visible={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
@@ -623,12 +845,12 @@ const PrenezIndex = () => {
         </CModalHeader>
         <CModalBody>{successMessage?.content}</CModalBody>
         <CModalFooter>
-          <CButton
-            color="success"
-            className="text-white"
-            onClick={() => setShowSuccessModal(false)}
-          >
-            Entendido
+          <CButton color="secondary" onClick={() => setShowSuccessModal(false)}>
+            Cerrar
+          </CButton>
+          <CButton color="success" className="text-white" onClick={openCalfRegistration}>
+            <CIcon icon={cilPlus} className="me-2" />
+            Registrar Cría
           </CButton>
         </CModalFooter>
       </CModal>
@@ -665,6 +887,21 @@ const PrenezIndex = () => {
           </CButton>
         </CModalFooter>
       </CModal>
+
+      {/* Modal Agregar Cría (Reutilizado de Cattle) */}
+      <AddCattleModal
+        visible={showAddCalfModal}
+        setVisible={setShowAddCalfModal}
+        addCattleForm={addCattleForm}
+        setAddCattleForm={setAddCattleForm}
+        handleAddCattle={handleAddCattle}
+        razas={razas}
+        colores={colores}
+        etapas={etapas}
+        estados={estados}
+        males={males}
+        females={females}
+      />
     </>
   )
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import sanidadService from '../../../../api/sanidadService'
+import { useNavigate } from 'react-router-dom'
+import sanidadService, { getVisitasByBovino } from '../../../../api/sanidadService'
 import {
   CModal,
   CModalHeader,
@@ -29,6 +30,11 @@ import {
   CCard,
   CCardBody,
   CWidgetStatsF,
+  CFormInput,
+  CFormTextarea,
+  CFormSelect,
+  CCollapse,
+  CSpinner,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -43,6 +49,8 @@ import {
   cilMedicalCross,
   cilChartLine,
   cilLocationPin,
+  cilPlus,
+  cilCheck,
 } from '@coreui/icons'
 import { CChartLine } from '@coreui/react-chartjs'
 import PropTypes from 'prop-types'
@@ -62,8 +70,13 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
   const [controlesSanitarios, setControlesSanitarios] = useState([])
   const [preneces, setPreneces] = useState([])
 
+  // Estado para Visitas Veterinarias
+  const [visitasVet, setVisitasVet] = useState([])
+
   const [loading, setLoading] = useState(false)
   const [exporting, setExporting] = useState(false)
+
+  const navigate = useNavigate()
 
   // Helper para edad
   const calculateAge = (dobString) => {
@@ -112,7 +125,7 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
           const id = currentCattle.ttrIdbovino
 
           // Usamos catch individualmente para que un error 404 (ej: sin historial de leche) no rompa todo el Promise.all
-          const [production, history, controles, pren] = await Promise.all([
+          const [production, history, controles, pren, visitas] = await Promise.all([
             get(`prodleche/bovino/animal/${id}`).catch((err) => {
               console.warn('Info produccion no encontrada o vacia', err)
               return []
@@ -120,12 +133,14 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
             get(`lotepotreros/bovino/${id}`).catch(() => []),
             sanidadService.getControlesSanitariosByBovino(id).catch(() => []),
             get(`sanidad/prenez/bovino/${id}`).catch(() => []),
+            getVisitasByBovino(id).catch(() => []),
           ])
 
           setMilkProduction(Array.isArray(production) ? production : [])
           setPastureHistory(Array.isArray(history) ? history : [])
           setControlesSanitarios(Array.isArray(controles) ? controles : [])
           setPreneces(Array.isArray(pren) ? pren : [])
+          setVisitasVet(Array.isArray(visitas) ? visitas : [])
         } catch (error) {
           console.error('Error al cargar detalles del bovino:', error)
           toast.error('Ocurrió un error cargando algunos datos del expediente.')
@@ -139,6 +154,7 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
         setPastureHistory([])
         setControlesSanitarios([])
         setPreneces([])
+        setVisitasVet([])
         setActiveTab('resumen')
       }
     }
@@ -373,6 +389,21 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
             >
               <CIcon icon={cilLocationPin} className="me-2" />
               Ubicación
+            </CNavLink>
+          </CNavItem>
+          <CNavItem>
+            <CNavLink
+              active={activeTab === 'visitasVet'}
+              onClick={() => setActiveTab('visitasVet')}
+              style={{ cursor: 'pointer' }}
+            >
+              <CIcon icon={cilClipboard} className="me-2" />
+              Visitas Vet.
+              {visitasVet.length > 0 && (
+                <CBadge color="info" shape="rounded-pill" className="ms-2">
+                  {visitasVet.length}
+                </CBadge>
+              )}
             </CNavLink>
           </CNavItem>
         </CNav>
@@ -650,6 +681,97 @@ const ExpBovModal = ({ expBovVisible, setExpBovVisible, currentCattle }) => {
                   </CTable>
                 ) : (
                   <CAlert color="info">No hay historial de movimientos.</CAlert>
+                )}
+              </CCardBody>
+            </CCard>
+          </CTabPane>
+
+          {/* VISITAS VETERINARIAS */}
+          <CTabPane role="tabpanel" visible={activeTab === 'visitasVet'}>
+            <CCard className="shadow-sm">
+              <CCardBody>
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                  <h5 className="mb-0">
+                    <CIcon icon={cilClipboard} className="me-2" />
+                    Visitas Veterinarias
+                  </h5>
+                  <CButton
+                    color="primary"
+                    size="sm"
+                    onClick={() => {
+                      // Redirigir a la página de Visitas Veterinarias con el bovino pre-seleccionado
+                      setExpBovVisible(false) // Cerrar modal actual
+                      navigate('/sanidad/visitas-veterinarias', {
+                        state: {
+                          preselectedBovine: {
+                            ttrIdbovino: currentCattle.ttrIdbovino,
+                            ttrNumerobv: currentCattle.ttrNumerobv,
+                            ttrSexo: currentCattle.ttrSexo,
+                          },
+                        },
+                      })
+                    }}
+                  >
+                    <CIcon icon={cilPlus} className="me-1" />
+                    Nueva Visita
+                  </CButton>
+                </div>
+
+                {/* Tabla de historial */}
+                {visitasVet.length > 0 ? (
+                  <CTable hover responsive small striped className="align-middle">
+                    <CTableHead color="light">
+                      <CTableRow>
+                        <CTableHeaderCell>Fecha</CTableHeaderCell>
+                        <CTableHeaderCell>Veterinario</CTableHeaderCell>
+                        <CTableHeaderCell>Diagnóstico</CTableHeaderCell>
+                        <CTableHeaderCell>Tratamiento</CTableHeaderCell>
+                        <CTableHeaderCell>Estado Reproductivo</CTableHeaderCell>
+                        <CTableHeaderCell>Observaciones</CTableHeaderCell>
+                      </CTableRow>
+                    </CTableHead>
+                    <CTableBody>
+                      {visitasVet.map((v, idx) => (
+                        <CTableRow key={v.ttr_idvisbov || idx}>
+                          <CTableDataCell>
+                            <strong>{formatDateToDDMMYYYY(v.fecha_visita)}</strong>
+                          </CTableDataCell>
+                          <CTableDataCell>
+                            {v.veterinario || <span className="text-muted">N/A</span>}
+                          </CTableDataCell>
+                          <CTableDataCell>
+                            {v.ttr_diagnos || (
+                              <span className="text-muted fst-italic">Sin diagnóstico</span>
+                            )}
+                          </CTableDataCell>
+                          <CTableDataCell>
+                            {v.ttr_tratamie ? (
+                              <CBadge color="info" className="text-wrap">
+                                {v.ttr_tratamie}
+                              </CBadge>
+                            ) : (
+                              <span className="text-muted fst-italic">-</span>
+                            )}
+                          </CTableDataCell>
+                          <CTableDataCell>
+                            {v.ttr_estadore ? (
+                              <CBadge color="success">{v.ttr_estadore}</CBadge>
+                            ) : (
+                              '-'
+                            )}
+                          </CTableDataCell>
+                          <CTableDataCell className="text-muted small">
+                            {v.ttr_observa || '-'}
+                          </CTableDataCell>
+                        </CTableRow>
+                      ))}
+                    </CTableBody>
+                  </CTable>
+                ) : (
+                  <CAlert color="info" className="d-flex align-items-center">
+                    <CIcon icon={cilInfo} className="me-2" />
+                    Este bovino no tiene visitas veterinarias registradas.
+                  </CAlert>
                 )}
               </CCardBody>
             </CCard>

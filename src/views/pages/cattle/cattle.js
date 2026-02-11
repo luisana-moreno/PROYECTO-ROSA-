@@ -22,6 +22,7 @@ import ViewCattleModal from './components/ViewCattleModal'
 import ExpBovModal from './components/ExpBovModal'
 import CattleFilters from './components/CattleFilters'
 import ReactivateCattleModal from './components/ReactivateCattleModal'
+import LifecyclePending from './components/LifecyclePending'
 
 const Cattle = () => {
   const {
@@ -73,6 +74,8 @@ const Cattle = () => {
     setFilterStatus,
   } = useCattle()
 
+  const [activeLayoutTab, setActiveLayoutTab] = React.useState('inventory')
+
   return (
     <>
       {/* Header Card con descripción */}
@@ -80,9 +83,37 @@ const Cattle = () => {
         <CCol xs={12}>
           <CCard className="mb-4">
             <CCardHeader>
-              <div className="d-flex align-items-center">
-                <CIcon icon={cilAnimal} className="me-2" size="lg" style={{ color: '#28a745' }} />
-                <strong>Gestión de Ganado</strong>
+              <div className="d-flex align-items-center justify-content-between">
+                <div className="d-flex align-items-center">
+                  <CIcon icon={cilAnimal} className="me-2" size="lg" style={{ color: '#28a745' }} />
+                  <strong>Gestión de Ganado</strong>
+                </div>
+                <CNav variant="pills">
+                  <CNavItem>
+                    <CNavLink
+                      href="#"
+                      active={activeLayoutTab === 'inventory'}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setActiveLayoutTab('inventory')
+                      }}
+                    >
+                      Inventario
+                    </CNavLink>
+                  </CNavItem>
+                  <CNavItem>
+                    <CNavLink
+                      href="#"
+                      active={activeLayoutTab === 'transitions'}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setActiveLayoutTab('transitions')
+                      }}
+                    >
+                      Transiciones
+                    </CNavLink>
+                  </CNavItem>
+                </CNav>
               </div>
             </CCardHeader>
             <CCardBody>
@@ -98,69 +129,80 @@ const Cattle = () => {
       {/* Contenido Principal */}
       <CRow>
         <CCol xs={12}>
-          <CCard className="mb-4">
-            <CCardHeader className="d-flex justify-content-between align-items-center">
-              <strong>Registro de Bovinos</strong>
-              <CButton color="success" onClick={() => setVisible(!visible)}>
-                <CIcon icon={cilPlus} className="me-2" />
-                Nuevo Bovino
-              </CButton>
-            </CCardHeader>
-            <CCardBody>
-              <CNav variant="tabs" className="mb-3">
-                <CNavItem>
-                  <CNavLink
-                    active={filterStatus === '3'}
-                    onClick={() => setFilterStatus('3')}
-                    style={{ cursor: 'pointer', color: filterStatus === '3' ? '#2eb85c' : '' }}
-                  >
-                    Activos
-                  </CNavLink>
-                </CNavItem>
-                <CNavItem>
-                  <CNavLink
-                    active={filterStatus === '1'}
-                    onClick={() => setFilterStatus('1')}
-                    style={{
-                      cursor: 'pointer',
-                      color: filterStatus === '1' ? '#e55353' : '',
-                    }}
-                  >
-                    Inactivos
-                  </CNavLink>
-                </CNavItem>
-              </CNav>
+          {activeLayoutTab === 'transitions' && (
+            <LifecyclePending
+              onTransitionConfirmed={() => {
+                // Recargar lista de bovinos cuando se confirma una transición
+                // window.location.reload() // Mejor recargar datos sin refrescar toda la página si es posible
+              }}
+            />
+          )}
 
-              {/* Filtros de búsqueda */}
-              <CattleFilters
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-                filterRaza={filterRaza}
-                setFilterRaza={setFilterRaza}
-                filterColor={filterColor}
-                setFilterColor={setFilterColor}
-                filterEtapa={filterEtapa}
-                setFilterEtapa={setFilterEtapa}
-                filterEstado={filterEstado}
-                setFilterEstado={setFilterEstado}
-                razas={razas}
-                colores={colores}
-                etapas={etapas}
-                estados={estados}
-              />
+          {activeLayoutTab === 'inventory' && (
+            <CCard className="mb-4">
+              <CCardHeader className="d-flex justify-content-between align-items-center">
+                <strong>Registro de Bovinos</strong>
+                <CButton color="success" onClick={() => setVisible(!visible)}>
+                  <CIcon icon={cilPlus} className="me-2" />
+                  Nuevo Bovino
+                </CButton>
+              </CCardHeader>
+              <CCardBody>
+                <CNav variant="tabs" className="mb-3">
+                  <CNavItem>
+                    <CNavLink
+                      active={filterStatus === '3'}
+                      onClick={() => setFilterStatus('3')}
+                      style={{ cursor: 'pointer', color: filterStatus === '3' ? '#2eb85c' : '' }}
+                    >
+                      Activos
+                    </CNavLink>
+                  </CNavItem>
+                  <CNavItem>
+                    <CNavLink
+                      active={filterStatus === '1'}
+                      onClick={() => setFilterStatus('1')}
+                      style={{
+                        cursor: 'pointer',
+                        color: filterStatus === '1' ? '#e55353' : '',
+                      }}
+                    >
+                      Inactivos
+                    </CNavLink>
+                  </CNavItem>
+                </CNav>
 
-              {/* Tabla de ganado */}
-              <CattleTable
-                cattle={filteredCattle}
-                setCurrentCattle={setCurrentCattle}
-                setEditVisible={setEditVisible}
-                setDeleteVisible={setDeleteVisible}
-                setViewVisible={setViewVisible}
-                handleViewExpBov={handleViewExpBov}
-                setReactivateVisible={setReactivateVisible}
-              />
-            </CCardBody>
-          </CCard>
+                {/* Filtros de búsqueda */}
+                <CattleFilters
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  filterRaza={filterRaza}
+                  setFilterRaza={setFilterRaza}
+                  filterColor={filterColor}
+                  setFilterColor={setFilterColor}
+                  filterEtapa={filterEtapa}
+                  setFilterEtapa={setFilterEtapa}
+                  filterEstado={filterEstado}
+                  setFilterEstado={setFilterEstado}
+                  razas={razas}
+                  colores={colores}
+                  etapas={etapas}
+                  estados={estados}
+                />
+
+                {/* Tabla de ganado */}
+                <CattleTable
+                  cattle={filteredCattle}
+                  setCurrentCattle={setCurrentCattle}
+                  setEditVisible={setEditVisible}
+                  setDeleteVisible={setDeleteVisible}
+                  setViewVisible={setViewVisible}
+                  handleViewExpBov={handleViewExpBov}
+                  setReactivateVisible={setReactivateVisible}
+                />
+              </CCardBody>
+            </CCard>
+          )}
         </CCol>
       </CRow>
 

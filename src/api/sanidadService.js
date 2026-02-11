@@ -176,6 +176,17 @@ export const agregarTratamientosPostParto = async (idPrenez, fechaParto) => {
   return response.data
 }
 
+// Alertas de secado
+export const getAlertasSecado = async () => {
+  const response = await axios.get(`${API_URL}/sanidad/prenez/alertas-secado`)
+  return response.data
+}
+
+export const confirmarSecado = async (idPrenez) => {
+  const response = await axios.post(`${API_URL}/sanidad/prenez/${idPrenez}/confirmar-secado`)
+  return response.data
+}
+
 // ==================== VISITAS VETERINARIAS ====================
 
 export const getVisitasVeterinarias = async () => {
@@ -217,6 +228,18 @@ export const addBovinoVisita = async (idVisita, bovinoData) => {
   const response = await axios.post(
     `${API_URL}/sanidad/visitas-veterinarias/${idVisita}/bovinos`,
     bovinoData,
+  )
+  return response.data
+}
+
+export const getVeterinarios = async () => {
+  const response = await axios.get(`${API_URL}/sanidad/visitas-veterinarias/veterinarios`)
+  return response.data
+}
+
+export const getVisitasByBovino = async (idBovino) => {
+  const response = await axios.get(
+    `${API_URL}/sanidad/visitas-veterinarias/bovino-visitas/${idBovino}`,
   )
   return response.data
 }

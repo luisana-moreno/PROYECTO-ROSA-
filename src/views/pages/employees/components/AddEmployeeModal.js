@@ -18,6 +18,7 @@ import CIcon from '@coreui/icons-react'
 import { cilSave } from '@coreui/icons'
 import { toast } from 'react-toastify'
 import { employeeService } from '../../../../api/employeeService'
+import ImageUpload from 'src/components/ImageUpload'
 
 const AddEmployeeModal = ({
   visible,
@@ -30,6 +31,7 @@ const AddEmployeeModal = ({
   const today = new Date().toISOString().split('T')[0]
   const [idExists, setIdExists] = useState(false)
   const [isVerifying, setIsVerifying] = useState(false)
+  const [photoFile, setPhotoFile] = useState(null)
 
   const handleChange = (e) => {
     setAddEmployee({ ...addEmployee, [e.target.name]: e.target.value })
@@ -70,14 +72,25 @@ const AddEmployeeModal = ({
     }
   }
 
+  const handlePhotoUpload = async (file) => {
+    setPhotoFile(file)
+    return Promise.resolve()
+  }
+
+  const handlePhotoDelete = async () => {
+    setPhotoFile(null)
+    return Promise.resolve()
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
-    handleAddEmployee()
+    handleAddEmployee(photoFile)
   }
 
   const handleClose = () => {
     setVisible(false)
     setIdExists(false)
+    setPhotoFile(null)
   }
 
   return (
@@ -226,6 +239,18 @@ const AddEmployeeModal = ({
                   </option>
                 ))}
               </CFormSelect>
+            </CCol>
+          </CRow>
+
+          {/* Foto del Empleado (Opcional) */}
+          <CRow className="mb-3">
+            <CCol md={12}>
+              <CFormLabel>Foto del Empleado (Opcional)</CFormLabel>
+              <ImageUpload
+                currentImageUrl={null}
+                onUpload={handlePhotoUpload}
+                onDelete={handlePhotoDelete}
+              />
             </CCol>
           </CRow>
         </CModalBody>

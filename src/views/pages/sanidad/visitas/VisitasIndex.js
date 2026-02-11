@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import {
   CCard,
   CCardBody,
@@ -37,6 +38,7 @@ import {
   cilPencil,
   cilSpreadsheet,
   cilWarning,
+  cilMinus,
 } from '@coreui/icons'
 import {
   getVisitasVeterinarias,
@@ -45,15 +47,18 @@ import {
   deleteVisitaVeterinaria,
   getBovinosVisita,
   addBovinoVisita,
+  getVeterinarios,
 } from '../../../../api/sanidadService'
 import { cattleService } from '../../../../api/cattleService'
 import { toast } from 'react-toastify'
 import { usePagination } from '../../../../hooks/usePagination'
 
 const VisitasIndex = () => {
+  const location = useLocation()
   const [visitas, setVisitas] = useState([])
   const { currentData, currentPage, totalPages, setCurrentPage } = usePagination(visitas, 10)
   const [bovinos, setBovinos] = useState([])
+  const [veterinarios, setVeterinarios] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [showBovinosModal, setShowBovinosModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -68,11 +73,21 @@ const VisitasIndex = () => {
     observaciones: '',
   })
 
-  const [bovinoForm, setBovinoForm] = useState({
+  // Lista de bovinos que se agregarán a la visita al crearla
+  const [bovinosToAdd, setBovinosToAdd] = useState([])
+  const [bovinoFormInline, setBovinoFormInline] = useState({
     idBovino: '',
     diagnostico: '',
-    estadoReproductivo: 'Normal',
-    tratamientoAplicado: '',
+    tratamiento: '',
+    observaciones: '',
+  })
+
+  // Form para agregar bovinos en el modal de Detalles (post-creación)
+  const [bovinoFormDetail, setBovinoFormDetail] = useState({
+    idBovino: '',
+    diagnostico: '',
+    tratamiento: '',
+    observaciones: '',
   })
 
   useEffect(() => {
@@ -81,22 +96,112 @@ const VisitasIndex = () => {
 
   const loadData = async () => {
     try {
-      const [visitasData, bovinosData] = await Promise.all([
+      const [visitasData, bovinosData, veterinariosData] = await Promise.all([
         getVisitasVeterinarias(),
         cattleService.getAllCattle(),
+        getVeterinarios(),
       ])
 
       setVisitas(visitasData)
       setBovinos(bovinosData)
+      setVeterinarios(veterinariosData)
     } catch (error) {
       console.error('Error al cargar datos:', error)
     }
   }
 
+  // Effect para manejar redirección desde el expediente
+  useEffect(() => {
+    if (location.state?.preselectedBovine && bovinos.length > 0) {
+      const { preselectedBovine } = location.state
+      console.log('Preseleccionando bovino:', preselectedBovine)
+
+      // Verificar si ya está agregado para evitar duplicados al recargar
+      // (Aunquen react strict mode puede ejecutar esto doble, el check evita dudos)
+      const alreadyAdded = bovinosToAdd.some(
+        (b) => String(b.idBovino) === String(preselectedBovine.ttrIdbovino),
+      )
+
+      if (!alreadyAdded) {
+        setBovinosToAdd((prev) => [
+          ...prev,
+          {
+            idBovino: preselectedBovine.ttrIdbovino,
+            numeroBovino: preselectedBovine.ttrNumerobv,
+            sexo: preselectedBovine.ttrSexo,
+            diagnostico: '',
+            tratamiento: '',
+            observaciones: '',
+          },
+        ])
+        setShowModal(true)
+        // Limpiar el state para que no se re-aplique si cierra y abre el modal
+        // (Nota: modificar location.state directamente no es posible, pero
+        //  podemos validar con un flag o simplemente confiar en que setShowModal(true) es lo que queremos)
+        window.history.replaceState({}, document.title)
+      }
+    }
+  }, [location.state, bovinos]) // Dependemos de bovinos para asegurar que cargaron (para validaciones extra si se requieren)
+
+  // Agregar bovino a la lista temporal (antes de guardar la visita)
+  const handleAddBovinoInline = () => {
+    if (!bovinoFormInline.idBovino) {
+      toast.warning('Seleccione un bovino')
+      return
+    }
+
+    // Verificar que no esté duplicado
+    if (bovinosToAdd.some((b) => b.idBovino === bovinoFormInline.idBovino)) {
+      toast.warning('Este bovino ya fue agregado')
+      return
+    }
+
+    // Buscar nombre del bovino para mostrar
+    const bovinoInfo = bovinos.find(
+      (b) => String(b.ttrIdbovino) === String(bovinoFormInline.idBovino),
+    )
+
+    setBovinosToAdd([
+      ...bovinosToAdd,
+      {
+        ...bovinoFormInline,
+        numeroBovino: bovinoInfo?.ttrNumerobv || '?',
+        sexo: bovinoInfo?.ttrSexo || '',
+      },
+    ])
+
+    setBovinoFormInline({
+      idBovino: '',
+      diagnostico: '',
+      tratamiento: '',
+      observaciones: '',
+    })
+  }
+
+  // Quitar bovino de la lista temporal
+  const handleRemoveBovinoInline = (index) => {
+    setBovinosToAdd(bovinosToAdd.filter((_, i) => i !== index))
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      await createVisitaVeterinaria(formData)
+      // Buscar nombre del veterinario seleccionado
+      const vetSeleccionado = veterinarios.find((v) => v.ttr_idemplo == formData.veterinario)
+      const nombreVet = vetSeleccionado
+        ? `${vetSeleccionado.ttr_nombrel} ${vetSeleccionado.ttr_apellid}`
+        : formData.veterinario
+
+      await createVisitaVeterinaria({
+        ...formData,
+        veterinario: nombreVet,
+        bovinos: bovinosToAdd.map((b) => ({
+          idBovino: b.idBovino,
+          diagnostico: b.diagnostico || null,
+          tratamiento: b.tratamiento || null,
+          observaciones: b.observaciones || null,
+        })),
+      })
       setShowModal(false)
       loadData()
       resetForm()
@@ -137,17 +242,23 @@ const VisitasIndex = () => {
     }
   }
 
-  const handleAddBovino = async (e) => {
+  const handleAddBovinoDetail = async (e) => {
     e.preventDefault()
     try {
-      await addBovinoVisita(selectedVisita.ttr_idvisvet, bovinoForm)
+      await addBovinoVisita(selectedVisita.ttr_idvisvet, {
+        idBovino: bovinoFormDetail.idBovino,
+        diagnostico: bovinoFormDetail.diagnostico,
+        tratamiento: bovinoFormDetail.tratamiento,
+        estadoReproductivo: 'Normal',
+        observaciones: bovinoFormDetail.observaciones,
+      })
       const bovinosData = await getBovinosVisita(selectedVisita.ttr_idvisvet)
       setBovinosVisita(bovinosData)
-      setBovinoForm({
+      setBovinoFormDetail({
         idBovino: '',
         diagnostico: '',
-        estadoReproductivo: 'Normal',
-        tratamientoAplicado: '',
+        tratamiento: '',
+        observaciones: '',
       })
       toast.success('Bovino agregado a la visita.')
     } catch (error) {
@@ -161,6 +272,13 @@ const VisitasIndex = () => {
       fechaVisita: new Date().toISOString().split('T')[0],
       veterinario: '',
       motivo: '',
+      observaciones: '',
+    })
+    setBovinosToAdd([])
+    setBovinoFormInline({
+      idBovino: '',
+      diagnostico: '',
+      tratamiento: '',
       observaciones: '',
     })
   }
@@ -283,12 +401,14 @@ const VisitasIndex = () => {
         </CCol>
       </CRow>
 
-      <CModal visible={showModal} onClose={() => setShowModal(false)} size="lg" backdrop="static">
+      {/* ======================= Modal Nueva Visita ======================= */}
+      <CModal visible={showModal} onClose={() => setShowModal(false)} size="xl" backdrop="static">
         <CModalHeader>
           <CModalTitle>Nueva Visita Veterinaria</CModalTitle>
         </CModalHeader>
         <CForm onSubmit={handleSubmit}>
           <CModalBody>
+            {/* Datos de la visita */}
             <CRow className="mb-3">
               <CCol md={6}>
                 <CFormLabel>Fecha de Visita *</CFormLabel>
@@ -301,18 +421,28 @@ const VisitasIndex = () => {
               </CCol>
               <CCol md={6}>
                 <CFormLabel>Veterinario *</CFormLabel>
-                <CFormInput
-                  type="text"
+                <CFormSelect
                   value={formData.veterinario}
                   onChange={(e) => setFormData({ ...formData, veterinario: e.target.value })}
-                  placeholder="Nombre del veterinario"
                   required
-                />
+                >
+                  <option value="">Seleccione un veterinario</option>
+                  {veterinarios.map((vet) => (
+                    <option key={vet.ttr_idemplo} value={vet.ttr_idemplo}>
+                      {vet.ttr_nombrel} {vet.ttr_apellid}
+                    </option>
+                  ))}
+                </CFormSelect>
+                {veterinarios.length === 0 && (
+                  <small className="text-muted">
+                    No hay empleados con cargo de Veterinario (cargo 1).
+                  </small>
+                )}
               </CCol>
             </CRow>
 
             <CRow className="mb-3">
-              <CCol>
+              <CCol md={6}>
                 <CFormLabel>Motivo de la Visita *</CFormLabel>
                 <CFormInput
                   type="text"
@@ -322,13 +452,10 @@ const VisitasIndex = () => {
                   required
                 />
               </CCol>
-            </CRow>
-
-            <CRow className="mb-3">
-              <CCol>
-                <CFormLabel>Observaciones</CFormLabel>
-                <CFormTextarea
-                  rows={3}
+              <CCol md={6}>
+                <CFormLabel>Observaciones Generales</CFormLabel>
+                <CFormInput
+                  type="text"
                   value={formData.observaciones}
                   onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
                   placeholder="Observaciones generales de la visita..."
@@ -336,7 +463,129 @@ const VisitasIndex = () => {
               </CCol>
             </CRow>
 
-            <CAlert color="info" className="d-flex align-items-center">
+            {/* Sección para agregar bovinos */}
+            <hr />
+            <h6 className="text-success mb-3">
+              <CIcon icon={cilSpreadsheet} className="me-2" />
+              Bovinos Atendidos
+            </h6>
+
+            <CCard className="mb-3 border-0 bg-light">
+              <CCardBody>
+                <CRow className="g-3 mb-2">
+                  <CCol md={3}>
+                    <CFormLabel className="small fw-bold">Bovino *</CFormLabel>
+                    <CFormSelect
+                      value={bovinoFormInline.idBovino}
+                      onChange={(e) =>
+                        setBovinoFormInline({ ...bovinoFormInline, idBovino: e.target.value })
+                      }
+                      size="sm"
+                    >
+                      <option value="">Seleccione</option>
+                      {bovinos.map((b) => (
+                        <option key={b.ttrIdbovino} value={b.ttrIdbovino}>
+                          #{b.ttrNumerobv} - {b.ttrSexo || 'Sin sexo'}
+                        </option>
+                      ))}
+                    </CFormSelect>
+                  </CCol>
+                  <CCol md={3}>
+                    <CFormLabel className="small fw-bold">Diagnóstico</CFormLabel>
+                    <CFormInput
+                      size="sm"
+                      value={bovinoFormInline.diagnostico}
+                      onChange={(e) =>
+                        setBovinoFormInline({ ...bovinoFormInline, diagnostico: e.target.value })
+                      }
+                      placeholder="Diagnóstico"
+                    />
+                  </CCol>
+                  <CCol md={2}>
+                    <CFormLabel className="small fw-bold">Tratamiento</CFormLabel>
+                    <CFormInput
+                      size="sm"
+                      value={bovinoFormInline.tratamiento}
+                      onChange={(e) =>
+                        setBovinoFormInline({ ...bovinoFormInline, tratamiento: e.target.value })
+                      }
+                      placeholder="Tratamiento"
+                    />
+                  </CCol>
+                  <CCol md={2}>
+                    <CFormLabel className="small fw-bold">Observación</CFormLabel>
+                    <CFormInput
+                      size="sm"
+                      value={bovinoFormInline.observaciones}
+                      onChange={(e) =>
+                        setBovinoFormInline({ ...bovinoFormInline, observaciones: e.target.value })
+                      }
+                      placeholder="Observación"
+                    />
+                  </CCol>
+                  <CCol md={2} className="d-flex align-items-end">
+                    <CButton
+                      color="success"
+                      size="sm"
+                      className="w-100 text-white"
+                      type="button"
+                      onClick={handleAddBovinoInline}
+                    >
+                      <CIcon icon={cilPlus} className="me-1" />
+                      Agregar
+                    </CButton>
+                  </CCol>
+                </CRow>
+              </CCardBody>
+            </CCard>
+
+            {/* Lista de bovinos agregados */}
+            {bovinosToAdd.length > 0 && (
+              <CTable small striped bordered responsive className="mb-3">
+                <CTableHead color="light">
+                  <CTableRow>
+                    <CTableHeaderCell>Bovino</CTableHeaderCell>
+                    <CTableHeaderCell>Diagnóstico</CTableHeaderCell>
+                    <CTableHeaderCell>Tratamiento</CTableHeaderCell>
+                    <CTableHeaderCell>Observación</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center" style={{ width: '60px' }}>
+                      Quitar
+                    </CTableHeaderCell>
+                  </CTableRow>
+                </CTableHead>
+                <CTableBody>
+                  {bovinosToAdd.map((b, index) => (
+                    <CTableRow key={index}>
+                      <CTableDataCell className="fw-bold">
+                        #{b.numeroBovino} <small className="text-muted">{b.sexo}</small>
+                      </CTableDataCell>
+                      <CTableDataCell>{b.diagnostico || '-'}</CTableDataCell>
+                      <CTableDataCell>{b.tratamiento || '-'}</CTableDataCell>
+                      <CTableDataCell>{b.observaciones || '-'}</CTableDataCell>
+                      <CTableDataCell className="text-center">
+                        <CButton
+                          color="danger"
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleRemoveBovinoInline(index)}
+                        >
+                          <CIcon icon={cilMinus} />
+                        </CButton>
+                      </CTableDataCell>
+                    </CTableRow>
+                  ))}
+                </CTableBody>
+              </CTable>
+            )}
+
+            {bovinosToAdd.length === 0 && (
+              <CAlert color="warning" className="py-2 small border-0">
+                No se han agregado bovinos a esta visita. Use el formulario de arriba para
+                agregarlos.
+              </CAlert>
+            )}
+
+            <CAlert color="info" className="d-flex align-items-center mt-3">
               <CIcon icon={cilCalendar} className="me-2" />
               <div>
                 <strong>Nota:</strong> La próxima visita se programará automáticamente para dentro
@@ -345,17 +594,24 @@ const VisitasIndex = () => {
             </CAlert>
           </CModalBody>
           <CModalFooter>
-            <CButton color="secondary" onClick={() => setShowModal(false)}>
+            <CButton
+              color="secondary"
+              onClick={() => {
+                setShowModal(false)
+                resetForm()
+              }}
+            >
               Cancelar
             </CButton>
             <CButton color="success" type="submit" className="text-white">
+              <CIcon icon={cilCheckCircle} className="me-1" />
               Guardar Visita
             </CButton>
           </CModalFooter>
         </CForm>
       </CModal>
 
-      {/* Modal Bovinos de la Visita */}
+      {/* ======================= Modal Detalles / Bovinos ======================= */}
       <CModal
         visible={showBovinosModal}
         onClose={() => setShowBovinosModal(false)}
@@ -369,74 +625,86 @@ const VisitasIndex = () => {
           </CModalTitle>
         </CModalHeader>
         <CModalBody>
-          {/* Formulario para agregar bovino */}
+          {/* Formulario para agregar más bovinos (post-creación) */}
           <CCard className="mb-4 shadow-sm border-0 bg-light">
             <CCardHeader className="bg-transparent border-bottom">
               <strong className="text-success">Agregar Bovino a la Visita</strong>
             </CCardHeader>
             <CCardBody>
-              <CForm onSubmit={handleAddBovino}>
-                <CRow className="g-3 align-items-end">
-                  <CCol md={3}>
+              <CForm onSubmit={handleAddBovinoDetail}>
+                <CRow className="g-3 mb-3">
+                  <CCol md={6}>
                     <CFormLabel>Bovino *</CFormLabel>
                     <CFormSelect
-                      value={bovinoForm.idBovino}
-                      onChange={(e) => setBovinoForm({ ...bovinoForm, idBovino: e.target.value })}
+                      value={bovinoFormDetail.idBovino}
+                      onChange={(e) =>
+                        setBovinoFormDetail({ ...bovinoFormDetail, idBovino: e.target.value })
+                      }
                       required
                     >
-                      <option value="">Seleccione</option>
+                      <option value="">Seleccione un bovino</option>
                       {bovinos.map((b) => (
                         <option key={b.ttrIdbovino} value={b.ttrIdbovino}>
-                          #{b.ttrNumerobv}
+                          #{b.ttrNumerobv} - {b.ttrSexo || 'Sin sexo'}
                         </option>
                       ))}
                     </CFormSelect>
                   </CCol>
-                  <CCol md={3}>
-                    <CFormLabel>Estado Reproductivo</CFormLabel>
-                    <CFormSelect
-                      value={bovinoForm.estadoReproductivo}
-                      onChange={(e) =>
-                        setBovinoForm({ ...bovinoForm, estadoReproductivo: e.target.value })
-                      }
-                    >
-                      <option value="Normal">Normal</option>
-                      <option value="Preñada">Preñada</option>
-                      <option value="Vacía">Vacía</option>
-                      <option value="En tratamiento">En tratamiento</option>
-                    </CFormSelect>
-                  </CCol>
-                  <CCol md={4}>
-                    <CFormLabel>Diagnóstico / Tratamiento</CFormLabel>
+                  <CCol md={6}>
+                    <CFormLabel>Diagnóstico</CFormLabel>
                     <CFormInput
                       type="text"
-                      value={bovinoForm.diagnostico}
+                      value={bovinoFormDetail.diagnostico}
                       onChange={(e) =>
-                        setBovinoForm({ ...bovinoForm, diagnostico: e.target.value })
+                        setBovinoFormDetail({ ...bovinoFormDetail, diagnostico: e.target.value })
                       }
-                      placeholder="Diagnóstico y trat. aplicado"
+                      placeholder="Diagnóstico del animal"
                     />
                   </CCol>
-                  <CCol md={2}>
-                    <CButton color="success" type="submit" className="w-100 text-white">
-                      <CIcon icon={cilPlus} className="me-1" />
-                      Agregar
-                    </CButton>
+                </CRow>
+                <CRow className="g-3 mb-3">
+                  <CCol md={6}>
+                    <CFormLabel>Tratamiento</CFormLabel>
+                    <CFormInput
+                      type="text"
+                      value={bovinoFormDetail.tratamiento}
+                      onChange={(e) =>
+                        setBovinoFormDetail({ ...bovinoFormDetail, tratamiento: e.target.value })
+                      }
+                      placeholder="Tratamiento aplicado"
+                    />
+                  </CCol>
+                  <CCol md={6}>
+                    <CFormLabel>Observación</CFormLabel>
+                    <CFormInput
+                      type="text"
+                      value={bovinoFormDetail.observaciones}
+                      onChange={(e) =>
+                        setBovinoFormDetail({ ...bovinoFormDetail, observaciones: e.target.value })
+                      }
+                      placeholder="Observaciones"
+                    />
                   </CCol>
                 </CRow>
+                <div className="text-end">
+                  <CButton color="success" type="submit" className="text-white">
+                    <CIcon icon={cilPlus} className="me-1" />
+                    Agregar Bovino
+                  </CButton>
+                </div>
               </CForm>
             </CCardBody>
           </CCard>
 
-          {/* Lista de bovinos */}
+          {/* Lista de bovinos ya registrados */}
           <h6 className="text-success mb-3">Listado de Bovinos Atendidos</h6>
           <CTable striped hover responsive className="align-middle border">
             <CTableHead color="light">
               <CTableRow>
                 <CTableHeaderCell>Bovino</CTableHeaderCell>
                 <CTableHeaderCell>Diagnóstico</CTableHeaderCell>
-                <CTableHeaderCell>Estado Reproductivo</CTableHeaderCell>
                 <CTableHeaderCell>Tratamiento</CTableHeaderCell>
+                <CTableHeaderCell>Observación</CTableHeaderCell>
               </CTableRow>
             </CTableHead>
             <CTableBody>
@@ -444,20 +712,8 @@ const VisitasIndex = () => {
                 <CTableRow key={index}>
                   <CTableDataCell className="fw-bold">#{bv.numero_bovino}</CTableDataCell>
                   <CTableDataCell>{bv.ttr_diagnos || '-'}</CTableDataCell>
-                  <CTableDataCell>
-                    <CBadge
-                      color={
-                        bv.ttr_estadore === 'Preñada'
-                          ? 'success'
-                          : bv.ttr_estadore === 'En tratamiento'
-                            ? 'warning'
-                            : 'info'
-                      }
-                    >
-                      {bv.ttr_estadore}
-                    </CBadge>
-                  </CTableDataCell>
                   <CTableDataCell>{bv.ttr_tratamie || '-'}</CTableDataCell>
+                  <CTableDataCell>{bv.ttr_observa || '-'}</CTableDataCell>
                 </CTableRow>
               ))}
             </CTableBody>
@@ -477,7 +733,7 @@ const VisitasIndex = () => {
         </CModalFooter>
       </CModal>
 
-      {/* Modal Confirmar Eliminación */}
+      {/* ======================= Modal Confirmar Eliminación ======================= */}
       <CModal
         visible={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}

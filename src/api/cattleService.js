@@ -449,4 +449,54 @@ export const cattleService = {
     const data = await response.json()
     return mapKeysToCamelCase(data)
   },
+
+  // ==========================================
+  // Servicios de Ciclo de Vida (Lifecycle)
+  // ==========================================
+
+  // Obtener transiciones pendientes
+  getLifecyclePending: async () => {
+    const response = await fetch(`${API_URL}/bovinos/lifecycle/pending`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al obtener transiciones pendientes')
+    }
+    return response.json()
+  },
+
+  // Confirmar una transición de etapa
+  confirmLifecycleTransition: async (bovinoId, newEtapaId) => {
+    const response = await fetch(`${API_URL}/bovinos/lifecycle/confirm/${bovinoId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ newEtapaId }),
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al confirmar transición')
+    }
+    return response.json()
+  },
+
+  // Confirmar todas las transiciones pendientes
+  confirmAllLifecycleTransitions: async () => {
+    const response = await fetch(`${API_URL}/bovinos/lifecycle/confirm-all`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al confirmar todas las transiciones')
+    }
+    return response.json()
+  },
 }

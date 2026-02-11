@@ -147,7 +147,7 @@ export const useEmployees = () => {
     fetchPositions()
   }, [])
 
-  const handleAddEmployee = async () => {
+  const handleAddEmployee = async (photoFile) => {
     if (!validateEmployeeForm(addEmployeeForm)) {
       return
     }
@@ -164,6 +164,20 @@ export const useEmployees = () => {
     try {
       const newEmp = await employeeService.addEmployee(employeeToSend)
       if (newEmp) {
+        // Si hay foto, subirla
+        if (photoFile) {
+          try {
+            // Asumimos que newEmp tiene ttr_idemplo o id
+            const newId = newEmp.ttr_idemplo || newEmp.id
+            if (newId) {
+              await employeeService.uploadPhoto(newId, photoFile)
+            }
+          } catch (photoError) {
+            console.error('Error uploading photo:', photoError)
+            toast.warning('Empleado creado, pero hubo un error al subir la foto.')
+          }
+        }
+
         await fetchEmployees() // Refrescar la tabla de empleados
         setAddEmployeeForm({
           ttrNombrel: '',
@@ -176,7 +190,7 @@ export const useEmployees = () => {
           ttrIdcargp: '',
         })
         setVisible(false)
-        toast.success('Registro agregado correctamente')
+        if (!photoFile) toast.success('Registro agregado correctamente')
       }
     } catch (error) {
       const errorMessage =

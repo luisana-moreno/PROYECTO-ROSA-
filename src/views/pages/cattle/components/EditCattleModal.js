@@ -124,6 +124,18 @@ const EditCattleModal = ({
           </CRow>
 
           <CRow className="mb-3">
+            <CCol md={12}>
+              <CFormLabel>Nombre (Opcional)</CFormLabel>
+              <CFormInput
+                placeholder="Nombre del bovino"
+                value={currentCattle?.ttrNombre || ''}
+                onChange={(e) => setCurrentCattle({ ...currentCattle, ttrNombre: e.target.value })}
+              />
+              <small className="text-muted">Nombre o apodo del animal</small>
+            </CCol>
+          </CRow>
+
+          <CRow className="mb-3">
             <CCol md={6}>
               <CFormLabel>Raza *</CFormLabel>
               <CFormSelect

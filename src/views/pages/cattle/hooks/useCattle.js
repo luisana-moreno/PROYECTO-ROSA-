@@ -157,6 +157,7 @@ export const useCattle = () => {
         ttrMadreExterna: currentCattle.ttrMadreExterna,
         numPartos: currentCattle.ttrNumpartos || 0,
         fecUltimoParto: currentCattle.ttrFecultpar,
+        nombre: currentCattle.ttrNombre,
       })
       if (updated) {
         const formattedUpdated = {

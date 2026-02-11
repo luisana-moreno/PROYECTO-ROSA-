@@ -18,22 +18,39 @@ import {
   CAlert,
   CSpinner,
   CFormSwitch,
+  CTooltip,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilPlus, cilTrash, cilSave } from '@coreui/icons'
+import { cilPlus, cilTrash, cilSave, cilUserFollow } from '@coreui/icons'
 import { toast } from 'react-toastify'
 import useClientes from '../hooks/useClientes'
 import useProductos from '../hooks/useProductos'
 import ventasService from 'src/api/ventasService'
+import AddClientModal from '../../client/AddClientModal'
+import { clientService } from 'src/api/clientService'
 
 const VentaForm = ({ onVentaCreated, config }) => {
-  const { clientes, loading: loadingClientes } = useClientes()
+  const { clientes, loading: loadingClientes, fetchClientes } = useClientes()
   const { insumos, bovinos, loading: loadingProductos, fetchProductos } = useProductos()
 
   const [formData, setFormData] = useState({
     idCliente: '',
     idTipoVenta: '1', // Por defecto: Contado
     productos: [],
+  })
+
+  // Estado para el modal de Cliente Rápido
+  const [modalClientVisible, setModalClientVisible] = useState(false)
+  const [newClientData, setNewClientData] = useState({
+    client_type: '',
+    company_name: '',
+    firts_name: '',
+    Firts_Las_Name: '',
+    Document_Number: '',
+    Rif: '',
+    Phone: '',
+    Address: '',
+    email: '',
   })
 
   // Estado para el nuevo producto
@@ -101,6 +118,47 @@ const VentaForm = ({ onVentaCreated, config }) => {
     const iva = subtotal * 0.16
     const total = subtotal + iva
     return { subtotal, iva, total }
+  }
+
+  const handleCreateClient = async () => {
+    try {
+      // Mapear datos para el backend
+      const clientToSend = {
+        tipo_cliente: newClientData.client_type === 'Company' ? 'Juridico' : 'Natural',
+        nombre_empresa: newClientData.company_name,
+        nombre: newClientData.firts_name,
+        apellido: newClientData.Firts_Las_Name,
+        documento:
+          newClientData.client_type === 'Company'
+            ? newClientData.Rif
+            : newClientData.Document_Number,
+        telefono: newClientData.Phone,
+        direccion: newClientData.Address,
+        email: newClientData.email,
+        activo: true,
+      }
+
+      await clientService.createClient(clientToSend)
+      toast.success('Cliente creado exitosamente')
+      setModalClientVisible(false)
+
+      // Recargar lista y limpiar form
+      fetchClientes()
+      setNewClientData({
+        client_type: '',
+        company_name: '',
+        firts_name: '',
+        Firts_Las_Name: '',
+        Document_Number: '',
+        Rif: '',
+        Phone: '',
+        Address: '',
+        email: '',
+      })
+    } catch (error) {
+      console.error('Error creando cliente:', error)
+      toast.error(error.message || 'Error al crear cliente')
+    }
   }
 
   const handleAgregarProducto = () => {
@@ -256,18 +314,29 @@ const VentaForm = ({ onVentaCreated, config }) => {
         <CRow className="mb-4">
           <CCol md={6}>
             <CFormLabel>Cliente *</CFormLabel>
-            <CFormSelect
-              value={formData.idCliente}
-              onChange={(e) => setFormData({ ...formData, idCliente: e.target.value })}
-              disabled={loadingClientes}
-            >
-              <option value="">Seleccione un cliente</option>
-              {clientes.map((cliente) => (
-                <option key={cliente.ttr_idclient} value={cliente.ttr_idclient}>
-                  {cliente.ttr_nombrecl} {cliente.ttr_apellido}
-                </option>
-              ))}
-            </CFormSelect>
+            <div className="d-flex gap-2">
+              <CFormSelect
+                value={formData.idCliente}
+                onChange={(e) => setFormData({ ...formData, idCliente: e.target.value })}
+                disabled={loadingClientes}
+              >
+                <option value="">Seleccione un cliente</option>
+                {clientes.map((cliente) => (
+                  <option key={cliente.ttr_idclient} value={cliente.ttr_idclient}>
+                    {cliente.ttr_nomcompa || `${cliente.ttr_nombrecl} ${cliente.ttr_apellido}`}
+                  </option>
+                ))}
+              </CFormSelect>
+              <CTooltip content="Agregar Nuevo Cliente">
+                <CButton
+                  color="primary"
+                  variant="outline"
+                  onClick={() => setModalClientVisible(true)}
+                >
+                  <CIcon icon={cilUserFollow} />
+                </CButton>
+              </CTooltip>
+            </div>
           </CCol>
           <CCol md={6}>
             <CFormLabel>Tipo de Venta *</CFormLabel>
@@ -494,6 +563,15 @@ const VentaForm = ({ onVentaCreated, config }) => {
           </CCol>
         </CRow>
       </CCardBody>
+
+      {/* Modal para agregar Cliente */}
+      <AddClientModal
+        visible={modalClientVisible}
+        setVisible={setModalClientVisible}
+        addClient={newClientData}
+        setAddClient={setNewClientData}
+        handleAddClient={handleCreateClient}
+      />
     </CCard>
   )
 }

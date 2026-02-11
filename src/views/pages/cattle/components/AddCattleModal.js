@@ -243,6 +243,18 @@ const AddCattleModal = ({
 
               <CRow className="mb-3">
                 <CCol md={12}>
+                  <CFormLabel>Nombre del Bovino (Opcional)</CFormLabel>
+                  <CFormInput
+                    placeholder="Ej: Lola, Mariposa..."
+                    value={addCattleForm.nombre || ''}
+                    onChange={(e) => setAddCattleForm({ ...addCattleForm, nombre: e.target.value })}
+                  />
+                  <small className="text-muted">Nombre individual o apodo del animal</small>
+                </CCol>
+              </CRow>
+
+              <CRow className="mb-3">
+                <CCol md={12}>
                   <CFormLabel>Raza *</CFormLabel>
                   <CFormSelect
                     value={addCattleForm.idRazaBovino}
@@ -581,6 +593,24 @@ const AddCattleModal = ({
                   </CCol>
                   <CCol md={6}>{addCattleForm.sexo || 'No especificado'}</CCol>
                 </CRow>
+
+                {addCattleForm.nombre && (
+                  <CRow className="mb-2">
+                    <CCol md={6}>
+                      <strong>Nombre:</strong>
+                    </CCol>
+                    <CCol md={6}>{addCattleForm.nombre}</CCol>
+                  </CRow>
+                )}
+
+                {addCattleForm.nombre && (
+                  <CRow className="mb-2">
+                    <CCol md={6}>
+                      <strong>Nombre:</strong>
+                    </CCol>
+                    <CCol md={6}>{addCattleForm.nombre}</CCol>
+                  </CRow>
+                )}
 
                 <CRow className="mb-2">
                   <CCol md={6}>
