@@ -1,5 +1,10 @@
 import React from 'react'
 import { AppContent, AppSidebar, AppFooter, AppHeader } from '../components/index'
+<<<<<<< HEAD
+=======
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+>>>>>>> master
 
 const DefaultLayout = () => {
   return (
@@ -12,6 +17,21 @@ const DefaultLayout = () => {
         </div>
         <AppFooter />
       </div>
+<<<<<<< HEAD
+=======
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+>>>>>>> master
     </div>
   )
 }

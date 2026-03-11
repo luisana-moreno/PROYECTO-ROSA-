@@ -1,0 +1,5 @@
+0000000000000000000000000000000000000000 8237a1730f50c3a8cd9f4aebbdea4f304e7bd472 Bit9-A <adrian24vergel@gmail.com> 1761529058 -0400	clone: from https://github.com/luisana-moreno/PROYECTO-ROSA-.git
+8237a1730f50c3a8cd9f4aebbdea4f304e7bd472 8237a1730f50c3a8cd9f4aebbdea4f304e7bd472 Bit9-A <adrian24vergel@gmail.com> 1761529318 -0400	checkout: moving from main to feature-conection
+8237a1730f50c3a8cd9f4aebbdea4f304e7bd472 34c9dd5f2c853580832bfb83898ce9dc67e5ab80 Bit9-A <adrian24vergel@gmail.com> 1761529332 -0400	commit: Users
+34c9dd5f2c853580832bfb83898ce9dc67e5ab80 60da4a1027f3332246013dc4fe114ab3b0efa37f Bit9-A <adrian24vergel@gmail.com> 1761612968 -0400	checkout: moving from feature-conection to feature-users
+60da4a1027f3332246013dc4fe114ab3b0efa37f 34c9dd5f2c853580832bfb83898ce9dc67e5ab80 Bit9-A <adrian24vergel@gmail.com> 1761613101 -0400	checkout: moving from feature-users to feature-conection

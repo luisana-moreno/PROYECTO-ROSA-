@@ -8,6 +8,10 @@ import DocsComponents from './DocsComponents'
 import DocsIcons from './DocsIcons'
 import DocsLink from './DocsLink'
 import DocsExample from './DocsExample'
+<<<<<<< HEAD
+=======
+import CustomTableModal from './CustomTableModal'
+>>>>>>> master
 
 export {
   AppBreadcrumb,
@@ -20,4 +24,8 @@ export {
   DocsIcons,
   DocsLink,
   DocsExample,
+<<<<<<< HEAD
+=======
+  CustomTableModal,
+>>>>>>> master
 }

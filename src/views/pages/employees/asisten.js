@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
 import { helpFetch } from 'src/helpper/helpFetch'
 const { get } = helpFetch()
@@ -208,3 +209,13 @@ const Asisten = () => {
 };
 
 export default Asisten;
+=======
+import React from 'react'
+import AsistenciaModule from './asistencia'
+
+const Asisten = () => {
+  return <AsistenciaModule />
+}
+
+export default Asisten
+>>>>>>> master

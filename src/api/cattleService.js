@@ -1,0 +1,502 @@
+const API_URL = import.meta.env.VITE_API_URL
+
+// Función auxiliar para mapear nombres de columnas de la base de datos a camelCase para el frontend
+const mapKeysToCamelCase = (data) => {
+  if (!data) return null
+  if (Array.isArray(data)) {
+    return data.map((item) => mapKeysToCamelCase(item))
+  }
+  const newObject = {}
+  for (const key in data) {
+    if (Object.prototype.hasOwnProperty.call(data, key)) {
+      const newKey = key.toLowerCase().replace(/_([a-z])/g, (g) => g[1].toUpperCase())
+      newObject[newKey] = data[key]
+    }
+  }
+  return newObject
+}
+
+export const cattleService = {
+  // Servicios para Bovinos (TTRBOVINOSS)
+  getAllCattle: async () => {
+    const response = await fetch(`${API_URL}/bovinos`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al obtener bovinos')
+    }
+    const data = await response.json()
+    // Asegurarse de que los datos de bovinos tengan una propiedad 'id' para CustomTableModal
+    return mapKeysToCamelCase(data).map((item) => ({
+      ...item,
+      id: item.idbovino || item.ttrIdbovino || item.id, // Usar idbovino o ttrIdbovino como id si existe
+      ttrIdbovino: item.idbovino || item.ttrIdbovino || item.id, // Asegurar que ttrIdbovino siempre esté presente
+    }))
+  },
+
+  getCattleById: async (id) => {
+    const response = await fetch(`${API_URL}/bovinos/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al obtener bovino por ID')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  createCattle: async (cattleData) => {
+    const response = await fetch(`${API_URL}/bovinos`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(cattleData),
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al crear bovino')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  updateCattle: async (id, cattleData) => {
+    const response = await fetch(`${API_URL}/bovinos/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(cattleData),
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al actualizar bovino')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  deleteCattle: async (id) => {
+    const response = await fetch(`${API_URL}/bovinos/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al eliminar bovino')
+    }
+    return true
+  },
+
+  reactivateCattle: async (id) => {
+    const response = await fetch(`${API_URL}/bovinos/${id}/reactivate`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al reactivar bovino')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  // Servicios para Razas de Bovino (TMARAZABOVI)
+  getAllRazas: async () => {
+    const response = await fetch(`${API_URL}/bovinos/razas`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al obtener razas de bovino')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  createRaza: async (razaData) => {
+    const response = await fetch(`${API_URL}/bovinos/razas`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(razaData),
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al crear raza')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  updateRaza: async (id, razaData) => {
+    const response = await fetch(`${API_URL}/bovinos/razas/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(razaData),
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al actualizar raza')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  deleteRaza: async (id) => {
+    const response = await fetch(`${API_URL}/bovinos/razas/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al eliminar raza')
+    }
+    return true
+  },
+
+  // Servicios para Colores de Bovino (TMACOLBOVIN)
+  getAllColores: async () => {
+    const response = await fetch(`${API_URL}/bovinos/colores`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al obtener colores de bovino')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  createColor: async (colorData) => {
+    const response = await fetch(`${API_URL}/bovinos/colores`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(colorData),
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al crear color')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  updateColor: async (id, colorData) => {
+    const response = await fetch(`${API_URL}/bovinos/colores/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(colorData),
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al actualizar color')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  deleteColor: async (id) => {
+    const response = await await fetch(`${API_URL}/bovinos/colores/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al eliminar color')
+    }
+    return true
+  },
+
+  // Servicios para Etapas de Bovino (TMAETABOVIN)
+  getAllEtapas: async () => {
+    const response = await fetch(`${API_URL}/bovinos/etapas`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al obtener etapas de bovino')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  createEtapa: async (etapaData) => {
+    const response = await fetch(`${API_URL}/bovinos/etapas`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(etapaData),
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al crear etapa')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  updateEtapa: async (id, etapaData) => {
+    const response = await fetch(`${API_URL}/bovinos/etapas/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(etapaData),
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al actualizar etapa')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  deleteEtapa: async (id) => {
+    const response = await fetch(`${API_URL}/bovinos/etapas/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al eliminar etapa')
+    }
+    return true
+  },
+
+  // Servicios para Estados de Bovino (TMAESTBOVIN)
+  getAllEstados: async () => {
+    const response = await fetch(`${API_URL}/bovinos/estados`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al obtener estados de bovino')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  createEstado: async (estadoData) => {
+    const response = await fetch(`${API_URL}/bovinos/estados`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(estadoData),
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al crear estado')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  updateEstado: async (id, estadoData) => {
+    const response = await fetch(`${API_URL}/bovinos/estados/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(estadoData),
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al actualizar estado')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  deleteEstado: async (id) => {
+    const response = await fetch(`${API_URL}/bovinos/estados/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al eliminar estado')
+    }
+    return true
+  },
+
+  // Servicio para exportar expediente de bovino a PDF
+  // Esta función se ha movido a pdfService.js
+
+  // ==========================================
+  // Servicios de Genealogía y Reproducción
+  // ==========================================
+
+  // Obtener genealogía (árbol de antepasados)
+  getGenealogy: async (id, depth = 3) => {
+    const response = await fetch(`${API_URL}/bovinos/${id}/genealogy?depth=${depth}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al obtener genealogía')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  // Obtener descendencia (hijos)
+  getOffspring: async (id) => {
+    const response = await fetch(`${API_URL}/bovinos/${id}/offspring`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al obtener descendencia')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  // Actualizar información reproductiva
+  updateReproductive: async (id, reproductiveData) => {
+    const response = await fetch(`${API_URL}/bovinos/${id}/reproductive`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(reproductiveData),
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al actualizar información reproductiva')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  // Obtener machos (para selección de padre)
+  getMales: async () => {
+    const response = await fetch(`${API_URL}/bovinos/males/list`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al obtener machos')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  // Obtener hembras (para selección de madre)
+  getFemales: async () => {
+    const response = await fetch(`${API_URL}/bovinos/females/list`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al obtener hembras')
+    }
+    const data = await response.json()
+    return mapKeysToCamelCase(data)
+  },
+
+  // ==========================================
+  // Servicios de Ciclo de Vida (Lifecycle)
+  // ==========================================
+
+  // Obtener transiciones pendientes
+  getLifecyclePending: async () => {
+    const response = await fetch(`${API_URL}/bovinos/lifecycle/pending`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al obtener transiciones pendientes')
+    }
+    return response.json()
+  },
+
+  // Confirmar una transición de etapa
+  confirmLifecycleTransition: async (bovinoId, newEtapaId) => {
+    const response = await fetch(`${API_URL}/bovinos/lifecycle/confirm/${bovinoId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ newEtapaId }),
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al confirmar transición')
+    }
+    return response.json()
+  },
+
+  // Confirmar todas las transiciones pendientes
+  confirmAllLifecycleTransitions: async () => {
+    const response = await fetch(`${API_URL}/bovinos/lifecycle/confirm-all`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error al confirmar todas las transiciones')
+    }
+    return response.json()
+  },
+}

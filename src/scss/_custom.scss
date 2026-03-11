@@ -1,2 +1,13 @@
+<<<<<<< HEAD
 $primary: #c33333;
 $theme-colors:("primary":$primary,);
+=======
+/* _custom.scss */
+
+// Estilos para el elemento seleccionado en listas de CoreUI (CListGroupItem)
+.list-group-item.active {
+  background-color: #fff !important; /* Fondo blanco */
+  border-color: #28a745 !important; /* Borde verde */
+  color: #000 !important; /* Letras negras */
+}
+>>>>>>> master

@@ -1,0 +1,70 @@
+@import 'tailwindcss';
+
+/* ========================================
+   Toast Notifications - Estilo Personalizado
+   ======================================== */
+.Toastify__toast {
+  background: #ffffff !important;
+  color: #333 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  border-left: 4px solid;
+  font-family: inherit;
+}
+
+.Toastify__toast-body {
+  color: #333 !important;
+}
+
+/* Success - Verde */
+.Toastify__toast--success {
+  border-left-color: #28a745 !important;
+}
+.Toastify__toast--success .Toastify__progress-bar {
+  background: #28a745 !important;
+}
+.Toastify__toast--success .Toastify__toast-icon svg {
+  fill: #28a745 !important;
+}
+
+/* Error - Rojo */
+.Toastify__toast--error {
+  border-left-color: #dc3545 !important;
+}
+.Toastify__toast--error .Toastify__progress-bar {
+  background: #dc3545 !important;
+}
+.Toastify__toast--error .Toastify__toast-icon svg {
+  fill: #dc3545 !important;
+}
+
+/* Warning - Amarillo */
+.Toastify__toast--warning {
+  border-left-color: #ffc107 !important;
+}
+.Toastify__toast--warning .Toastify__progress-bar {
+  background: #ffc107 !important;
+}
+.Toastify__toast--warning .Toastify__toast-icon svg {
+  fill: #ffc107 !important;
+}
+
+/* Info - Azul */
+.Toastify__toast--info {
+  border-left-color: #17a2b8 !important;
+}
+.Toastify__toast--info .Toastify__progress-bar {
+  background: #17a2b8 !important;
+}
+.Toastify__toast--info .Toastify__toast-icon svg {
+  fill: #17a2b8 !important;
+}
+
+/* Botón de cerrar */
+.Toastify__close-button {
+  color: #666 !important;
+  opacity: 0.7 !important;
+}
+.Toastify__close-button:hover {
+  opacity: 1 !important;
+}

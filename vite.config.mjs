@@ -2,6 +2,11 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'node:path'
 import autoprefixer from 'autoprefixer'
+<<<<<<< HEAD
+=======
+import mkcert from 'vite-plugin-mkcert'
+import tailwindcss from '@tailwindcss/vite'
+>>>>>>> master
 
 export default defineConfig(() => {
   return {
@@ -29,7 +34,11 @@ export default defineConfig(() => {
         },
       },
     },
+<<<<<<< HEAD
     plugins: [react()],
+=======
+    plugins: [react(), mkcert(), tailwindcss()],
+>>>>>>> master
     resolve: {
       alias: [
         {
@@ -41,6 +50,10 @@ export default defineConfig(() => {
     },
     server: {
       port: 3000,
+<<<<<<< HEAD
+=======
+      host: true,
+>>>>>>> master
       proxy: {
         // https://vitejs.dev/config/server-options.html
       },

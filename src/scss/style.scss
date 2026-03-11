@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 @use "@coreui/coreui/scss/coreui" as * with ( 
   $enable-deprecation-messages: false,
 );
@@ -11,10 +12,229 @@ body {
   background-color: rgba(240, 248, 255, 0);
 }
 
+=======
+@use 'sass:color';
+
+// ==========================================
+// VARIABLES DEL TEMA (ESTÁNDAR)
+// ==========================================
+$primary-green: #28a745; // Verde principal (botones, activos)
+$dark-green: #1e7e34; // Verde oscuro (hover, bordes)
+
+// Imports de CoreUI con overrides de colores
+@use '@coreui/coreui/scss/coreui' as * with (
+  $enable-deprecation-messages: false,
+  $info: #28a745,
+  $primary: #28a745
+);
+@use '@coreui/chartjs/scss/coreui-chartjs';
+@use 'vendors/simplebar';
+@use '_custom';
+@use 'src/scss/_fullCalendar.scss';
+@use 'tailwindcss';
+
+// ==========================================
+// VARIABLES DEL TEMA (ESTÁNDAR)
+// ==========================================
+// Las variables principales ya están definidas arriba
+$sidebar-bg: #212631; // Fondo oscuro profesional para Sidebar
+$sidebar-header-bg: #1b1f28; // Fondo más oscuro para header del sidebar
+$text-light: #ffffff;
+$body-bg: #f8f9fa; // Fondo gris muy claro para el cuerpo
+
+// ==========================================
+// ESTILOS GLOBALES
+// ==========================================
+
+body {
+  background-color: $body-bg;
+}
+
+// ==========================================
+// SIDEBAR (DARK PROFESSIONAL)
+// ==========================================
+
+// Contenedor principal del sidebar
+.sidebar {
+  background-color: $sidebar-bg !important;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+// Header del Sidebar (Logo)
+.sidebar-header {
+  background-color: $sidebar-header-bg !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+// Footer del Sidebar
+.sidebar-footer {
+  background-color: $sidebar-header-bg !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+// Items de Navegación
+.sidebar-nav {
+  .nav-link {
+    color: rgba(255, 255, 255, 0.75);
+
+    &:hover {
+      color: $text-light;
+      background-color: rgba(255, 255, 255, 0.05) !important;
+
+      .nav-icon {
+        color: $primary-green;
+      }
+    }
+
+    &.active {
+      color: $text-light;
+      background-color: rgba($primary-green, 0.15) !important; // Fondo verde transparente
+      border-left: 3px solid $primary-green; // Borde indicador
+      font-weight: 600;
+
+      .nav-icon {
+        color: $primary-green; // Icono verde activo
+      }
+    }
+
+    .nav-icon {
+      color: rgba(255, 255, 255, 0.6);
+    }
+  }
+
+  .nav-group-toggle {
+    &::after {
+      filter: invert(1) grayscale(100%) brightness(200%); // Flecha blanca
+    }
+  }
+}
+
+// Botón de colapsar (Toggler)
+.sidebar-toggler {
+  background-color: transparent !important;
+
+  &:hover {
+    background-color: color.adjust($sidebar-header-bg, $lightness: 5%) !important;
+  }
+
+  &::before {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='%23ffffff' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E");
+  }
+}
+
+// ==========================================
+// LOGIN PAGE
+// ==========================================
+
+body.login-page {
+  background-image: url('src/assets/images/finca/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  z-index: 1;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    // Overlay oscuro para resaltar el form
+    background: rgba(0, 0, 0, 0.5);
+    z-index: -1;
+  }
+}
+
+.login-background {
+  // Overlay negro con baja opacidad para resaltar fondo de imagen + logo brillante
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4)),
+    url('src/assets/images/finca/login2.jpeg') no-repeat center center;
+  background-size: cover;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// ==========================================
+// COMPONENTES ESTANDARIZADOS
+// ==========================================
+
+// Botones Verdes (Primary Action)
+.button-no-hover-green,
+.btn-success,
+.button-color-login {
+  background-color: $primary-green !important;
+  border-color: $primary-green !important;
+  color: white !important;
+
+  &:hover,
+  &:focus,
+  &:active {
+    background-color: $dark-green !important;
+    border-color: $dark-green !important;
+    box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2);
+  }
+}
+
+// Textos
+.text-green,
+.typography-color-title {
+  color: $primary-green !important;
+}
+
+// Modales (Header Verde)
+.modal-module,
+.modal-header {
+  background-color: $primary-green !important; // Header verde
+  color: white !important;
+
+  .modal-title {
+    color: white !important;
+  }
+
+  .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%); // X blanca
+  }
+}
+
+.modal-border,
+.modal-name {
+  border: 1px solid #ced4da; // Borde sutil estándar
+
+  &:focus {
+    border-color: $primary-green !important;
+    box-shadow: 0 0 0 0.25rem rgba($primary-green, 0.25) !important;
+  }
+}
+
+.custom-select:focus,
+.form-control:focus {
+  border-color: $primary-green !important;
+  box-shadow: 0 0 0 0.25rem rgba($primary-green, 0.25) !important;
+}
+
+// Utilidades extra
+.bg-custom-green {
+  background-color: $primary-green !important;
+}
+
+// Badge Success
+.badge-success {
+  background-color: $primary-green !important;
+}
+
+// Wrappers y Layout
+>>>>>>> master
 .wrapper {
   width: 100%;
   padding-inline: var(--cui-sidebar-occupy-start, 0) var(--cui-sidebar-occupy-end, 0);
   will-change: auto;
+<<<<<<< HEAD
   @include transition(padding .15s);
 }
 
@@ -197,3 +417,139 @@ body {
   box-shadow: 0 0 0 0.2rem rgb(255, 255, 255)!important; /* Sombra verde */
 }
 
+=======
+  @include transition(padding 0.15s);
+}
+
+.header {
+  background-color: #fff;
+  border-bottom: 1px solid #e1e1e1;
+}
+
+.footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #e1e1e1;
+}
+
+// ==========================================
+// HEADER STYLES (PROFESSIONAL)
+// ==========================================
+
+// Header hover effects
+.header-toggler:hover .menu-icon {
+  color: $primary-green !important;
+  transform: scale(1.1);
+}
+
+.bell-icon {
+  &:hover {
+    color: $primary-green !important;
+    transform: scale(1.1);
+  }
+}
+
+// Avatar hover effect
+.avatar-hover:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3) !important;
+  border-color: $dark-green !important;
+}
+
+// Dropdown items hover
+.dropdown-item-hover {
+  &:hover {
+    background-color: rgba($primary-green, 0.08) !important;
+
+    .cicon {
+      transform: translateX(3px);
+    }
+  }
+}
+
+// Hover effect for bell notification link
+.nav-link:has(.bell-icon):hover {
+  background-color: rgba($primary-green, 0.05) !important;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .header {
+    .container-fluid {
+      padding-left: 0.75rem !important;
+      padding-right: 0.75rem !important;
+    }
+  }
+
+  .avatar-hover {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 0.85rem !important;
+  }
+}
+
+// ==========================================
+// FORZAR VERDE EN INFO Y PRIMARY (GLOBAL)
+// ==========================================
+
+// Botones info y primary → verde (mantener otros colores semánticos)
+.btn-info,
+.btn-primary {
+  background-color: $primary-green !important;
+  border-color: $primary-green !important;
+  color: white !important;
+
+  &:hover,
+  &:focus {
+    background-color: $dark-green !important;
+    border-color: $dark-green !important;
+  }
+}
+
+// Botones outline info y primary
+.btn-outline-info,
+.btn-outline-primary {
+  color: $primary-green !important;
+  border-color: $primary-green !important;
+
+  &:hover {
+    background-color: $primary-green !important;
+    color: white !important;
+  }
+}
+
+// Badges info y primary → verde
+.badge-info,
+.badge-primary,
+.badge.bg-info,
+.badge.bg-primary {
+  background-color: $primary-green !important;
+  color: white !important;
+}
+
+// Alerts info → fondo verde claro con texto negro
+.alert-info {
+  background-color: rgba($primary-green, 0.1) !important;
+  border-color: $primary-green !important;
+  color: #000000 !important;
+}
+
+// Spinners
+.spinner-border.text-primary {
+  color: $primary-green !important;
+}
+
+// Tabs activas (solo si usan primary)
+.nav-pills .nav-link.active {
+  background-color: $primary-green !important;
+}
+
+// Text utilities
+.text-primary {
+  color: $primary-green !important;
+}
+
+// Border utilities
+.border-primary {
+  border-color: $primary-green !important;
+}
+>>>>>>> master

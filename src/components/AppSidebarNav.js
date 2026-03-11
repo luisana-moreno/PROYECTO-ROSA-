@@ -6,8 +6,16 @@ import SimpleBar from 'simplebar-react'
 import 'simplebar-react/dist/simplebar.min.css'
 
 import { CBadge, CNavLink, CSidebarNav } from '@coreui/react'
+<<<<<<< HEAD
 
 export const AppSidebarNav = ({ items }) => {
+=======
+import { useAuth } from '../context/AuthContext' // Importa useAuth
+
+export const AppSidebarNav = ({ items }) => {
+  const { hasRole } = useAuth()
+
+>>>>>>> master
   const navLink = (name, icon, badge, indent = false) => {
     return (
       <>
@@ -29,6 +37,7 @@ export const AppSidebarNav = ({ items }) => {
   }
 
   const navItem = (item, index, indent = false) => {
+<<<<<<< HEAD
     const { component, name, badge, icon, ...rest } = item
     const Component = component
     return (
@@ -45,10 +54,31 @@ export const AppSidebarNav = ({ items }) => {
           navLink(name, icon, badge, indent)
         )}
       </Component>
+=======
+    const { component, name, badge, icon, roles, ...rest } = item
+    const Component = component
+    return (
+      (roles === undefined || hasRole(roles)) && (
+        <Component as="div" key={index}>
+          {rest.to || rest.href ? (
+            <CNavLink
+              {...(rest.to && { as: NavLink })}
+              {...(rest.href && { target: '_blank', rel: 'noopener noreferrer' })}
+              {...rest}
+            >
+              {navLink(name, icon, badge, indent)}
+            </CNavLink>
+          ) : (
+            navLink(name, icon, badge, indent)
+          )}
+        </Component>
+      )
+>>>>>>> master
     )
   }
 
   const navGroup = (item, index) => {
+<<<<<<< HEAD
     const { component, name, icon, items, to, ...rest } = item
     const Component = component
     return (
@@ -57,6 +87,18 @@ export const AppSidebarNav = ({ items }) => {
           item.items ? navGroup(item, index) : navItem(item, index, true),
         )}
       </Component>
+=======
+    const { component, name, icon, items, roles, ...rest } = item
+    const Component = component
+    return (
+      (roles === undefined || hasRole(roles)) && (
+        <Component compact as="div" key={index} toggler={navLink(name, icon)} {...rest}>
+          {items?.map((item, index) =>
+            item.items ? navGroup(item, index) : navItem(item, index, true),
+          )}
+        </Component>
+      )
+>>>>>>> master
     )
   }
 

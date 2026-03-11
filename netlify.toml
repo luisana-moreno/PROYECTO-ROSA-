@@ -1,0 +1,9 @@
+[build]
+  environment = {
+    VITE_API_URL = "https://backendluisana.onrender.com/api"
+  }
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
